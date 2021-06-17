@@ -3,7 +3,7 @@
 this is taken from the [MyST page](https://myst-parser.readthedocs.io/en/latest/index.html) as example
 ```
 ```{todo}
-Delete this file once there is actual documentation apart from the API ({py:mod}`blueprint`)
+Delete this file once there is actual documentation apart from the API ({py:mod}`spatialHeterogeneity`)
 ```
 
 ```{note}

@@ -1,6 +1,6 @@
 """Unit test for complex_module.core."""
 import unittest
-from blueprint.complex_module.core import salutation
+from spatialHeterogeneity.complex_module.core import salutation
 
 
 class CoreTestCase(unittest.TestCase):

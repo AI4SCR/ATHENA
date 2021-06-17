@@ -3,7 +3,7 @@
 A script external to the package.
 """
 import click
-from blueprint.complex_module.core import salutation
+from spatialHeterogeneity.complex_module.core import salutation
 
 
 @click.command()

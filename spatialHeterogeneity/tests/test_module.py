@@ -1,6 +1,6 @@
 """Unit testing for module."""
 import pytest
-from blueprint.module import Foo
+from spatialHeterogeneity.module import Foo
 
 
 @pytest.mark.parametrize(

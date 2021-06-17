@@ -1,6 +1,6 @@
-# blueprint-python-package
-[![Build Status](https://travis.ibm.com/CHCLS/blueprint-python-package.svg?token=xpL9AKxpNBFpJzLTfSTv&branch=master)](https://travis.ibm.com/CHCLS/blueprint-python-package)
-[![GitHub Pages](https://img.shields.io/badge/docs-sphinx-blue)](https://pages.github.ibm.com/CHCLS/blueprint-python-package)
+# spatial-heterogeneity
+[![Build Status](https://travis.ibm.com/art-zurich/spatial-heterogeneity.svg?token=bmUqdLriQp1g3yv7TJC6&branch=master)](https://travis.ibm.com/art-zurich/spatial-heterogeneity)
+[![GitHub Pages](https://img.shields.io/badge/docs-sphinx-blue)](https://pages.github.ibm.com/art-zurich/spatial-heterogeneity)
 
 Blueprint for a python package to create reproducible assets in a collaboration friendly manner.
 
@@ -10,13 +10,13 @@ Click the "Use this template" button (on GitHub Enterprise) to create a new repo
 
 Your package is installable for anyone with access to your repo.
 
-### Adapting the blueprint for you: TODOs
+### Adapting the spatialHeterogeneity for you: TODOs
 
 Of course, clone your repo.
 
 - [ ] [.travis.yml](.travis.yml) notifications: delete the section if undesired, else set up a slack channel and set the token.
 - [ ] If you do not want to build documentation same as last step but also delete the `docs` folder. Else consider deleting the example markdown file.
-- [ ] change the name "blueprint" to your desired package name. If really needed, underscores are valid. Note that the repo name is independent. Don't forget to change it in [docs/conf.py](docs/conf.py) and [docs/index.md](docs/index.md).
+- [ ] change the name "spatialHeterogeneity" to your desired package name. If really needed, underscores are valid. Note that the repo name is independent. Don't forget to change it in [docs/conf.py](docs/conf.py) and [docs/index.md](docs/index.md).
 - [ ] Update author information in [setup.py](setup.py) and [docs/conf.py](docs/conf.py).
 - [ ] If you decide against some checks, remove them from .travis.yml and the respective tools from the development requirements ([setup.py](setup.py) "dev" extras and [dev_requirements.txt](dev_requirements.txt)).
 - [ ] Set up Travis, including a github token in case of pushing docs.
@@ -72,14 +72,14 @@ On older systems where python 2 is default, using the preinstalled python 3 you 
 
 ### Tests
 
-The blueprint contains unit tests in `tests/` directories in each subfolder.
+The spatialHeterogeneity contains unit tests in `tests/` directories in each subfolder.
 This keeps the tests in close proximity to what they test. See the `setup.py` to include/exclude them with installation.
 
-The test file blueprint/tests/test_module.py contains examples using the recommended `pytest`.
+The test file spatialHeterogeneity/tests/test_module.py contains examples using the recommended `pytest`.
 `pytest` will also run unittests
 ```sh
 # also prints a coverage report that requires a percentage
-python -m pytest -sv --cov=blueprint --cov-fail-under=65
+python -m pytest -sv --cov=spatialHeterogeneity --cov-fail-under=65
 ```
 
 The test file `complex_module/tests/test_core.py` contains an example using `unittests` that is in the standard library.
@@ -87,7 +87,7 @@ The test file `complex_module/tests/test_core.py` contains an example using `uni
 Run the tests with: 
 
 ```sh 
-python -m unittest discover -s blueprint -p "test_*" -v
+python -m unittest discover -s spatialHeterogeneity -p "test_*" -v
 ```
 
 You can also use additional scripts to reproducibly test other functionalities beyond unit tests. Consider keep such in a root level tests directory without `__init__.py`.
@@ -135,11 +135,11 @@ You can [set up your IDE](https://black.readthedocs.io/en/stable/editor_integrat
 
 to check for changes:
 ```sh
-black blueprint --check --diff --color
+black spatialHeterogeneity --check --diff --color
 ```
 to apply changes:
 ```sh
-black blueprint
+black spatialHeterogeneity
 ```
 
 #### Linter `flake8`
@@ -147,7 +147,7 @@ flake8 for one checks code style (mostly a non issue when using black), but also
 
 example usage:
 ```sh
-flake blueprint
+flake spatialHeterogeneity
 ```
 
 #### Static typing with `mypy`
@@ -160,7 +160,7 @@ But yes, it is an investment, especially if you are not used to do it.
 
 example usage:
 ```sh
-mypy blueprint
+mypy spatialHeterogeneity
 ```
 
 The `py.typed` file is only there to mark the package to support typing.
@@ -181,8 +181,8 @@ cd docs && make html && cd ..
 now open [docs/_build/html/index.html](docs/_build/html/index.html) in your browser.
 
 For examples have a look at
-- the [API page](https://pages.github.ibm.com/CHCLS/blueprint-python-package/api/blueprint.module.html) for [blueprint/module.py](blueprint/module.py).
-- some [example](https://pages.github.ibm.com/CHCLS/blueprint-python-package/source/wealth_dynamics_md.html) additional documentation. Note that it can refer into the API.
+- the [API page](https://pages.github.ibm.com/art-zurich/spatial-heterogeneity/api/spatialHeterogeneity.module.html) for [spatialHeterogeneity/module.py](spatialHeterogeneity/module.py).
+- some [example](https://pages.github.ibm.com/art-zurich/spatial-heterogeneity/source/wealth_dynamics_md.html) additional documentation. Note that it can refer into the API.
 
 Unlike usual sphinx setups, here
 - the api files are automatically regenerated each time instead of once. So refactoring is not an issue at all (if old files stick around, just call `make clean`).
@@ -209,12 +209,12 @@ notifications:
 
 See [Travis CI documentation](https://docs.travis-ci.com/user/notifications/#configuring-slack-notifications) for more info.
 
-Have a look a the example [slack channel for the blueprint bots](https://ibm-research.slack.com/archives/C02167RH2LW)
+Have a look a the example [slack channel for the spatialHeterogeneity bots](https://ibm-research.slack.com/archives/C02167RH2LW)
 
 
 ### Docker support
 
-The blueprint contains a `Dockerfile` that builds an image containing the python package.
+The spatialHeterogeneity contains a `Dockerfile` that builds an image containing the python package.
 At the moment, it is based on the image `python:3.7` and this can be adapted to your needs. 
 Docker images can be stored in a docker registry for later use.
 IBM TaaS offers the possibility to create an enterprise docker registry on Artifactory. 
@@ -225,7 +225,7 @@ See [here](https://pages.github.ibm.com/TAAS/tools_guide/artifactory/getting-sta
 Assuming the following environment variables are set:
 - `DOCKER_USER`: your w3id email.
 - `DOCKER_PASSWORD`: token (obtained from IBM Artifactory).
-- `DOCKER_REGISTRY`: url of Artifactory registry. E.g.: `blueprint-docker-local.artifactory.swg-devops.com`.
+- `DOCKER_REGISTRY`: url of Artifactory registry. E.g.: `spatialHeterogeneity-docker-local.artifactory.swg-devops.com`.
 - `DOCKER_IMAGE`: name of the image. 
 - `DOCKER_TAG`: version, tag information. E.g.: `latest`, `test`.
 
@@ -260,6 +260,6 @@ RUN --mount=type=ssh pip install --no-cache-dir -r requirements.txt
 
 and run it with the `--ssh` argument (requires docker>=18.09 and enabled BuildKit)
 ```
-DOCKER_BUILDKIT=1 docker build --ssh default -t blueprint:test .
+DOCKER_BUILDKIT=1 docker build --ssh default -t spatialHeterogeneity:test .
 ```
 If you can't use BuildKit, have a look at multi-stage builds or the --sqash flag.

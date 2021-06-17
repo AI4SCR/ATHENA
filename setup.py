@@ -40,20 +40,20 @@ except FileNotFoundError:
 
 # TODO: Update these values according to the name of the module.
 setup(
-    name="blueprint",
-    version=read_version("blueprint/__init__.py"),  # single place for version
-    description="Installable blueprint package. Modify as needed.",
+    name="spatialHeterogeneity",
+    version=read_version("spatialHeterogeneity/__init__.py"),  # single place for version
+    description="Installable spatialHeterogeneity package. Modify as needed.",
     long_description=open("README.md").read(),
-    url="https://github.ibm.com/CHCLS/blueprint-python-package",
+    url="https://github.ibm.com/art-zurich/spatial-heterogeneity",
     author="Antonio Foncubierta Rodríguez, Matteo Manica, Joris Cadow",
     author_email="fra@zurich.ibm.com, tte@zurich.ibm.com, dow@zurich.ibm.com",
     # the following exclusion is to prevent shipping of tests.
     # if you do include them, add pytest to the required packages.
     packages=find_packages(".", exclude=["*tests*"]),
-    package_data={"blueprint": ["py.typed"]},
+    package_data={"spatialHeterogeneity": ["py.typed"]},
     entry_points="""
         [console_scripts]
-        salutation=blueprint.complex_module.core:formal_introduction
+        salutation=spatialHeterogeneity.complex_module.core:formal_introduction
     """,
     scripts=["bin/brief_salutation", "bin/a_shell_script"],
     extras_require={

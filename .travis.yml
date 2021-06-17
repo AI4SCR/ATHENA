@@ -6,9 +6,7 @@ services:
 language: python
 
 python:
-  - 3.7
   - 3.8
-  - 3.9
 
 install:
   # install the package
@@ -19,7 +17,7 @@ install:
 
 script:
   # test import
-  - python -c "import blueprint"
+  - python -c "import spatialHeterogeneity"
 
   # ensure installed commands helps run successfully
   # (add as required)
@@ -28,19 +26,19 @@ script:
   - a_shell_script
 
   # run unit tests
-  - python -m pytest -sv --cov=blueprint --cov-fail-under=65
+  - python -m pytest -sv --cov=spatialHeterogeneity --cov-fail-under=65
 
   # static type checking
-  - python -m mypy blueprint
+  - python -m mypy spatialHeterogeneity
   # style checking
-  - python -m black blueprint --check --diff --color
-  - python -m flake8 --per-file-ignores="__init__.py:F401" blueprint
+  - python -m black spatialHeterogeneity --check --diff --color
+  - python -m flake8 --per-file-ignores="__init__.py:F401" spatialHeterogeneity
 
 # the following stages only start if the "test" stage above all succeed
 jobs:
   include:
     - stage: Documentation
-      python: 3.7
+      python: 3.8
       before_install: skip
       install: pip install --progress-bar off -r dev_requirements.txt
       before_script: skip
@@ -55,21 +53,6 @@ jobs:
           # see https://docs.travis-ci.com/user/deployment/pages/#setting-the-github-token
           local_dir: docs/_build/html
           github_url: github.ibm.com
-          on:
-            branch: master
-    - stage: Docker
-      services: docker
-      before_install: skip
-      install: skip
-      before_script: skip
-      script:
-        # check docker build and test inside
-        - docker build -t blueprint:test .
-        - docker run --rm -t blueprint:test python -m pytest -sv
-      deploy:
-        - provider: script
-          skip_cleanup: true
-          script: bash .travis/deploy.sh
           on:
             branch: master
 
