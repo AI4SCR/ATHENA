@@ -1,0 +1,81 @@
+dist: trusty
+
+services:
+  - docker
+
+language: python
+
+python:
+  - 3.7
+  - 3.8
+  - 3.9
+
+install:
+  # install the package
+  - pip install -U pip
+  - pip install --progress-bar off -r requirements.txt
+  - pip install --progress-bar off -r dev_requirements.txt
+  - pip install .
+
+script:
+  # test import
+  - python -c "import blueprint"
+
+  # ensure installed commands helps run successfully
+  # (add as required)
+  - salutation --help
+  - brief_salutation --help
+  - a_shell_script
+
+  # run unit tests
+  - python -m pytest -sv --cov=blueprint --cov-fail-under=65
+
+  # static type checking
+  - python -m mypy blueprint
+  # style checking
+  - python -m black blueprint --check --diff --color
+  - python -m flake8 --per-file-ignores="__init__.py:F401" blueprint
+
+# the following stages only start if the "test" stage above all succeed
+jobs:
+  include:
+    - stage: Documentation
+      python: 3.7
+      before_install: skip
+      install: pip install --progress-bar off -r dev_requirements.txt
+      before_script: skip
+      script:
+        # build documentation pages
+        - cd docs && make html && cd ..
+      deploy:
+        - provider: pages
+          skip_cleanup: true
+          github_token: $GITHUB_TOKEN
+          # Set in the settings page of your repository, as a secure variable
+          # see https://docs.travis-ci.com/user/deployment/pages/#setting-the-github-token
+          local_dir: docs/_build/html
+          github_url: github.ibm.com
+          on:
+            branch: master
+    - stage: Docker
+      services: docker
+      before_install: skip
+      install: skip
+      before_script: skip
+      script:
+        # check docker build and test inside
+        - docker build -t blueprint:test .
+        - docker run --rm -t blueprint:test python -m pytest -sv
+      deploy:
+        - provider: script
+          skip_cleanup: true
+          script: bash .travis/deploy.sh
+          on:
+            branch: master
+
+notifications:
+  slack:
+    rooms:
+      - ibm-research:CNxvi7KYPJMe9A4Xf0dfTand
+    on_success: always
+    on_failure: always

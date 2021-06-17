@@ -1,0 +1,3 @@
+#!/usr/bin/env bash
+echo "We can also ship bash scripts with the python package if we have to."
+echo "What matters is the shebang."
