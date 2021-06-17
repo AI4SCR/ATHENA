@@ -59,6 +59,6 @@ jobs:
 notifications:
   slack:
     rooms:
-      - ibm-research:CNxvi7KYPJMe9A4Xf0dfTand
+      - ibm-research:82jY54xYQAiJOqZ2ycRDM4jo
     on_success: always
     on_failure: always
