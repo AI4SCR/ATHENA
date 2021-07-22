@@ -1,2 +1,11 @@
 #pip package names required by the package, and exact versions you know to work
 click==7.1.2
+scipy
+numpy
+pandas
+networkx
+scikit-learn
+scikit-image
+astropy
+tqdm
+napari
