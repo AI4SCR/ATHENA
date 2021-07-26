@@ -8,13 +8,32 @@ import os
 import time
 from astropy.stats import RipleysKEstimator
 import logging
+
 logging.basicConfig(level=logging.INFO)
 
 from ..utils.general import make_iterable
 from .utils import get_node_interactions, get_interaction_score, permute_labels
+
+
 # %%
-def _infiltration(node_interactions, interaction1=('tumor', 'immune'), interaction2=('immune', 'immune')):
-    nint = node_interactions  # verbos
+def _infiltration(node_interactions: pd.DataFrame, interaction1=('tumor', 'immune'),
+                  interaction2=('immune', 'immune')) -> float:
+    """
+    Compute infiltration score between two species.
+
+    Args:
+        node_interactions: Dataframe with columns `source_label` and `target_label` that specifies interactions.
+        interaction1: labels of enumerator interaction
+        interaction2: labels of denominator interaction
+
+    Notes:
+        The infiltration score is computed as #interactions1 / #interactions2.
+
+    Returns:
+        Interaction score
+
+    """
+    nint = node_interactions  # verbose
 
     (a1, a2), (b1, b2) = interaction1, interaction2
     num = nint[(nint.source_label == a1) & (nint.target_label == a2)].shape[0]
@@ -24,10 +43,32 @@ def _infiltration(node_interactions, interaction1=('tumor', 'immune'), interacti
 
 
 class Interactions:
+    """
+    Estimator to quantify interaction strength between different species in the sample.
+    """
+
     VALID_MODES = ['classic', 'histoCAT', 'proportion']
     VALID_PREDICTION_TYPES = ['pvalue', 'observation', 'diff']
 
-    def __init__(self, so, spl, attr='meta_id', mode='classic', n_permutations=500, random_seed=None, alpha=.01, graph_key='knn'):
+    def __init__(self, so, spl: str, attr: str = 'meta_id', mode: str = 'classic', n_permutations: int = 500,
+                 random_seed=None, alpha: float = .01, graph_key: str = 'knn'):
+        """Estimator to quantify interaction strength between different species in the sample.
+
+        Args:
+            so: SpatialOmics
+            spl: Sample for which to compute the interaction strength
+            attr: Categorical feature in SpatialOmics.obs to use for the grouping
+            mode: One of {classic, histoCAT, proportion}, see notes
+            n_permutations: Number of permutations to compute p-values and the interactions strength score (mode diff)
+            random_seed: Random seed for permutations
+            alpha: Threshold for significance
+            graph_key: Specifies the graph representation to use in so.G[spl] if `local=True`.
+
+        Notes:
+            classic and histoCAT are python implementations of the corresponding methods pubished by the Bodenmiller lab at UZH.
+            The proportion method is similar to the classic method but normalises the score by the number of edges and is thus bound [0,1].
+        """
+
         self.so = so
         self.spl: str = spl
         self.graph_key = graph_key
@@ -49,7 +90,22 @@ class Interactions:
         self.h0_file = f'{spl}_{attr}_{graph_key}_{mode}.pkl'
         self.h0 = None
 
-    def fit(self, prediction_type='observation', try_load=True):
+    def fit(self, prediction_type: str = 'observation', try_load: bool = True) -> None:
+        """Compute the interactions scores for the sample.
+
+        Args:
+            prediction_type: One of {observation, pvalue, diff}, see Notes
+            try_load: load pre-computed permutation results if available
+
+        Returns:
+
+        Notes:
+            `observation`: computes the observed interaction strength in the sample
+
+            `pvalue`: computes the P-value of a two-sided t-test for the interactions strength based on the random permutations
+
+            `diff`: computes the difference between observed and average interaction strength (across permutations)
+        """
         if prediction_type not in self.VALID_PREDICTION_TYPES:
             raise ValueError(
                 f'invalid `prediction_type` {prediction_type}. Available modes are {self.VALID_PREDICTION_TYPES}')
@@ -84,7 +140,12 @@ class Interactions:
 
         self.fitted = True
 
-    def predict(self):
+    def predict(self) -> pd.DataFrame:
+        """Predict interactions strengths of observations.
+
+        Returns: A dataframe with the interaction results.
+
+        """
         if self.prediction_type == 'observation':
             return self.obs_interaction
         elif self.prediction_type == 'pvalue':
@@ -168,7 +229,17 @@ class Interactions:
 
 
 class RipleysK():
-    def __init__(self, so, spl, id, attr='cell_type_id', graph_key='knn'):
+    def __init__(self, so, spl: str, id, attr: str='cell_type_id', graph_key: str='knn'):
+        """Compute Ripley's K for a given sample and group.
+
+        Args:
+            so: SpatialOmics
+            spl: Sample for which to compute the interaction strength
+            id: The category in the categorical feature `attr`, for which Ripley's K should be computed
+            attr: Categorical feature in SpatialOmics.obs to use for the grouping
+            graph_key: Specifies the graph representation to use in so.G[spl] if `local=True`.
+
+        """
         self.g = so.G[spl][graph_key]
         self.id = id
         self.area = so.spl.loc[spl].area
@@ -184,7 +255,20 @@ class RipleysK():
     def fit(self):
         pass
 
-    def predict(self, radii, correction='ripley', mode='K'):
+    def predict(self, radii: list, correction: str='ripley', mode: str='K'):
+        """Estimate Ripley's K
+
+        Args:
+            radii: List of radiis for which Ripley's K is computed
+            correction: Correction method to use to correct for boarder effects, see [1].
+            mode: {K, csr-deviation}. If `K`, Ripley's K is estimated, with `csr-deviation` the deviation from a poission process is computed.
+
+        Returns:
+            Ripley's K estimates
+
+        Notes:
+            .. [1] https://docs.astropy.org/en/stable/stats/ripley.html
+        """
 
         if radii is None:
             radii = np.linspace(0, min(self.height, self.width) / 2, 10)
@@ -205,7 +289,17 @@ class RipleysK():
         res = pd.Series(res, index=radii)
         return res
 
-    def csr_deviation(self, radii, correction='ripley'):
+    def csr_deviation(self, radii, correction='ripley') -> np.ndarray:
+        """
+        Compute deviation from random poisson process.
+
+        Args:
+            radii: List of radiis for which Ripley's K is computed
+            correction: Correction method to use to correct for boarder effects, see [1].
+
+        Returns:
+
+        """
         # http://doi.wiley.com/10.1002/9781118445112.stat07751
         radii = make_iterable(radii)
         K = self.rkE(data=self.df[['x', 'y']], radii=radii, mode=correction)
