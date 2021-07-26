@@ -15,13 +15,13 @@ def richness(so, spl: str, attr: str, *, local=True, key_added=None, graph_key='
     """Computes the richness on the observation or the sample level
 
     Args:
-        so:
-        spl:
-        attr:
-        local:
-        key_added:
-        graph_key:
-        inplace:
+        so: SpatialOmics instance
+        spl: Spl for which to compute the metric
+        attr: Categorical feature to use for the grouping in either obs (if local=True) or in spl (if local=False)
+        local: Whether to compute the metric on the observation or the sample level
+        key_added: Key added to either obs or spl depending on the choice of `local`
+        graph_key: Specifies the graph representation to use in so.G[spl] if `local=True`.
+        inplace: Whether to add the metric to the current SpatialOmics instance or to return a new one.
 
     Returns:
 
@@ -45,14 +45,13 @@ def shannon(so, spl: str, attr: str, *, local=True, key_added=None, graph_key='k
     """Computes the Shannon Index on the observation or the sample level
 
     Args:
-        so:
-        spl:
-        attr:
-        local:
-        key_added:
-        graph_key:
-        base:
-        inplace:
+        so: SpatialOmics instance
+        spl: Spl for which to compute the metric
+        attr: Categorical feature to use for the grouping in either obs (if local=True) or in spl (if local=False)
+        local: Whether to compute the metric on the observation or the sample level
+        key_added: Key added to either obs or spl depending on the choice of `local`
+        graph_key: Specifies the graph representation to use in so.G[spl] if `local=True`.
+        inplace: Whether to add the metric to the current SpatialOmics instance or to return a new one.
 
     Returns:
 
@@ -75,13 +74,13 @@ def simpson(so, spl: str, attr: str, *, local=True, key_added=None, graph_key='k
     """Computes the Simpson Index on the observation or the sample level
 
     Args:
-        so:
-        spl:
-        attr:
-        local:
-        key_added:
-        graph_key:
-        inplace:
+        so: SpatialOmics instance
+        spl: Spl for which to compute the metric
+        attr: Categorical feature to use for the grouping in either obs (if local=True) or in spl (if local=False)
+        local: Whether to compute the metric on the observation or the sample level
+        key_added: Key added to either obs or spl depending on the choice of `local`
+        graph_key: Specifies the graph representation to use in so.G[spl] if `local=True`.
+        inplace: Whether to add the metric to the current SpatialOmics instance or to return a new one.
 
     Returns:
 
@@ -104,14 +103,13 @@ def hill_number(so, spl: str, attr: str, q: float, *, local=True, key_added=None
     """Computes the Hill Numbers on the observation or the sample level
 
     Args:
-        so:
-        spl:
-        attr:
-        q:
-        local:
-        key_added:
-        graph_key:
-        inplace:
+        so: SpatialOmics instance
+        spl: Spl for which to compute the metric
+        attr: Categorical feature to use for the grouping in either obs (if local=True) or in spl (if local=False)
+        local: Whether to compute the metric on the observation or the sample level
+        key_added: Key added to either obs or spl depending on the choice of `local`
+        graph_key: Specifies the graph representation to use in so.G[spl] if `local=True`.
+        inplace: Whether to add the metric to the current SpatialOmics instance or to return a new one.
 
     Returns:
 
@@ -135,15 +133,13 @@ def renyi_entropy(so, spl: str, attr: str, q: float, *, local=True, key_added=No
     """Computes the Renyi-Entropy
 
     Args:
-        so:
-        spl:
-        attr:
-        q:
-        local:
-        key_added:
-        graph_key:
-        base:
-        inplace:
+        so: SpatialOmics instance
+        spl: Spl for which to compute the metric
+        attr: Categorical feature to use for the grouping in either obs (if local=True) or in spl (if local=False)
+        local: Whether to compute the metric on the observation or the sample level
+        key_added: Key added to either obs or spl depending on the choice of `local`
+        graph_key: Specifies the graph representation to use in so.G[spl] if `local=True`.
+        inplace: Whether to add the metric to the current SpatialOmics instance or to return a new one.
 
     Returns:
 
@@ -168,14 +164,13 @@ def abundance(so, spl: str, attr: str, *, mode='proportion', key_added: str = No
     """Computes the abundance of species on the observation or the sample level
 
     Args:
-        so:
-        spl:
-        attr:
-        mode:
-        key_added:
-        graph_key:
-        local:
-        inplace:
+        so: SpatialOmics instance
+        spl: Spl for which to compute the metric
+        attr: Categorical feature to use for the grouping in either obs (if local=True) or in spl (if local=False)
+        local: Whether to compute the metric on the observation or the sample level
+        key_added: Key added to either obs or spl depending on the choice of `local`
+        graph_key: Specifies the graph representation to use in so.G[spl] if `local=True`.
+        inplace: Whether to add the metric to the current SpatialOmics instance or to return a new one.
 
     Returns:
 
