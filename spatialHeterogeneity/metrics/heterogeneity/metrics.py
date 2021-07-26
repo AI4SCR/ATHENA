@@ -8,36 +8,25 @@ import numpy as np
 import pandas as pd
 from collections import Counter
 
-# configure logging
-import logging
-
-logger = logging.getLogger(__name__)
-
 
 # %%
 
-def richness(so, spl: str, attr: str, *, local=True, key_added=None, graph_key='knn', inplace=True):
-    """Computes the richness for each cell or the spl
+def richness(so, spl: str, attr: str, *, local=True, key_added=None, graph_key='knn', inplace=True) -> None:
+    """Computes the richness on the observation or the sample level
 
-    Parameters
-    ----------
-    so
-    spl
-    attr: str
-        attribute for which to compute the richness
-    local: bool
-        if richness is computed for each cell or on the spl level
-    key_added:
-        key where result is stored
+    Args:
+        so:
+        spl:
+        attr:
+        local:
+        key_added:
+        graph_key:
+        inplace:
 
-    Notes
-    -----
-    If local is true the result is stored in obs, else in spl.
-
-    Returns
-    -------
+    Returns:
 
     """
+
     if key_added is None:
         key_added = 'richness'
         key_added = f'{key_added}_{attr}'
@@ -52,28 +41,20 @@ def richness(so, spl: str, attr: str, *, local=True, key_added=None, graph_key='
                            local=local, inplace=inplace)
 
 
-def shannon(so, spl: str, attr: str, *, local=True, key_added=None, graph_key='knn', base=2, inplace=True):
-    """Computes the shannon entropy for each cell or the spl
+def shannon(so, spl: str, attr: str, *, local=True, key_added=None, graph_key='knn', base=2, inplace=True) -> None:
+    """Computes the Shannon Index on the observation or the sample level
 
-    Parameters
-    ----------
-    so
-    spl
-    attr: str
-        attribute for which to compute the entropy
-    local: bool
-        if entropies are computed for each cell or on the spl level
-    key_added:
-        key where result is stored
-    base:
-        basis of logarithm in entropy
+    Args:
+        so:
+        spl:
+        attr:
+        local:
+        key_added:
+        graph_key:
+        base:
+        inplace:
 
-    Notes
-    -----
-    If local is true the result is stored in obs, else in cores.
-
-    Returns
-    -------
+    Returns:
 
     """
     if key_added is None:
@@ -90,28 +71,19 @@ def shannon(so, spl: str, attr: str, *, local=True, key_added=None, graph_key='k
                            local=local, inplace=inplace)
 
 
-def simpson(so, spl: str, attr: str, *, local=True, key_added=None, graph_key='knn', inplace=True):
-    """Computes the simpson index for each cell or the spl
+def simpson(so, spl: str, attr: str, *, local=True, key_added=None, graph_key='knn', inplace=True) -> None:
+    """Computes the Simpson Index on the observation or the sample level
 
-    Parameters
-    ----------
-    so
-    spl
-    attr: str
-        attribute for which to compute the simpson index
-    local: bool
-        if simpson index is computed for each cell or on the spl level
-    key_added:
-        key where result is stored
-    base:
-        basis of logarithm in simpson index
+    Args:
+        so:
+        spl:
+        attr:
+        local:
+        key_added:
+        graph_key:
+        inplace:
 
-    Notes
-    -----
-    If local is true the result is stored in obs, else in cores.
-
-    Returns
-    -------
+    Returns:
 
     """
     if key_added is None:
@@ -129,27 +101,19 @@ def simpson(so, spl: str, attr: str, *, local=True, key_added=None, graph_key='k
 
 
 def hill_number(so, spl: str, attr: str, q: float, *, local=True, key_added=None, graph_key='knn', inplace=True):
-    """Computes the gini simpson index for each cell or the spl
+    """Computes the Hill Numbers on the observation or the sample level
 
-    Parameters
-    ----------
-    so
-    spl
-    attr: str
-        attribute for which to compute the gini simpson index index
-    local: bool
-        if gini simpson index index is computed for each cell or on the spl level
-    key_added:
-        key where result is stored
-    base:
-        basis of logarithm in gini simpson index index
+    Args:
+        so:
+        spl:
+        attr:
+        q:
+        local:
+        key_added:
+        graph_key:
+        inplace:
 
-    Notes
-    -----
-    If local is true the result is stored in obs, else in cores.
-
-    Returns
-    -------
+    Returns:
 
     """
     if key_added is None:
@@ -168,27 +132,20 @@ def hill_number(so, spl: str, attr: str, q: float, *, local=True, key_added=None
 
 def renyi_entropy(so, spl: str, attr: str, q: float, *, local=True, key_added=None, graph_key='knn', base=2,
                   inplace=True):
-    """Computes the renyi entropy for each cell or the spl
+    """Computes the Renyi-Entropy
 
-    Parameters
-    ----------
-    so
-    spl
-    attr: str
-        attribute for which to compute the renyi entropy
-    local: bool
-        if renyi entropy is computed for each cell or on the spl level
-    key_added:
-        key where result is stored
-    base:
-        basis of logarithm in renyi entropy
+    Args:
+        so:
+        spl:
+        attr:
+        q:
+        local:
+        key_added:
+        graph_key:
+        base:
+        inplace:
 
-    Notes
-    -----
-    If local is true the result is stored in obs, else in cores.
-
-    Returns
-    -------
+    Returns:
 
     """
     if key_added is None:
@@ -208,31 +165,21 @@ def renyi_entropy(so, spl: str, attr: str, q: float, *, local=True, key_added=No
 
 def abundance(so, spl: str, attr: str, *, mode='proportion', key_added: str = None, graph_key='knn',
               local=False, inplace: bool = True):
-    """Computes the proportion of cells with a given attribute (like phenotype) given by the categories of attr.
+    """Computes the abundance of species on the observation or the sample level
 
-        Parameters
-        ----------
-        so: SpatialOmics instance
-        spl: Sample for which to compute the metric
-        attr: str
-            attribute indicating the classification of an observation.
-            Needs to be dtype categorical.
-        mode: str
-            either `proportion` to compute the relative attr frequency or `count` for number of observations.
+    Args:
+        so:
+        spl:
+        attr:
+        mode:
         key_added:
-            prefix-key where result is stored in splm (local=False) or obsm (local=True).
-        local: bool
-            if metric is computed for each observation (local=True) or on the sample level (local=False)
-        inplace: bool
-            whether to return a copy of so with the result
+        graph_key:
+        local:
+        inplace:
 
-        Notes
-        -----
+    Returns:
 
-        Returns
-        -------
-        so if inplace is False, else nothing
-        """
+    """
 
     if key_added is None:
         key_added = f'{mode}'
