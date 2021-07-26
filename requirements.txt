@@ -9,3 +9,5 @@ scikit-image
 astropy
 tqdm
 napari
+seaborn
+docrep

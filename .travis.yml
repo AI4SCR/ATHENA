@@ -19,17 +19,12 @@ script:
   # test import
   - python -c "import spatialHeterogeneity"
 
-  # ensure installed commands helps run successfully
-  # (add as required)
-  - salutation --help
-  - brief_salutation --help
-  - a_shell_script
-
   # run unit tests
   - python -m pytest -sv --cov=spatialHeterogeneity --cov-fail-under=65
 
   # static type checking
   - python -m mypy spatialHeterogeneity
+
   # style checking
   - python -m black spatialHeterogeneity --check --diff --color
   - python -m flake8 --per-file-ignores="__init__.py:F401" spatialHeterogeneity
