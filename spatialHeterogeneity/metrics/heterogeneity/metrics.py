@@ -1,6 +1,6 @@
 # %%
 from .base_metrics import _shannon, _richness, _simpson, _shannon_evenness, _hill_number, \
-    _simpson_evenness, _gini_simpson, _renyi, _quadratic_entropy, _abundance, _diveristy_profile
+    _simpson_evenness, _gini_simpson, _renyi, _abundance
 
 from ...utils.general import is_categorical, make_iterable, is_numeric
 
@@ -29,8 +29,6 @@ def richness(so, spl: str, attr: str, *, local=True, key_added=None, graph_key='
         if richness is computed for each cell or on the spl level
     key_added:
         key where result is stored
-    observation_ids:
-        observation_ids for which to compute the richness
 
     Notes
     -----
