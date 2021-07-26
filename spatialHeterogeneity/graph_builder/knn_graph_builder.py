@@ -1,43 +1,35 @@
 from sklearn.neighbors import kneighbors_graph
 import networkx as nx
-import numpy as np
 import pandas as pd
 
 from ..utils.tools.graph import df2node_attr
 from .base_graph_builder import BaseGraphBuilder
-from .constants import DILATION_KERNELS, EDGE_WEIGHT
+from .constants import EDGE_WEIGHT
 
 
 # %%
 class KNNGraphBuilder(BaseGraphBuilder):
-    '''\
-    KNN (K-Nearest Neighbors) class for graph building.
+    '''KNN (K-Nearest Neighbors) class for graph building.
     '''
 
     def __init__(self, config: dict):
-        '''\
-        KNN-Graph Builder constructor
+        """KNN-Graph Builder constructor
 
-        Parameters
-        ----------
-        config: dict
-            Dictionary containing `builder_params`.
-            Refer to [1] for possible parameters
+        Args:
+            config: Dictionary containing `builder_params`. Refer to [1] for possible parameters
 
-        Notes
-        _____
-        Example `builder_params` :
-            config = {'builder_params': {'n_neighbors': 5, 'mode':'connectivity', 'metric':'minkowski', 'p':2, 'n_jobs':-1}, 'cellmask_file': 'path_to_file'}
+        Examples:
+            config = {'builder_params': {'n_neighbors': 5, 'mode':'connectivity', 'metric':'minkowski', 'p':2, 'n_jobs':-1}}
 
-        See Also
-        ________
-        .. [1] https://scikit-learn.org/stable/modules/generated/sklearn.neighbors.kneighbors_graph.html
-        '''
+        Notes:
+            .. [1] https://scikit-learn.org/stable/modules/generated/sklearn.neighbors.kneighbors_graph.html
+
+        """
+
         super().__init__(config)
 
-    def _build_topology(self, **kwargs):
-        '''\
-        Build topology using a kNN algorithm based on the distance between the centroid of the nodes.
+    def _build_topology(self, **kwargs) -> None:
+        '''Build topology using a kNN algorithm based on the distance between the centroid of the nodes.
         '''
 
         # compute adjacency matrix

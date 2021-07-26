@@ -1,8 +1,24 @@
 from .constants import GRAPH_BUILDER_DEFAULT_PARAMS
 from .mappings import GRAPH_BUILDERS
 import networkx as nx
+from ..utils.docs.default_docs import docstrings
 
+@docstrings.dedent
 def build_graph(so, spl: str, builder_type = 'knn', mask_key = 'cellmasks', key_added=None, config = None, inplace=True):
+    """Build graph representation for a sample
+
+    Args:
+        so:
+        spl:
+        builder_type: graph type to construct {knn, radius, contact}
+        mask_key: key in so.masks[spl] to use as segmentation masks
+        key_added:
+        config: dict containing a dict 'builder_params' that specifies the graph construction parameters
+        inplace: whether to return a new SpatialOmics instance
+
+    Returns:
+        None or SpatialOmics if inplace = False
+    """
     if builder_type not in GRAPH_BUILDERS:
         raise ValueError(f'invalid type {builder_type}. Available types are {GRAPH_BUILDERS.keys()}')
     if config is None:

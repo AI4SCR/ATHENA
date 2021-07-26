@@ -9,8 +9,17 @@ from .constants import DILATION_KERNELS
 
 from tqdm import tqdm
 
+
 # %%
-def dilation(args):
+def dilation(args) -> list:
+    """Compute dilation of a given object in a segmentation mask
+
+    Args:
+        args: masks, obj and dilation kernel
+
+    Returns:
+
+    """
     mask, obj, kernel = args
     dilated_img = binary_dilation(mask == obj, kernel)
     cells = np.unique(mask[dilated_img])
@@ -27,18 +36,22 @@ class ContactGraphBuilder(BaseGraphBuilder):
     '''
 
     def __init__(self, config: dict):
-        '''Contact-Graph Builder constructor
+        """Base-Graph Builder constructor
 
-        Parameters
-        ----------
-        config: dict
-            Dictionary containing dict `builder_params` that specifies the dilation_kernel, radius and `cellmask_file`.
-        '''
+        Args:
+            config: Dictionary containing a dict called `builder_params` that provides function call arguments to the build_topology function
+        """
         super().__init__(config)
 
-    def _build_topology(self, topo_data, **kwargs):
-        '''Build topology using pixel expansion of cell masks. Cells which cell masks overlap after expansion are connected in the graph.
-        '''
+    def _build_topology(self, topo_data: dict, **kwargs) -> None:
+        """Build topology using pixel expansion of segmentation masks provided by topo_data['mask']. Masks that overlap after expansion are connected in the graph.
+
+        Args:
+            topo_data: dict providing the segmentation mask under key 'mask'
+
+        Returns:
+
+        """
 
         # type hints
         self.graph: nx.Graph

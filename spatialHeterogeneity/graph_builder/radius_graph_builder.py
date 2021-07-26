@@ -1,38 +1,27 @@
 from sklearn.neighbors import radius_neighbors_graph
 import networkx as nx
-import numpy as np
 import pandas as pd
 
 from ..utils.tools.graph import df2node_attr
 from .base_graph_builder import BaseGraphBuilder
-from .constants import DILATION_KERNELS, EDGE_WEIGHT
+from .constants import EDGE_WEIGHT
 
 
 # %%
 class RadiusGraphBuilder(BaseGraphBuilder):
     '''\
-    KNN (K-Nearest Neighbors) class for graph building.
+    Radius graph class for graph building.
     '''
 
     def __init__(self, config: dict):
-        '''\
-        KNN-Graph Builder constructor
+        """Build topology using a radius algorithm based on the distance between the centroid of the nodes.
 
-        Parameters
-        ----------
-        config: dict
-            Dictionary containing `builder_params`.
-            Refer to [1] for possible parameters
+        Args:
+            config: dict specifying graph builder params
 
-        Notes
-        _____
-        Example `builder_params` :
-            config = {'builder_params': {'n_neighbors': 5, 'mode':'connectivity', 'metric':'minkowski', 'p':2, 'n_jobs':-1}, 'cellmask_file': 'path_to_file'}
-
-        See Also
-        ________
-        .. [1] https://scikit-learn.org/stable/modules/generated/sklearn.neighbors.kneighbors_graph.html
-        '''
+        Examples:
+            config = {'builder_params': {'radius': 36, 'mode':'connectivity', 'metric':'minkowski', 'p':2, 'n_jobs':-1}}
+        """
         super().__init__(config)
 
     def _build_topology(self, **kwargs):
