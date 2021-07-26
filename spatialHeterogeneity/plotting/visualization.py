@@ -19,11 +19,41 @@ from .utils import dpi, label_fontdict, title_fontdict, make_cbar, savefig
 
 # %%
 
-def spatial(so, spl, attr:str ,*, mode='scatter', node_size=4, coordinate_keys = ['x', 'y'], mask_key='cellmasks', graph_key='knn',
-            edges=False, edge_width=.5, edge_color='black', edge_zorder=2, background_color = 'white',
-            ax=None, norm=None, set_title=True, cmap=None,
-            cmap_labels=None, cbar=True, cbar_title=True, show=True, save=None, tight_layout=True):
+def spatial(so, spl: str, attr: str, *, mode: str = 'scatter', node_size: float = 4, coordinate_keys: list = ['x', 'y'],
+            mask_key: str = 'cellmasks', graph_key: str = 'knn', edges: bool = False, edge_width: float = .5,
+            edge_color: str = 'black', edge_zorder: int = 2, background_color: str = 'white', ax: plt.Axes = None,
+            norm=None, set_title: bool = True, cmap=None, cmap_labels: list = None, cbar: bool = True,
+            cbar_title: bool = True, show: bool = True, save: str = None, tight_layout: bool = True):
+    """Visualisation of samples.
 
+    Args:
+        so: SpatialOmics instance
+        spl: sample to visualise
+        attr: feature to visualise
+        mode: {scatter, mask}. In `scatter` mode, observations are represented by their centroid, in `mask` mode by their actual segmentation mask
+        node_size: size of the node when plotting the graph representation
+        coordinate_keys: column names in SpatialOmics.obs[spl] that indicates the x and y coordinates
+        mask_key: key for the segmentation masks when in `mask` mode
+        graph_key: which graph representation to use
+        edges: whether to plot the graph or not
+        edge_width: width of edges
+        edge_color: color of edges as string
+        edge_zorder: z-order of edges
+        background_color: background color of plot
+        ax: axes object in which to plot
+        norm: normalisation instance to normalise the values of `attr`
+        set_title: title of plot
+        cmap: colormap to use
+        cmap_labels: colormap labels to use
+        cbar: whether to plot a colorbar or not
+        cbar_title: whether to plot the `attr` name as title of the colorbar
+        show: whether to show the plot or not
+        save: path to the file in which the plot is saved
+        tight_layout: whether to apply tight_layout or not.
+
+    Returns:
+
+    """
     # get attribute information
     data = None  # pd.Series/array holding the attr for colormapping
     colors = None  # array holding the colormappig of data
@@ -84,7 +114,8 @@ def spatial(so, spl, attr:str ,*, mode='scatter', node_size=4, coordinate_keys =
     # plot
     if mode == 'scatter':
         # convert data to numeric
-        data = np.asarray(data) if data is not None else None  # categorical data does not work with cmap, therefore we construct an array
+        data = np.asarray(
+            data) if data is not None else None  # categorical data does not work with cmap, therefore we construct an array
         _broadcast_to_numeric = not is_numeric(data)  # if data is now still categorical, map to numeric
 
         if _broadcast_to_numeric and data is not None:
@@ -115,9 +146,9 @@ def spatial(so, spl, attr:str ,*, mode='scatter', node_size=4, coordinate_keys =
         elif colors:
             # case in which attr is a color
             uniq = np.unique(mask)
-            uniq = uniq[uniq!=0]
-            mapping = {i:j for i,j in zip(uniq,np.ones(len(uniq), dtype=int))} # map everything to 1
-            cmap = ListedColormap([to_rgba('white'),colors])
+            uniq = uniq[uniq != 0]
+            mapping = {i: j for i, j in zip(uniq, np.ones(len(uniq), dtype=int))}  # map everything to 1
+            cmap = ListedColormap([to_rgba('white'), colors])
         else:
             raise RuntimeError('Unknown case')
         mapping.update({0: 0})
@@ -129,7 +160,7 @@ def spatial(so, spl, attr:str ,*, mode='scatter', node_size=4, coordinate_keys =
 
         # plot
         im = cmap(norm(im))
-        im[mask==0] = to_rgba(background_color)
+        im[mask == 0] = to_rgba(background_color)
         imobj = ax.imshow(im)
         ax.invert_yaxis()
 
@@ -144,7 +175,7 @@ def spatial(so, spl, attr:str ,*, mode='scatter', node_size=4, coordinate_keys =
         make_cbar(ax, title, norm, cmap, cmap_labels)
 
     # format plot
-    ax_pad = min(loc['x'].max()*.05, loc['y'].max()*.05, 10)
+    ax_pad = min(loc['x'].max() * .05, loc['y'].max() * .05, 10)
     ax.set_xlim(loc['x'].min() - ax_pad, loc['x'].max() + ax_pad)
     ax.set_ylim(loc['y'].min() - ax_pad, loc['y'].max() + ax_pad)
     ax.set_xticks([]);
@@ -163,9 +194,22 @@ def spatial(so, spl, attr:str ,*, mode='scatter', node_size=4, coordinate_keys =
         fig.show()
 
     if save:
-        savefig(fig,save)
+        savefig(fig, save)
+
 
 def napari_viewer(so, spl: str, attrs: list, censor: float = .95, add_masks='cellmasks'):
+    """Starts interactive Napari viewer to visualise raw images
+
+    Args:
+        so: SpatialOmics instance
+        spl: sample to visualise
+        attrs: list of attributes to add as channels to the viewer
+        censor: percentil to use to censore pixle values in the raw images
+        add_masks: segmentation masks to add as channels to the viewer
+
+    Returns:
+
+    """
     attrs = list(make_iterable(attrs))
     var = so.var[spl]
     index = var[var.target.isin(attrs)].fullstack_index
@@ -186,8 +230,22 @@ def napari_viewer(so, spl: str, attrs: list, censor: float = .95, add_masks='cel
             mask = so.masks[spl][m]
             labels_layer = viewer.add_labels(mask, name=m)
 
-def channel(so, spl: str, attrs: str, ax=None, colors=None, censor: float = None, show = True):
 
+def channel(so, spl: str, attrs: str, ax=None, colors=None, censor: float = None, show=True):
+    """Plot challnels. Decreapted, will be removed.
+
+    Args:
+        so:
+        spl:
+        attrs:
+        ax:
+        colors:
+        censor:
+        show:
+
+    Returns:
+
+    """
     attrs = list(make_iterable(attrs))
     var = so.var[spl]
     i = var[var.target.isin(attrs)].fullstack_index
@@ -229,18 +287,37 @@ def channel(so, spl: str, attrs: str, ax=None, colors=None, censor: float = None
     if show:
         fig.show()
 
-def interactions(so, spl, attr, mode='proportion', prediction_type='diff', graph_key='knn', linewidths=.5, cmap=None, norm=None, ax=None, show=True):
 
+def interactions(so, spl, attr, mode='proportion', prediction_type='diff', graph_key='knn', linewidths=.5, cmap=None,
+                 norm=None, ax=None, show=True):
+    """Visualise interaction results.
+
+    Args:
+        so: SpatialOmics instance
+        spl: Spl for which to compute the metric
+        attr: Categorical feature in SpatialOmics.obs to use for the grouping
+        mode: One of {classic, histoCAT, proportion}, see notes
+        prediction_type: prediction_type: One of {observation, pvalue, diff}
+        graph_key: Specifies the graph representation to use in so.G[spl]
+        linewidths: Space between tiles
+        cmap: colormap to use
+        norm: normalisation to use
+        ax: axes object to use
+        show: whether to show the plot
+
+    Returns:
+
+    """
     if ax is None:
         fig, ax = plt.subplots()
     else:
         fig = ax.get_figure()
-        show=False
+        show = False
 
     if cmap is None:
         cmap = 'coolwarm'
 
-    data = so.uns[spl]['interactions'][f'{attr}_{mode}_{prediction_type}']
+    data = so.uns[spl]['interactions'][f'{attr}_{mode}_{prediction_type}_{graph_key}']
     score = 'diff' if prediction_type == 'diff' else 'score'
     data = data.reset_index().pivot('source_label', 'target_label', score)
     data.index = data.index.astype(int)
@@ -258,6 +335,7 @@ def interactions(so, spl, attr, mode='proportion', prediction_type='diff', graph
 
     if show:
         fig.show()
+
 
 def get_cmap(so, attr: str, data):
     '''

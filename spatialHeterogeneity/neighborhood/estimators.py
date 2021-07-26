@@ -34,7 +34,7 @@ def interactions(so, spl: str, attr: str, mode: str ='classic', prediction_type:
 
     # NOTE: uns_path = f'{spl}/interactions/'
     if key_added is None:
-        key_added = f'{attr}_{mode}_{prediction_type}'
+        key_added = f'{attr}_{mode}_{prediction_type}_{graph_key}'
 
     if random_seed is None:
         random_seed = so.random_seed
