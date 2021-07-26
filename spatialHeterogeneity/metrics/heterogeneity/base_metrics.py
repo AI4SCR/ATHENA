@@ -205,7 +205,6 @@ def _abundance(counts: Union[ct, Iterable], mode='proportion', event_space=None)
 
     Args:
         counts: If a Counter object or an interable with intergers is provided it is assumed that those are counts of the different species.
-                If the iterable contains dtype `float` it is interpreted as probabilities of the different classes
         mode: Either `proportion` or `counts`. If `proportion` we compute the frequency of the species, else the absolute counts.
         event_space: If provided, computes the abundance of all species in the event space. Useful to compute results including all species even of those not present in the current counts.
 
@@ -215,16 +214,15 @@ def _abundance(counts: Union[ct, Iterable], mode='proportion', event_space=None)
     VALID_MODES = ['proportion', 'count']
     # if a counter is provided we will add zero counts for all the events in the event space
     # if an list-like object is provided we compute the counts first
-    if event_space is None:
-        raise ValueError('No event_space provided.')
+    if event_space is not None:
+        c0 = Counter({i: 0 for i in event_space})
+        counts.update(c0)
 
     if not isinstance(counts, Counter):
-        counts = Counter(counts)
+        counts = Counter({key:val for key, val in zip(range(len(counts)), counts)})
+        # counts = Counter(counts)
 
-    c0 = Counter({i: 0 for i in event_space})
-    counts.update(c0)
     index = counts.keys()
-
     if mode == 'proportion':
         vals = _process_input(counts)
         dtype = np.float
