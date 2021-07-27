@@ -45,17 +45,14 @@ setup(
     description="Installable spatialHeterogeneity package. Modify as needed.",
     long_description=open("README.md").read(),
     url="https://github.ibm.com/art-zurich/spatial-heterogeneity",
-    author="Antonio Foncubierta Rodríguez, Matteo Manica, Joris Cadow",
-    author_email="fra@zurich.ibm.com, tte@zurich.ibm.com, dow@zurich.ibm.com",
+    author="Adriano Martinelli",
+    author_email="art@zurich.ibm.com",
     # the following exclusion is to prevent shipping of tests.
     # if you do include them, add pytest to the required packages.
     packages=find_packages(".", exclude=["*tests*"]),
     package_data={"spatialHeterogeneity": ["py.typed"]},
-    entry_points="""
-        [console_scripts]
-        salutation=spatialHeterogeneity.complex_module.core:formal_introduction
-    """,
-    scripts=["bin/brief_salutation", "bin/a_shell_script"],
+    # entry_points='',
+    # scripts=["bin/brief_salutation", "bin/a_shell_script"],
     extras_require={
         "vcs": VCS_REQUIREMENTS,
         "test": ["pytest", "pytest-cov"],
@@ -80,6 +77,6 @@ setup(
         # versions should be very loose here, just exclude unsuitable versions
         # because your dependencies also have dependencies and so on ...
         # being too strict here will make dependency resolution harder
-        "click",
+        # "click",
     ],
 )

@@ -1,7 +1,7 @@
 dist: trusty
 
-services:
-  - docker
+#services:
+#  - docker
 
 language: python
 
@@ -34,9 +34,6 @@ jobs:
   include:
     - stage: Documentation
       python: 3.8
-      before_install: skip
-      install: pip install --progress-bar off -r dev_requirements.txt
-      before_script: skip
       script:
         # build documentation pages
         - cd docs && make html && cd ..
