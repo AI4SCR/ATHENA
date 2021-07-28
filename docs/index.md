@@ -1,12 +1,21 @@
-# Python Blueprint Repository
+# ATHENA - Analysis of Tumor Heterogeneity in Spatial Omics Measurements
 
 ## Site contents
+<h3>General</h3>
+```{toctree}
+---
+caption: General
+maxdepth: 2
+---
+Installation guide <source/install.md>
+```
 
 ```{toctree}
 ---
+caption: Gallery
 maxdepth: 2
 ---
-Example page with markdown source <source/wealth_dynamics_md.md>
+Getting started <source/athena.md>
 ```
 
 ## API
