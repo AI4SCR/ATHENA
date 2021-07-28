@@ -20,7 +20,7 @@ sys.path.insert(0, os.path.abspath(".."))
 
 project = "spatialHeterogeneity"
 copyright = "IBM Corp. 2021"
-author = "IBM spatialHeterogeneity team"
+author = "Adriano Martinelli (art@zurich.ibm.com)"
 
 # -- Generate API (auto) documentation ------------------------------------------------
 
