@@ -113,5 +113,9 @@ venv.bak/
 *.h5py
 *.tif?
 
+# ignore ATHENA doc
+athena.md
+athena_*.png
+
 
 
