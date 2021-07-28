@@ -33,7 +33,7 @@ script:
   - python -m flake8 --per-file-ignores="__init__.py:F401" spatialHeterogeneity
 
   # export tutorial as markdown to integrate it in the docs
-  - jupyter nbconvert --to markdown --output-dir=docs/source --output='athena.md'
+  - jupyter nbconvert --to markdown --output-dir=docs/source --output='athena.md' tutorials/getting-started.ipynb
 
 # the following stages only start if the "test" stage above all succeed
 jobs:

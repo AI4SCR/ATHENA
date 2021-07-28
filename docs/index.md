@@ -5,7 +5,7 @@
 ```{toctree}
 ---
 caption: General
-maxdepth: 2
+maxdepth: 1
 ---
 Installation guide <source/install.md>
 ```
