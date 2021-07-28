@@ -17,6 +17,7 @@ install:
   - pip install --progress-bar off -r requirements.txt
   - pip install --progress-bar off -r dev_requirements.txt
   - pip install .
+  - pip install "git+ssh://git@github.ibm.com/art-zurich/spatial-omics.git@master"
 
 script:
   # test import
