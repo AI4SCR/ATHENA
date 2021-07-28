@@ -109,5 +109,9 @@ venv.bak/
 .idea
 .idea/
 
+# files
+*.h5py
+*.tif?
+
 
 
