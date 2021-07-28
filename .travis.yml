@@ -8,6 +8,9 @@ language: python
 python:
   - 3.8
 
+#before_install:
+#  - sudo apt-get -y install pandoc
+
 install:
   # install the package
   - pip install -U pip
@@ -29,11 +32,16 @@ script:
   - python -m black spatialHeterogeneity --check --diff --color
   - python -m flake8 --per-file-ignores="__init__.py:F401" spatialHeterogeneity
 
+  # export tutorial as markdown to integrate it in the docs
+  - jupyter nbconvert --to markdown --output-dir=docs/source --output='athena.md'
+
 # the following stages only start if the "test" stage above all succeed
 jobs:
   include:
     - stage: Documentation
       python: 3.8
+      before_script:
+        -
       script:
         # build documentation pages
         - cd docs && make html && cd ..
