@@ -113,6 +113,9 @@ venv.bak/
 *.h5py
 *.tif?
 
+# DS_Stores
+.DS_Store
+
 # ignore ATHENA doc
 athena.md
 athena_*.png
