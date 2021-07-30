@@ -5,6 +5,8 @@ pandas<1.3
 networkx
 scikit-learn
 scikit-image
+h5py
+tables
 astropy
 tqdm
 napari
