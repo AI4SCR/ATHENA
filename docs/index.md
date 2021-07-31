@@ -1,13 +1,13 @@
 # ATHENA - Analysis of Tumor Heterogeneity in Spatial Omics Measurements
 
 ## Site contents
-<h3>General</h3>
+
 ```{toctree}
 ---
 caption: General
 maxdepth: 1
 ---
-Installation guide <source/install.md>
+Installation <source/install.md>
 ```
 
 ```{toctree}
@@ -22,8 +22,8 @@ Getting started <source/athena.md>
 
 ```{toctree}
 ---
+caption: API
 maxdepth: 1
-
 ---
-API of the spatialHeterogeneity package <api/spatialHeterogeneity>
+ATHENA API reference <api/spatialHeterogeneity>
 ```
