@@ -9,6 +9,6 @@ h5py
 tables
 astropy
 tqdm
-napari
+"napari[all]"
 seaborn
 docrep
