@@ -16,6 +16,7 @@ caption: Gallery
 maxdepth: 2
 ---
 Getting started <source/athena.md>
+Introduction to spatialOmics class <source/introduction-spatialOmics.md>
 ```
 
 ## API
