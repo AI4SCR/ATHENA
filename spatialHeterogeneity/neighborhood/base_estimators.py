@@ -86,7 +86,7 @@ class Interactions:
         self.data = self.data.astype(CategoricalDtype(categories=self.data.unique(), ordered=False))
 
         # path where h0 models would be
-        self.path = os.path.expanduser(f'~/.spatial-heterogeneity/h0-models/')
+        self.path = os.path.expanduser(f'~/.cache/spatialHeterogeneity/h0-models/')
         self.h0_file = f'{spl}_{attr}_{graph_key}_{mode}.pkl'
         self.h0 = None
 
