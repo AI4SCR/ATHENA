@@ -34,6 +34,7 @@ samples = ['slide_7_Cy2x2',
            'slide_59_Cy8x1',
            'SP43_116_X3Y4',
            'slide_49_By2x5']
+so.spl = so.spl.loc[samples]
 
 # add image / mask data to instance
 for s in tqdm(samples):
@@ -48,7 +49,8 @@ for s in tqdm(samples):
 
 del data
 
-fpath = Path(os.path.expanduser('~/Documents/imc_dataset.h5py'))
+fpath = Path(os.path.expanduser('~/Documents/imc.h5py'))
+# fpath = Path(os.path.expanduser('~/.cache/spatialHeterogeneity/imc.h5py'))
 so.to_h5py(fpath)
 
 # %%
