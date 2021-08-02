@@ -38,11 +38,21 @@ except FileNotFoundError:
     print("requirements.txt not found.")
     VCS_REQUIREMENTS = []
 
+def install_requires():
+    req = []
+    with open('requirements.txt', 'r') as f:
+        for l in f:
+            if l.startswith('#'):
+                continue
+            else:
+                req.append(l.replace('\n', ''))
+    return req
+
 # TODO: Update these values according to the name of the module.
 setup(
     name="spatialHeterogeneity",
     version=read_version("spatialHeterogeneity/__init__.py"),  # single place for version
-    description="Installable spatialHeterogeneity package. Modify as needed.",
+    description="spatialHeterogeneity package provides methods to analyse spatial heterogeneity in spatial omics data",
     long_description=open("README.md").read(),
     url="https://github.ibm.com/art-zurich/spatial-heterogeneity",
     author="Adriano Martinelli",
@@ -73,10 +83,8 @@ setup(
             "myst-parser",
         ],
     },
-    install_requires=[
-        # versions should be very loose here, just exclude unsuitable versions
-        # because your dependencies also have dependencies and so on ...
-        # being too strict here will make dependency resolution harder
-        # "click",
-    ],
+    # versions should be very loose here, just exclude unsuitable versions
+    # because your dependencies also have dependencies and so on ...
+    # being too strict here will make dependency resolution harder
+    install_requires=install_requires()
 )

@@ -11,4 +11,3 @@ astropy
 tqdm
 napari[all]
 seaborn
-docrep
