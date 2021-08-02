@@ -1,9 +1,7 @@
 from .constants import GRAPH_BUILDER_DEFAULT_PARAMS
 from .mappings import GRAPH_BUILDERS
 import networkx as nx
-from ..utils.docs.default_docs import docstrings
 
-@docstrings.dedent
 def build_graph(so, spl: str, builder_type = 'knn', mask_key = 'cellmasks', key_added=None, config = None, inplace=True):
     """Build graph representation for a sample
 
