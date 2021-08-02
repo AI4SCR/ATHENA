@@ -7,7 +7,7 @@
 caption: General
 maxdepth: 1
 ---
-Installation <source/install.md>
+Installation <source/installation.md>
 ```
 
 ```{toctree}
