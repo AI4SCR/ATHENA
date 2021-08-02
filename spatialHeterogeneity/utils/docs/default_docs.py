@@ -20,18 +20,18 @@ def ddoc(fun):
 
     return fun
 
-from docrep import DocstringProcessor
-docstrings = DocstringProcessor()
-
-@docstrings.get_sections
-def default_doc(so, inplace):
-    """
-
-    Args:
-        so: SpatialOmics
-        inplace: Apply function in place
-
-    Returns:
-
-    """
-    pass
+# from docrep import DocstringProcessor
+# docstrings = DocstringProcessor()
+#
+# @docstrings.get_sections
+# def default_doc(so, inplace):
+#     """
+#
+#     Args:
+#         so: SpatialOmics
+#         inplace: Apply function in place
+#
+#     Returns:
+#
+#     """
+#     pass
