@@ -43,7 +43,7 @@ jobs:
         - jupyter nbconvert --to markdown --output-dir=docs/source --output='athena.md' tutorials/getting-started.ipynb
         - jupyter nbconvert --to markdown --output-dir=docs/source --output='introduction-spatialOmics.md' tutorials/introduction-spatialOmics.ipynb
         # build documentation pages
-        - cd docs && make html && cd ..
+        - cd docs && make clean && make html && cd ..
       deploy:
         - provider: pages
           skip_cleanup: true
