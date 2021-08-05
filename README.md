@@ -18,8 +18,5 @@ ATHENA is a computational framwork to analyse spatial heterogeneity in spatial s
 
 ![overview.png](docs/source/img//overview.png)
 
-## Installation
-Install ATHENA from git by
-```bash
-pip install "git+ssh://git@github.ibm.com/art-zurich/spatial-heterogeneity.git@master"
-```
+# Installation
+Install the package as outlined in the [docs](https://pages.github.ibm.com/art-zurich/spatial-heterogeneity).
