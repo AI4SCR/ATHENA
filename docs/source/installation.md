@@ -8,5 +8,4 @@ pip install pip install "git+git://github.com/histocartography/spatial-omics.git
 
 # install ATHENA package
 pip install "git+git://github.com/histocartography/athena.git@master"
-
 ```
