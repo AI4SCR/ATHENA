@@ -19,4 +19,4 @@ ATHENA is a computational framwork to analyse spatial heterogeneity in spatial s
 ![overview.png](docs/source/img//overview.png)
 
 # Installation
-Install the package as outlined in the [docs](https://pages.github.ibm.com/art-zurich/spatial-heterogeneity).
+Install the package as outlined in the [docs](https://histocartography.github.io/athena/).
