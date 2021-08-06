@@ -1,7 +1,5 @@
 # ATHENA - Analysis of Tumor Heterogeneity in Spatial Omics Measurements
 
-## Site contents
-
 ```{toctree}
 ---
 caption: General
@@ -18,8 +16,6 @@ maxdepth: 2
 Getting started <source/athena.md>
 Introduction to spatialOmics <source/introduction-spatialOmics.md>
 ```
-
-## API
 
 ```{toctree}
 ---
