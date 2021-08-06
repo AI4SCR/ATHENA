@@ -51,7 +51,7 @@ jobs:
           # Set in the settings page of your repository, as a secure variable
           # see https://docs.travis-ci.com/user/deployment/pages/#setting-the-github-token
           local_dir: docs/_build/html
-          github_url: github.ibm.com
+#          github_url: github.ibm.com  #  defaults to github.com
           on:
             branch: master
 
