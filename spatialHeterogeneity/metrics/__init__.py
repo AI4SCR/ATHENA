@@ -11,9 +11,9 @@ from .heterogeneity.metrics import richness, \
     shannon, \
     simpson,\
     renyi_entropy,\
-    hill_number
+    hill_number, \
+    quadratic_entropy
     # shannon_evenness,\
-    # quadratic_entropy,\
     # gini_simpson, \
     # simpson_evenness,\
     # diversity_profile

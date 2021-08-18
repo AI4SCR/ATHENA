@@ -1,12 +1,14 @@
 # %%
 from .base_metrics import _shannon, _richness, _simpson, _shannon_evenness, _hill_number, \
-    _simpson_evenness, _gini_simpson, _renyi, _abundance
+    _simpson_evenness, _gini_simpson, _renyi, _abundance, _quadratic_entropy
 
 from ...utils.general import is_categorical, make_iterable, is_numeric
 
 import numpy as np
 import pandas as pd
 from collections import Counter
+
+from sklearn.preprocessing import StandardScaler
 
 
 # %%
@@ -155,6 +157,58 @@ def renyi_entropy(so, spl: str, attr: str, q: float, *, local=True, key_added=No
                      'base': base}
 
     return _compute_metric(so=so, spl=spl, attr=attr, key_added=key_added, graph_key=graph_key, metric=metric,
+                           kwargs_metric=kwargs_metric,
+                           local=local, inplace=inplace)
+
+
+def quadratic_entropy(so, spl: str, attr: str, *, metric='minkowski', metric_kwargs={'p': 2}, scale: bool = True,
+                      local=True, key_added=None, graph_key='knn', inplace=True):
+    """Computes the quadratic entropy, taking relative abundance and similarity between observations into account.
+
+    Args:
+        so: SpatialOmics instance
+        spl: Spl for which to compute the metric
+        attr: Categorical feature in SpatialOmics.obs to use for the grouping
+        metric: metric used to compute distance of observations in the features space so.X[spl]
+        metric_kwargs: key word arguments for metric
+        scale: whether to scale features of observations to unit variance and 0 mean
+        local: whether to compute the metric on the observation or the sample level
+        key_added: Key added to either obs or spl depending on the choice of `local`
+        graph_key: Specifies the graph representation to use in so.G[spl] if `local=True`.
+        inplace: Whether to add the metric to the current SpatialOmics instance or to return a new one.
+
+    Notes:
+        The implementation computes an average feature vector for each group in attr based on all observations in the
+        sample. Thus, if staining biases across samples exists this will directly distort this metric.
+
+    Returns:
+        float, quadratic entropy
+
+    """
+    if key_added is None:
+        key_added = 'quadratic'
+        key_added = f'{key_added}_{attr}'
+        if local:
+            key_added += f'_{graph_key}'
+
+    # collect feature vectors of all observations and add attr grouping
+    features: pd.DataFrame = so.X[spl]
+    features = features.merge(so.obs[spl][attr], right_index=True, left_index=True)
+    assert len(features) == len(so.X[spl]), 'inner merge resulted in dropped index ids'
+
+    # compute average feature vector for each attr group and standardise
+    features = features.groupby(attr).mean()
+    if scale:
+        tmp = StandardScaler().fit_transform(features)
+        features = pd.DataFrame(tmp, index=features.index, columns=features.columns)
+
+    base_metric = _quadratic_entropy
+    kwargs_metric = {'features': features,
+                     'metric': metric,
+                     'metric_kwargs': metric_kwargs,
+                     'scale': False}  # we scaled already
+
+    return _compute_metric(so=so, spl=spl, attr=attr, key_added=key_added, graph_key=graph_key, metric=base_metric,
                            kwargs_metric=kwargs_metric,
                            local=local, inplace=inplace)
 

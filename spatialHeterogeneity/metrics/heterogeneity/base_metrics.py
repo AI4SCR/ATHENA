@@ -1,11 +1,15 @@
 import numpy as np
 from ..utils import _process_input, _validate_counts_vector
+# from spatialHeterogeneity.metrics.utils import _process_input, _validate_counts_vector
 # from ...utils.general import make_iterable
 
 # from scipy.spatial.distance import pdist
 import pandas as pd
 from collections import Counter
 from typing import Counter as ct, Iterable, Union
+
+from sklearn.preprocessing import StandardScaler
+from scipy.spatial.distance import cdist
 
 import warnings
 
@@ -52,7 +56,7 @@ def _shannon(counts: Union[ct, Iterable], base: float = 2) -> float:
 
 
 def _shannon_evenness(counts: Union[ct, Iterable],
-                      base: float = 2) -> np.float:
+                      base: float = 2) -> float:
     """Compute shannon evenness. This is a normalised form of the shannon index.
 
     Args:
@@ -76,7 +80,7 @@ def _shannon_evenness(counts: Union[ct, Iterable],
     return H / H_max
 
 
-def _simpson(counts: Union[ct, Iterable]) -> np.float:
+def _simpson(counts: Union[ct, Iterable]) -> float:
     """Compute Simpson Index.
 
     Args:
@@ -102,7 +106,7 @@ def _simpson(counts: Union[ct, Iterable]) -> np.float:
     return (props ** 2).sum()
 
 
-def _simpson_evenness(counts: Union[ct, Iterable]) -> np.float:
+def _simpson_evenness(counts: Union[ct, Iterable]) -> float:
     """Compute Simpson Evenness.
 
     Args:
@@ -123,7 +127,7 @@ def _simpson_evenness(counts: Union[ct, Iterable]) -> np.float:
     return (1 / D) / S
 
 
-def _gini_simpson(counts: Union[ct, Iterable]) -> np.float:
+def _gini_simpson(counts: Union[ct, Iterable]) -> float:
     """Computes the Gini Simpson index
 
     Args:
@@ -170,7 +174,7 @@ def _hill_number(counts: Union[ct, Iterable], q: float) -> float:
 
 def _renyi(counts: Union[ct, Iterable],
            q: float,
-           base: float = 2) -> np.float:
+           base: float = 2) -> float:
     """Computes the Renyi-Entropy of order q.
 
     Args:
@@ -197,6 +201,37 @@ def _renyi(counts: Union[ct, Iterable],
 
     return 1 / (1 - q) * np.log(np.sum(props ** q)) / np.log(base)
 
+
+def _quadratic_entropy(counts: ct, features: pd.DataFrame, metric: str = 'minkowski', metric_kwargs: dict = {'p':2}, scale: bool = True) -> float:
+    """
+
+    Args:
+        counts: Counter object with counts of observed species / instances
+        features: pandas.DataFrame with index representing instances / species and columns features of these instances
+        metric: metric to compute distance between instances in the features space
+        metric_kwargs: key word arguments to the metric
+        scale: whether to scale the features to zero mean and unit variance
+
+    Returns:
+        float
+    """
+
+    # check that all instances in counts are in features
+    if not np.all([i in features.index for i in counts]):
+        raise KeyError(f'not all instances in counts are in the features index')
+
+    # order elements in features according to counts and drop excess features
+    features = features.loc[counts.keys()]
+
+    # scale features
+    # NOTE: If features are not scaled over-proportional weight might be given to some features
+    if scale:
+        features = StandardScaler().fit_transform(features)
+
+    props = _process_input(counts)
+    D = cdist(features, features, metric, **metric_kwargs)
+
+    return props@D@props
 
 # ----- MULTIDIMENSIONAL MEASURES -----#
 
@@ -225,12 +260,19 @@ def _abundance(counts: Union[ct, Iterable], mode='proportion', event_space=None)
     index = counts.keys()
     if mode == 'proportion':
         vals = _process_input(counts)
-        dtype = np.float
+        dtype = float
     elif mode == 'count':
         vals = np.asarray(list(counts.values()))
         _validate_counts_vector(vals)
-        dtype = np.int
+        dtype = int
     else:
         raise ValueError(f'{mode} is not a valid mode, available are {VALID_MODES}')
 
     return pd.Series(vals, index=index, dtype=dtype)
+
+# from string import ascii_lowercase
+# n = 10
+# counts = Counter({key:1 for key in ascii_lowercase[:n]})
+# feat = pd.DataFrame(np.diag(np.repeat(0.5,n)), index=[i for i in ascii_lowercase[:n]])
+# # res = _quadratic_entropy(Counter({key:1 for key in 'asd'}), pd.DataFrame(np.ones((3,5)), index=[i for i in 'asd']))
+# res = _quadratic_entropy(counts, feat, metric_kwargs={'p':1})
