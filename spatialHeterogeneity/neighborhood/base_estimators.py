@@ -244,7 +244,7 @@ class RipleysK():
         self.id = id
         self.area = so.spl.loc[spl].area
         self.width = so.spl.loc[spl].width
-        self.height = so.meta.loc[spl].height
+        self.height = so.spl.loc[spl].height
         self.rkE = RipleysKEstimator(area=float(self.area),
                                      # we need to cast since the implementation checks for type int/float and does not recognise np.int64
                                      x_max=float(self.width), x_min=0,
