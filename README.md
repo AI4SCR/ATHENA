@@ -1,13 +1,12 @@
 [![Build Status](https://travis.ibm.com/art-zurich/spatial-heterogeneity.svg?token=bmUqdLriQp1g3yv7TJC6&branch=master)](https://travis.ibm.com/art-zurich/spatial-heterogeneity)
 [![GitHub Pages](https://img.shields.io/badge/docs-sphinx-blue)](https://histocartography.github.io/athena/)
 
-<img src="tutorials/img/athena_logo.png" alt="ATHENA" style="width: 800px;" class="left"/>
+![athena logo](tutorials/img/athena_logo.png)
 
 ATHENA is an open-source computational framework written in Python that facilitates the visualization, processing and analysis of (spatial) heterogeneity from spatial omics data. ATHENA supports any spatially resolved dataset that contains spatial transcriptomic or proteomic measurements, including Imaging Mass Cytometry (IMC), Multiplexed Ion Beam Imaging (MIBI), multiplexed Immunohistochemisty (mIHC) or Immunofluorescence (mIF), seqFISH, MERFISH, Visium.
 
 ## Main functionalities
-<img src="tutorials/img/overview.png" alt="ATHENA" style="width: 1000px;" class="left"/>
-
+![overview](tutorials/img/overview.png)
 
 1. ATHENA accomodates raw multiplexed images from spatial omics measurements. Together with the images, segmentation masks, cell-level, feature-level and sample-level annotations can be uploaded.
 
