@@ -1,22 +1,22 @@
-# ATHENA - Analysis of Tumor Heterogeneity in Spatial Omics Measurements
 [![Build Status](https://travis.ibm.com/art-zurich/spatial-heterogeneity.svg?token=bmUqdLriQp1g3yv7TJC6&branch=master)](https://travis.ibm.com/art-zurich/spatial-heterogeneity)
 [![GitHub Pages](https://img.shields.io/badge/docs-sphinx-blue)](https://histocartography.github.io/athena/)
 
-ATHENA is a computational framwork to analyse spatial heterogeneity in spatial single-cell omics data.
+<img src="tutorials/img/athena_logo.png" alt="ATHENA" style="width: 800px;" class="left"/>
+
+ATHENA is an open-source computational framework written in Python that facilitates the visualization, processing and analysis of (spatial) heterogeneity from spatial omics data. ATHENA supports any spatially resolved dataset that contains spatial transcriptomic or proteomic measurements, including Imaging Mass Cytometry (IMC), Multiplexed Ion Beam Imaging (MIBI), multiplexed Immunohistochemisty (mIHC) or Immunofluorescence (mIF), seqFISH, MERFISH, Visium.
+
+## Main functionalities
+<img src="tutorials/img/overview.png" alt="ATHENA" style="width: 1000px;" class="left"/>
 
 
-## Overview ATHENA
-1. Spatially resolved omics measurements are acquired, resulting in highly dimensional images.
+1. ATHENA accomodates raw multiplexed images from spatial omics measurements. Together with the images, segmentation masks, cell-level, feature-level and sample-level annotations can be uploaded.
 
-2. If necessary (for IMC, MIBI) images are segmented into single cells (cellmasks) and single cell expression values are extracted. Based on the single cell expression values, cells are classified into different type, aka phenotyping.
+2. Based on the cell masks, ATHENA constructs graph representations of the data. The framework currently supports three flavors, namely radius, knn, and contact graphs.
 
-3. Cellmasks are used to construct a graph representation of the data. The framework currently supports three flavours (radius, knn, contact) that we will showcase later in this tutorial
+3. ATHENA incorporates a variety of methods to quantify heterogeneity, such as global and local entropic scores. Furthermore, cell type interaction strength scores or measures of spatial clustering and dispersion.
 
-4. The framework provides a variety of methods to quantify the observed diversity in samples. Furthermore, methods to analyse the interaction strength of different phenotypes are provided. 
+4. Finally, the large collection of computed scores can be extracted and used as input in downstream machine learning models to perform tasks such as clinical data prediction, patient stratification or discovery of new (spatial) biomarkers.
 
-5. The quantification methods can be used to featurise samples, this featurization can be used in downstream ML models to stratify patients and to discover new biomarkers.
-
-![overview.png](docs/source/img//overview.png)
 
 # Installation
 Install the package as outlined in the [docs](https://histocartography.github.io/athena/).
