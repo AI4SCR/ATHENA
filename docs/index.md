@@ -13,8 +13,6 @@ Installation <source/installation.md>
 caption: Gallery
 maxdepth: 2
 ---
-Getting started <source/athena.md>
-Introduction to spatialOmics <source/introduction-spatialOmics.md>
 Overview <source/overview.md>
 Documentation <source/documentation.md>
 Tutorial <source/tutorial.md>
