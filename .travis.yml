@@ -42,6 +42,9 @@ jobs:
         # export tutorial as markdown to integrate it in the docs
         - jupyter nbconvert --to markdown --output-dir=docs/source --output='athena.md' tutorials/getting-started.ipynb
         - jupyter nbconvert --to markdown --output-dir=docs/source --output='introduction-spatialOmics.md' tutorials/introduction-spatialOmics.ipynb
+        - jupyter nbconvert --to markdown --output-dir=docs/source --output='documentation.md' tutorials/documentation.ipynb
+        - jupyter nbconvert --to markdown --output-dir=docs/source --output='overview.md' tutorials/overview.ipynb
+        - jupyter nbconvert --to markdown --output-dir=docs/source --output='tutorial.md' tutorials/tutorial.ipynb
         # build documentation pages
         - cd docs && make clean && make html && cd ..
       deploy:
