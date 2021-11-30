@@ -118,7 +118,7 @@ venv.bak/
 
 # ignore ATHENA doc
 athena.md
-athena_*.png
+docs/source/img/athena_*.png
 
 
 
