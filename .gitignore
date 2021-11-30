@@ -117,8 +117,8 @@ venv.bak/
 .DS_Store
 
 # ignore ATHENA doc
-athena.md
-docs/source/img/athena_*.png
+#athena.md
+#docs/source/img/athena_*.png
 
 
 
