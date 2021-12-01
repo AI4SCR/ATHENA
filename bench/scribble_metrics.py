@@ -4,6 +4,8 @@ import spatialHeterogeneity as sh
 import pickle as pk
 import os
 
+# %%
+
 f = '/Users/art/Documents/spatial-omics/spatialOmics.hdf5'
 f = '/Users/art/Documents/spatial-omics/spatialOmics.pkl'
 # so = SpatialOmics.form_h5py(f)
@@ -27,6 +29,19 @@ spl = so.spl_keys[0]
 # sh.metrics.renyi_entropy(so, spl, 'meta_id', q=2)
 # sh.metrics.renyi_entropy(so, spl, 'meta_id', q=2, local=False)
 
+# %%
+import spatialHeterogeneity as sh
 
+# %%
+so = sh.dataset.imc()
+spl = list(so.obs.keys())[0]
+sh.metrics.shannon(so, spl, 'meta_id', graph_key='contact')
+so.obs[spl].columns
+sh.metrics.shannon(so, spl, 'meta_id', graph_key='contact')
+so.obs[spl].columns
 
+sh.metrics.shannon(so, spl, 'meta_id', local=False)
+so.spl.columns
+sh.metrics.shannon(so, spl, 'meta_id', local=False)
+so.spl.columns
 
