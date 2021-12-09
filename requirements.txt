@@ -11,3 +11,4 @@ astropy
 tqdm
 napari[all]
 seaborn
+squidpy
