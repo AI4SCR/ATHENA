@@ -13,9 +13,10 @@ Installation <source/installation.md>
 caption: Gallery
 maxdepth: 2
 ---
-Overview <source/overview.md>
-Documentation <source/documentation.md>
+Overview of ATHENA <source/overview.md>
+Methodology <source/documentation.md>
 Tutorial <source/tutorial.md>
+SpatialOmics Tutorial <source/introduction-spatialOmics.md>
 ```
 
 ```{toctree}
