@@ -1,6 +1,7 @@
 from .constants import GRAPH_BUILDER_DEFAULT_PARAMS
 from .mappings import GRAPH_BUILDERS
 import networkx as nx
+from pandas import DataFrame
 
 def build_graph(so, spl: str, builder_type = 'knn', mask_key = 'cellmasks', key_added=None, config = None, inplace=True):
     """Build graph representation for a sample
@@ -24,8 +25,13 @@ def build_graph(so, spl: str, builder_type = 'knn', mask_key = 'cellmasks', key_
     if key_added is None:
         key_added = builder_type
 
-    mask = so.get_mask(spl,mask_key)
-    g = GRAPH_BUILDERS[builder_type].from_mask(config, mask)
+    if mask_key is None:
+        ndat = so.obs[spl][['x','y']]
+        builder = GRAPH_BUILDERS[builder_type](config)
+        g = builder(ndata=ndat)
+    else:
+        mask = so.get_mask(spl,mask_key)
+        g = GRAPH_BUILDERS[builder_type].from_mask(config, mask)
 
     if 'include_self' in config['builder_params'] and config['builder_params']['include_self'] and builder_type == 'contact':
         edge_list = [(i,i) for i in g.nodes]

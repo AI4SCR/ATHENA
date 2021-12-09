@@ -240,7 +240,7 @@ class RipleysK():
             graph_key: Specifies the graph representation to use in so.G[spl] if `local=True`.
 
         """
-        self.g = so.G[spl][graph_key]
+
         self.id = id
         self.area = so.spl.loc[spl].area
         self.width = so.spl.loc[spl].width

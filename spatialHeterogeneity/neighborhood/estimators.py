@@ -119,7 +119,7 @@ def ripleysK(so, spl: str, attr: str, id, *, mode='K', radii=None, correction='r
 
     # NOTE: uns_path = f'{spl}/clustering/'
     if key_added is None:
-        uns_path = f'{attr}_{id}_{mode}_{correction}'
+        key_added = f'{attr}_{id}_{mode}_{correction}'
 
     estimator = RipleysK(so=so, spl=spl, id=id, attr=attr)
     res = estimator.predict(radii=radii, correction=correction, mode=mode)

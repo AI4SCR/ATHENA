@@ -100,7 +100,7 @@ def spatial(so, spl: str, attr: str, *, mode: str = 'scatter', node_size: float 
     # compute edge lines
     if edges:
         g = so.G[spl][graph_key]
-        e = np.array(g.edges, dtype=int)
+        e = np.array(g.edges, dtype=type(loc.index.dtype))
 
         tmp1 = loc.loc[e.T[0]]
         tmp2 = loc.loc[e.T[1]]
@@ -134,6 +134,7 @@ def spatial(so, spl: str, attr: str, *, mode: str = 'scatter', node_size: float 
             colors = cmap(norm(data))
 
         im = ax.scatter(loc[coordinate_keys[0]], loc[coordinate_keys[1]], s=node_size, c=colors, zorder=2.5)
+        ax.set_facecolor(background_color)
 
     elif mode == 'mask':
 

@@ -17,3 +17,5 @@ from .heterogeneity.metrics import richness, \
     # gini_simpson, \
     # simpson_evenness,\
     # diversity_profile
+
+from .graph import modularity
