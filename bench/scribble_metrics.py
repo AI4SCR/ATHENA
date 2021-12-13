@@ -45,3 +45,7 @@ so.spl.columns
 sh.metrics.shannon(so, spl, 'meta_id', local=False)
 so.spl.columns
 
+# %% abundance
+imc = sh.dataset.imc()
+spl = list(imc.obs.keys())[0]
+sh.metrics.abundance(imc, spl, attr='meta_id', local=False)

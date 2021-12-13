@@ -76,3 +76,12 @@ so.to_h5py(fpath)
 #
 # for s in spls:
 #     sh.pl.spatial(so, s, 'cell_type_id')
+
+# %% imc
+import spatialHeterogeneity as sh
+from pathlib import Path
+imc = sh.dataset.imc()
+imc.spl = imc.spl.loc[imc.obs.keys()]
+imc.spl = imc.spl.loc[:,~imc.spl.columns.str.contains('file_')]
+
+imc.to_h5py(Path('~/Downloads').expanduser() / 'imc.h5py')

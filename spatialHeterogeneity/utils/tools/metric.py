@@ -65,3 +65,15 @@ def get_group_feature(expr: np.ndarray,
         out[idx,:] = reducer(expr[grp, :], axis, **kwargs)
 
     return pd.DataFrame(out, index=groups.keys())
+
+def extract_metric_results(so):
+    # TODO
+    '''Extract all the computed results from the spatialOmics instance.
+
+    Args:
+        so:
+
+    Returns:
+
+    '''
+    pass

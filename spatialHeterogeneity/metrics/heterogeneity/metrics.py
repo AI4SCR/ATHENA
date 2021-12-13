@@ -215,14 +215,14 @@ def quadratic_entropy(so, spl: str, attr: str, *, metric='minkowski', metric_kwa
 
 def abundance(so, spl: str, attr: str, *, mode='proportion', key_added: str = None, graph_key='knn',
               local=False, inplace: bool = True):
-    """Computes the abundance of species on the observation or the sample level
+    """Computes the abundance of species on the observation or the sample level.
 
     Args:
         so: SpatialOmics instance
         spl: Spl for which to compute the metric
         attr: Categorical feature in SpatialOmics.obs to use for the grouping
         local: Whether to compute the metric on the observation or the sample level
-        key_added: Key added to either obs or spl depending on the choice of `local`
+        key_added: Key added to either uns[spl] or obs depending on the choice of `local`
         graph_key: Specifies the graph representation to use in so.G[spl] if `local=True`.
         inplace: Whether to add the metric to the current SpatialOmics instance or to return a new one.
 
@@ -290,9 +290,9 @@ def _compute_metric(so, spl: str, attr, key_added, graph_key, metric, kwargs_met
         res = metric(Counter(data), **kwargs_metric)
 
         if np.ndim(res) > 0:
-            if spl not in so.splm:
-                so.splm[spl] = {}
-            so.splm[spl][key_added] = res
+            if spl not in so.uns:
+                so.uns[spl] = {}
+            so.uns[spl][key_added] = res
         else:
             if key_added in so.spl:
                 so.spl.drop(key_added, 1, inplace=True)
