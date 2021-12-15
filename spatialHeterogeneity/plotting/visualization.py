@@ -7,6 +7,7 @@ from matplotlib import cm
 import matplotlib.pyplot as plt
 from matplotlib.colors import Normalize, NoNorm, to_rgba, to_rgb, Colormap, ListedColormap
 import seaborn as sns
+import pandas as pd
 
 # import matplotlib.ticker as mticker  # https://stackoverflow.com/questions/63723514/userwarning-fixedformatter-should-only-be-used-together-with-fixedlocator
 
@@ -370,3 +371,59 @@ def get_cmap(so, attr: str, data):
         cmap_labels = so.uns['cmap_labels'][attr]
 
     return cmap, cmap_labels
+
+def ripleysK(so, spl: str, attr: str, ids, *, mode='K', correction='ripley', key=None, ax=None):
+    """Plot results
+
+    Args:
+        so: SpatialOmics instance
+        spl: Spl for which to compute the metric
+        attr: Categorical feature in SpatialOmics.obs to use for the grouping
+        ids: The category in the categorical feature `attr`, for which Ripley's K should be plotted
+        mode: {K, csr-deviation}. If `K`, Ripley's K is estimated, with `csr-deviation` the deviation from a poission process is computed.
+        correction: Correction method to use to correct for boarder effects, see [1].
+        key: key to use in so.uns['ripleysK'] for the plot, if None it is constructed from spl,attr,ids,mode and correction
+        ax: axes to use for the plot
+
+    Returns:
+        None
+    """
+
+    if key is None:
+        if isinstance(ids, list):
+            keys = [f'{i}_{attr}_{mode}_{correction}' for i in ids]
+        else:
+            keys = [f'{ids}_{attr}_{mode}_{correction}']
+    else:
+        keys = [key]
+
+    res = []
+    for i in keys:
+        res.append(so.uns[spl]['ripleysK'][i])
+
+    res = pd.concat(res, 1)
+    if key is None:
+        colnames = [i.split('_')[0] for i in keys]
+    else:
+        colnames = keys
+    res = res.reset_index()
+    res.columns = ['radii'] + colnames
+    radii = res.radii.values
+    res = res.melt(id_vars='radii', var_name=attr)
+    res[attr] = res[attr].astype('category')
+
+    cmap, labels = get_cmap(so, attr, res.cell_type_id)
+    cmap_dict = {j:i for i,j in zip(cmap.colors, labels.values())}
+    if labels:
+        res[attr] = res[attr].astype(type(list(labels.keys())[0])).map(labels)
+
+
+    if ax is None:
+        fig, ax = plt.subplots()
+    else:
+        fig = ax.get_figure()
+
+    sns.lineplot(data=res, x='radii', y='value', hue=attr, palette=cmap_dict, ax=ax)
+    ax.plot(radii, np.repeat(0, len(radii)), color='black', linestyle=':')
+    fig.tight_layout()
+    fig.show()

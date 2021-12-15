@@ -106,7 +106,6 @@ def ripleysK(so, spl: str, attr: str, id, *, mode='K', radii=None, correction='r
         correction: Correction method to use to correct for boarder effects, see [1].
         inplace: Whether to add the metric to the current SpatialOmics instance or to return a new one.
         key_added: Key added to SpatialOmics.uns[spl][metric][key_added]
-        graph_key: Specifies the graph representation to use in so.G[spl] if `local=True`.
 
     Returns:
         Ripley's K estimates
@@ -119,7 +118,7 @@ def ripleysK(so, spl: str, attr: str, id, *, mode='K', radii=None, correction='r
 
     # NOTE: uns_path = f'{spl}/clustering/'
     if key_added is None:
-        key_added = f'{attr}_{id}_{mode}_{correction}'
+        key_added = f'{id}_{attr}_{mode}_{correction}'
 
     estimator = RipleysK(so=so, spl=spl, id=id, attr=attr)
     res = estimator.predict(radii=radii, correction=correction, mode=mode)

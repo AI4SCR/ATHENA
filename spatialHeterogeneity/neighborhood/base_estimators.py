@@ -229,7 +229,7 @@ class Interactions:
 
 
 class RipleysK():
-    def __init__(self, so, spl: str, id, attr: str='cell_type_id', graph_key: str='knn'):
+    def __init__(self, so, spl: str, id, attr: str):
         """Compute Ripley's K for a given sample and group.
 
         Args:
