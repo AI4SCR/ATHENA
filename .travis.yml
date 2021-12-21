@@ -46,8 +46,8 @@ jobs:
         - jupyter nbconvert --to markdown --output-dir=docs/source --output='overview.md' tutorials/overview.ipynb
         - jupyter nbconvert --to markdown --output-dir=docs/source --output='tutorial.md' tutorials/tutorial.ipynb
         # build documentation pages
+        - cp -r tutorials/img docs/source
         - cd docs && make clean && make html && cd ..
-        - cp tutorials/img doc/source/
       deploy:
         - provider: pages
           skip_cleanup: true
