@@ -6,7 +6,7 @@ from .base_estimators import Interactions, _infiltration, RipleysK
 
 from .utils import get_node_interactions
 from ..utils.general import is_categorical
-
+from tqdm import tqdm
 # %%
 def interactions(so, spl: str, attr: str, mode: str ='classic', prediction_type: str ='observation', *, n_permutations: int =100,
                  random_seed=None, alpha: float =.01, try_load: bool =True, key_added: str =None, graph_key: str ='knn',
@@ -53,7 +53,7 @@ def interactions(so, spl: str, attr: str, mode: str ='classic', prediction_type:
 
 
 def infiltration(so, spl: str, attr: str, *, interaction1=('tumor', 'immune'), interaction2=('immune', 'immune'),
-                 add_key='infiltration', inplace=True, graph_key='knn') -> None:
+                 add_key='infiltration', inplace=True, graph_key='knn', local=False) -> None:
     """Compute infiltration score.
 
     Args:
@@ -83,11 +83,28 @@ def infiltration(so, spl: str, attr: str, *, interaction1=('tumor', 'immune'), i
         missing = np.array(interaction1 + interaction2)[~mask]
         raise ValueError(f'specified interaction categories are not all in `attr`. Missing {missing}')
 
-    nint = get_node_interactions(so.G[spl][graph_key], data)
+    G = so.G[spl][graph_key]
+    if local:
+        cont = []
+        for node in tqdm(G.nodes):
+            neigh = G[node]
+            g = G.subgraph(neigh)
+            nint = get_node_interactions(g, data)
+            res = _infiltration(node_interactions=nint, interaction1=interaction1, interaction2=interaction2)
+            cont.append(res)
 
-    res = _infiltration(node_interactions=nint, interaction1=interaction1, interaction2=interaction2)
+        res = pd.DataFrame(cont, index=G.nodes, columns=[add_key])
+        if add_key in so.obs[spl]:
+            so.obs[spl] = so.obs[spl].drop(columns=[add_key])
 
-    so.spl.loc[spl, add_key] = res
+        so.obs[spl] = pd.concat((so.obs[spl], res), 1)
+
+    else:
+        nint = get_node_interactions(G, data)
+
+        res = _infiltration(node_interactions=nint, interaction1=interaction1, interaction2=interaction2)
+
+        so.spl.loc[spl, add_key] = res
 
     if not inplace:
         return so

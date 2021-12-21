@@ -13,9 +13,36 @@ logging.basicConfig(level=logging.INFO)
 
 from ..utils.general import make_iterable
 from .utils import get_node_interactions, get_interaction_score, permute_labels
+from collections import Counter
 
 
 # %%
+
+def _infiltration_local_deprecated(G: Graph,
+                        interaction1=('tumor', 'immune'),
+                        interaction2=('immune', 'immune')):
+
+    ids = np.unique(interaction1, interaction2)
+    nodes_inter1 = [node for node in G.nodes if G.nodes[node]['attr'] in ids]
+    nodes_inter1 = [node for node in G.nodes if G.nodes[node]['attr'] in interaction1]
+    nodes_inter2 = [node for node in G.nodes if G.nodes[node]['attr'] in interaction2]
+
+    for node in ids:
+        neigh = G[node]
+        counts = Counter([G.nodes[i]['attr'] for i in neigh])
+
+def _infiltration_local(G: Graph,
+                        interaction1=('tumor', 'immune'),
+                        interaction2=('immune', 'immune')):
+
+    ids = np.unique(interaction1, interaction2)
+    nodes = [node for node in G.nodes if G.nodes[node]['attr'] in ids]
+    for node in nodes:
+        neigh = G[node]
+        subG = G.subgraph()
+
+    pass
+
 def _infiltration(node_interactions: pd.DataFrame, interaction1=('tumor', 'immune'),
                   interaction2=('immune', 'immune')) -> float:
     """

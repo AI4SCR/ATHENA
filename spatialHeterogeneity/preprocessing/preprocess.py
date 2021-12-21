@@ -34,6 +34,8 @@ def extract_centroids(so, spl, mask_key='cellmasks', inplace=True):
     ndata.sort_index(axis=0, ascending=True, inplace=True)
 
     if spl in so.obs:
+        if 'x' in so.obs[spl] and 'y' in so.obs[spl]:
+            so.obs[spl] = so.obs[spl].drop(columns=['x', 'y'])
         so.obs[spl] = pd.concat((so.obs[spl], ndata), axis=1)
     else:
         so.obs[spl] = ndata

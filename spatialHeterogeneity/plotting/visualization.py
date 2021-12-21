@@ -132,6 +132,9 @@ def spatial(so, spl: str, attr: str, *, mode: str = 'scatter', node_size: float 
 
         # map to colors
         if colors is None:
+            no_na = data[~np.isnan(data)]
+            _ = norm(no_na)  # initialise norm with no NA data.
+
             colors = cmap(norm(data))
 
         im = ax.scatter(loc[coordinate_keys[0]], loc[coordinate_keys[1]], s=node_size, c=colors, zorder=2.5)
@@ -372,7 +375,8 @@ def get_cmap(so, attr: str, data):
 
     return cmap, cmap_labels
 
-def ripleysK(so, spl: str, attr: str, ids, *, mode='K', correction='ripley', key=None, ax=None):
+def ripleysK(so, spl: str, attr: str, ids, *, mode='K', correction='ripley',
+             key=None, ax=None, legend='auto'):
     """Plot results
 
     Args:
@@ -412,7 +416,7 @@ def ripleysK(so, spl: str, attr: str, ids, *, mode='K', correction='ripley', key
     res = res.melt(id_vars='radii', var_name=attr)
     res[attr] = res[attr].astype('category')
 
-    cmap, labels = get_cmap(so, attr, res.cell_type_id)
+    cmap, labels = get_cmap(so, attr, res[attr])
     cmap_dict = {j:i for i,j in zip(cmap.colors, labels.values())}
     if labels:
         res[attr] = res[attr].astype(type(list(labels.keys())[0])).map(labels)
@@ -423,7 +427,7 @@ def ripleysK(so, spl: str, attr: str, ids, *, mode='K', correction='ripley', key
     else:
         fig = ax.get_figure()
 
-    sns.lineplot(data=res, x='radii', y='value', hue=attr, palette=cmap_dict, ax=ax)
+    sns.lineplot(data=res, x='radii', y='value', hue=attr, palette=cmap_dict, ax=ax, legend=legend)
     ax.plot(radii, np.repeat(0, len(radii)), color='black', linestyle=':')
     fig.tight_layout()
     fig.show()
