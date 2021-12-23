@@ -431,3 +431,66 @@ def ripleysK(so, spl: str, attr: str, ids, *, mode='K', correction='ripley',
     ax.plot(radii, np.repeat(0, len(radii)), color='black', linestyle=':')
     fig.tight_layout()
     fig.show()
+
+def infiltration(so, spl: str, attr: str ='infiltration', step_size: int = 10,
+                 interpolation: str = 'gaussian',
+                 cmap: str ='plasma',
+                 collision_strategy='mean',
+                 ax=None,
+                 show=True):
+    """Visualises a heatmap of the featuer intensity.
+
+    Approximates the sample with a grid representation and colors each grid square according to the
+    value of the attribute. If multiple observations map to the same grid square a the aggregation specified
+    in `collision_strategy` is employed (any value accepted by pandas aggregate function, i.e. 'mean', 'max', ...)
+
+    Args:
+        so: SpatialOmics instance
+        spl: Spl for which to compute the metric
+        attr: feature in SpatialOmics.obs to plot
+        step_size: grid step size
+        interpolation: interpolation method to use between grid values, see [1]
+        cmap: colormap to use
+        collision_strategy: aggragation strategy to use if multiple obseravtion values map to the same grid value
+        ax: axes to use for the plot
+        show: whether to show the plot or not. Will be set to False if axes is provided.
+
+    Returns:
+        None
+    Notes:
+        .. [1] https://matplotlib.org/stable/gallery/images_contours_and_fields/interpolation_methods.html
+    """
+
+    dat = so.obs[spl][[attr] + ['x', 'y']]
+    dat = dat[~dat.infiltration.isna()]
+
+    # we add step_size to prevent out of bounds indexing should the `{x,y}_img` values be rounded up.
+    x, y = np.arange(0, so.images[spl].shape[2], step_size), np.arange(0, so.images[spl].shape[1], step_size)
+    img = np.zeros((len(y), len(x)))
+
+    dat['x_img'] = np.round(dat.x / step_size).astype(int)
+    dat['y_img'] = np.round(dat.y / step_size).astype(int)
+
+    if dat[['x_img', 'y_img']].duplicated().any():
+        logging.warning(
+            f'`step_size` is to granular, {dat[["x_img", "y_img"]].duplicated().sum()} observed infiltration values mapped to same grid square')
+
+    if collision_strategy is not None:
+        logging.warning(f'computing {collision_strategy} for collisions')
+        dat = dat.groupby(['x_img', 'y_img']).infiltration.agg(collision_strategy).reset_index()
+
+    for i in range(dat.shape[0]):
+        img[dat.y_img.iloc[i], dat.x_img.iloc[i]] = dat.infiltration.iloc[i]
+
+    # generate figure
+    if ax:
+        fig = ax.get_figure()
+        show = False  # do not automatically show plot if we provide axes
+    else:
+        fig, ax = plt.subplots()
+
+    ax.imshow(img, interpolation=interpolation, cmap=cmap)
+    ax.invert_yaxis()
+
+    if show:
+        fig.show()
