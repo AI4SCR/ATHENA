@@ -212,3 +212,6 @@ for ax, interpolation in zip(axs.flat, methods):
     ax.set_title(interpolation)
 fig.show()
 fig.savefig('/Users/art/Downloads/infiltration_interpolation.pdf')
+
+# %%
+sh.metrics.quadratic_entropy(so, spl, 'meta_id', graph_key='contact')

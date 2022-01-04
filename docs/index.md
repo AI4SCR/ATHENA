@@ -14,7 +14,7 @@ caption: Gallery
 maxdepth: 2
 ---
 Overview of ATHENA <source/overview.md>
-Methodology <source/documentation.md>
+Methodology <source/ATHENA_Supplementary.pdf>
 Tutorial <source/tutorial.md>
 SpatialOmics Tutorial <source/introduction-spatialOmics.md>
 ```
