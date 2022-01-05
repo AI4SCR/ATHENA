@@ -27,7 +27,7 @@ def modularity(so: SpatialOmics, spl: str, community_id: str,
     so = so if inplace else so.deepcopy()
 
     if key_added is None:
-        key_added = f'modularity_{community_id}_{resolution}'
+        key_added = f'modularity_{community_id}_res{resolution}'
 
     if community_id not in so.obs[spl]:
         raise ValueError(f'{community_id} not in so.obs[spl]')
