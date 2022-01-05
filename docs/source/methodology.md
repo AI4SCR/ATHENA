@@ -2,7 +2,6 @@
 
 The PDF is available [here](https://github.com/histocartography/athena/blob/master/tutorials/ATHENA_Supplementary.pdf)
 
-
 ![](img/ATHENA_Supplementary_1.png)
 ![](img/ATHENA_Supplementary_2.png)
 ![](img/ATHENA_Supplementary_3.png)
