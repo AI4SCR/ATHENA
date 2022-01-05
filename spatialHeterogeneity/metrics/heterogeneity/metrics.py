@@ -161,7 +161,7 @@ def renyi_entropy(so, spl: str, attr: str, q: float, *, local=True, key_added=No
                            local=local, inplace=inplace)
 
 
-def quadratic_entropy(so, spl: str, attr: str, *, metric='minkowski', metric_kwargs={'p': 2}, scale: bool = True,
+def quadratic_entropy(so, spl: str, attr: str, *, metric='minkowski', metric_kwargs={}, scale: bool = True,
                       local=True, key_added=None, graph_key='knn', inplace=True):
     """Computes the quadratic entropy, taking relative abundance and similarity between observations into account.
 
