@@ -294,8 +294,6 @@ def _compute_metric(so, spl: str, attr, key_added, graph_key, metric, kwargs_met
                 so.uns[spl] = {}
             so.uns[spl][key_added] = res
         else:
-            if key_added in so.spl:
-                so.spl.drop(key_added, 1, inplace=True)
             so.spl.loc[spl, key_added] = res
 
     if not inplace:
