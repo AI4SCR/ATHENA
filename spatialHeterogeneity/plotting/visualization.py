@@ -202,7 +202,7 @@ def spatial(so, spl: str, attr: str, *, mode: str = 'scatter', node_size: float 
         savefig(fig, save)
 
 
-def napari_viewer(so, spl: str, attrs: list, censor: float = .95, add_masks='cellmasks'):
+def napari_viewer(so, spl: str, attrs: list, censor: float = .95, add_masks='cellmasks', attrs_key='target', index_key:str='fullstack_index'):
     """Starts interactive Napari viewer to visualise raw images
 
     Args:
@@ -217,8 +217,8 @@ def napari_viewer(so, spl: str, attrs: list, censor: float = .95, add_masks='cel
     """
     attrs = list(make_iterable(attrs))
     var = so.var[spl]
-    index = var[var.target.isin(attrs)].fullstack_index
-    names = var[var.target.isin(attrs)].target
+    index = var[var[attrs_key].isin(attrs)][index_key]
+    names = var[var[attrs_key].isin(attrs)][attrs_key]
 
     img = so.get_image(spl)[index,]
     if censor:
@@ -253,7 +253,7 @@ def channel(so, spl: str, attrs: str, ax=None, colors=None, censor: float = None
     """
     attrs = list(make_iterable(attrs))
     var = so.var[spl]
-    i = var[var.target.isin(attrs)].fullstack_index
+    i = var[var.target.isin(attrs)][index_key]
 
     img = so.get_image(spl)[i,]
 
