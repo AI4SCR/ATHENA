@@ -4,11 +4,12 @@ from ._utils import DataSet
 def imc():
     """Pre-processed subset IMC dataset from *Jackson, H.W., Fischer, J.R., Zanotelli, V.R.T. et al. The single-cell pathology landscape of breast cancer.* `Nature <https://doi.org/10.1038/s41586-019-1876-x>`_
     """
-    return DataSet(
+    so = DataSet(
         name='imc',
         url='https://figshare.com/ndownloader/files/31750769',
         doc_header='Pre-processed subset IMC dataset from `Jackson et al '
     )
+    return so()
 
 
 def mibi():
@@ -17,11 +18,12 @@ def mibi():
     Normalised expression values of segmented cells and cell masks from `here <https://www.angelolab.com/mibi-data>`_ and tiff stacks from `here <https://mibi-share.ionpath.com/tracker/imageset/>`_
 
     """
-    return DataSet(
+    so = DataSet(
         name='mibi',
         url='https://figshare.com/ndownloader/files/34148859',
         doc_header='Processed data from https://www.angelolab.com/mibi-data and https://mibi-share.ionpath.com/tracker/imageset'
     )
+    return so()
 
 
 mibi_pop = DataSet(
