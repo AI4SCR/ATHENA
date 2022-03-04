@@ -1,5 +1,5 @@
 [![Build Status](https://travis.ibm.com/art-zurich/spatial-heterogeneity.svg?token=bmUqdLriQp1g3yv7TJC6&branch=master)](https://travis.ibm.com/art-zurich/spatial-heterogeneity)
-[![GitHub Pages](https://img.shields.io/badge/docs-sphinx-blue)](https://histocartography.github.io/athena/)
+[![GitHub Pages](https://img.shields.io/badge/docs-sphinx-blue)](https://ai4scr.github.io/ATHENA/)
 
 ![athena logo](tutorials/img/athena_logo.png)
 
