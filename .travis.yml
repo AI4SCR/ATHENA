@@ -51,7 +51,7 @@ jobs:
       deploy:
         - provider: pages
           skip_cleanup: true
-          repo: histocartography/athena
+          repo: AI4SCR/ATHENA
           #          github_token: $GITHUB_TOKEN
           github_token: $GITHUB_TOKEN_PUBLIC
           # Set in the settings page of your repository, as a secure variable
