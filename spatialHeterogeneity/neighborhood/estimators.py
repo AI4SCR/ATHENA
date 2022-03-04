@@ -111,7 +111,7 @@ def infiltration(so, spl: str, attr: str, *, interaction1=('tumor', 'immune'), i
 
 
 def ripleysK(so, spl: str, attr: str, id, *, mode='K', radii=None, correction='ripley', inplace=True, key_added=None):
-    """Compute Ripley's K
+    """Compute Ripley's K as implemented by [1]_.
 
     Args:
         so: SpatialOmics instance
@@ -127,7 +127,7 @@ def ripleysK(so, spl: str, attr: str, id, *, mode='K', radii=None, correction='r
     Returns:
         Ripley's K estimates
 
-    Notes:
+    References:
         .. [1] https://docs.astropy.org/en/stable/stats/ripley.html
 
     """

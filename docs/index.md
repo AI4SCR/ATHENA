@@ -22,7 +22,7 @@ SpatialOmics Tutorial <source/introduction-spatialOmics.md>
 ```{toctree}
 ---
 caption: API
-maxdepth: 1
+maxdepth: 2
 ---
-ATHENA API reference <api/spatialHeterogeneity>
+api_overview
 ```

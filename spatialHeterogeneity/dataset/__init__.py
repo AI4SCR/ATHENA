@@ -1,1 +1,1 @@
-from ._datasets import imc, mibi, mibi_pop
+from .datasets import imc, mibi
