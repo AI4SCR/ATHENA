@@ -18,4 +18,4 @@ ATHENA is an open-source computational framework written in Python that facilita
 
 
 # Installation
-Install the package as outlined in the [docs](https://histocartography.github.io/athena/).
+Install the package as outlined in the [docs](https://ai4scr.github.io/ATHENA/).
