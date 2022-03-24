@@ -16,8 +16,8 @@ install:
   - pip install -U pip
   - pip install --progress-bar off -r requirements.txt
   - pip install --progress-bar off -r dev_requirements.txt
-  - pip install .
-  - pip install "git+ssh://git@github.ibm.com/art-zurich/spatial-omics.git@master"
+  - pip install "git+https://github.com/AI4SCR/ATHENA.git@master"
+  - pip install "git+https://github.com/AI4SCR/spatial-omics.git@master"
 
 script:
   # test import
