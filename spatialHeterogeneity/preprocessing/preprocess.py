@@ -43,15 +43,33 @@ def extract_centroids(so, spl, mask_key='cellmasks', inplace=True):
     if not inplace:
         return so
 
-def extract_image_properties(so, spl, inplace=True):
+def arcsinh(so, spl, cofactor):
+    """Computes the arcsinh transformation of the expression values according to:
+
+    .. math::
+
+        X = \\mathtt{arcsinh}(\\frac{X}{\\mathtt{cofactor}})
+
+
+    Args:
+        so: spatialOmics instance
+        spl: sample name
+        cofactor: cofactor used for transformation
+
     """
+
+    X = so.X[spl]
+    np.divide(X, cofactor, out=X)
+    np.arcsinh(X, out=X)
+
+
+def _extract_image_properties(so, spl, inplace=True):
+    """Extract image properties from the high-dimensional images.
 
     Args:
         so: SpatialOmics instance
         spl: sample for which to extract centroids
         inplace: Whether to add the metric to the current SpatialOmics instance or to return a new one.
-
-    Returns:
 
     """
     so = so if inplace else so.copy()

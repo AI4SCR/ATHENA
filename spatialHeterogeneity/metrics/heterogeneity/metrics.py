@@ -25,8 +25,15 @@ def richness(so, spl: str, attr: str, *, local=True, key_added=None, graph_key='
         graph_key: Specifies the graph representation to use in so.G[spl] if `local=True`.
         inplace: Whether to add the metric to the current SpatialOmics instance or to return a new one.
 
-    Returns:
+    Examples:
 
+        .. code-block:: python
+
+            so = sh.dataset.imc()
+            spl = so.spl.index[0]
+
+            sh.metrics.richness(so, spl, 'meta_id', local=False)
+            sh.metrics.richness(so, spl, 'meta_id', local=True)
     """
 
     if key_added is None:
@@ -55,7 +62,15 @@ def shannon(so, spl: str, attr: str, *, local=True, key_added=None, graph_key='k
         graph_key: Specifies the graph representation to use in so.G[spl] if `local=True`.
         inplace: Whether to add the metric to the current SpatialOmics instance or to return a new one.
 
-    Returns:
+    Examples:
+
+        .. code-block:: python
+
+            so = sh.dataset.imc()
+            spl = so.spl.index[0]
+
+            sh.metrics.shannon(so, spl, 'meta_id', local=False)
+            sh.metrics.shannon(so, spl, 'meta_id', local=True)
 
     """
     if key_added is None:
@@ -84,7 +99,15 @@ def simpson(so, spl: str, attr: str, *, local=True, key_added=None, graph_key='k
         graph_key: Specifies the graph representation to use in so.G[spl] if `local=True`.
         inplace: Whether to add the metric to the current SpatialOmics instance or to return a new one.
 
-    Returns:
+    Examples:
+
+        .. code-block:: python
+
+            so = sh.dataset.imc()
+            spl = so.spl.index[0]
+
+            sh.metrics.simpson(so, spl, 'meta_id', local=False)
+            sh.metrics.simpson(so, spl, 'meta_id', local=True)
 
     """
     if key_added is None:
@@ -108,12 +131,21 @@ def hill_number(so, spl: str, attr: str, q: float, *, local=True, key_added=None
         so: SpatialOmics instance
         spl: Spl for which to compute the metric
         attr: Categorical feature in SpatialOmics.obs to use for the grouping
+        q: The hill coefficient as defined here_.
         local: Whether to compute the metric on the observation or the sample level
         key_added: Key added to either obs or spl depending on the choice of `local`
         graph_key: Specifies the graph representation to use in so.G[spl] if `local=True`.
         inplace: Whether to add the metric to the current SpatialOmics instance or to return a new one.
 
-    Returns:
+    Examples:
+
+        .. code-block:: python
+
+            so = sh.dataset.imc()
+            spl = so.spl.index[0]
+
+            sh.metrics.hill_number(so, spl, 'meta_id', q=2, local=False)
+            sh.metrics.hill_number(so, spl, 'meta_id', q=2, local=True)
 
     """
     if key_added is None:
@@ -132,19 +164,29 @@ def hill_number(so, spl: str, attr: str, q: float, *, local=True, key_added=None
 
 def renyi_entropy(so, spl: str, attr: str, q: float, *, local=True, key_added=None, graph_key='knn', base=2,
                   inplace=True):
-    """Computes the Renyi-Entropy
+    """Computes the Renyi-Entropy.
 
     Args:
         so: SpatialOmics instance
         spl: Spl for which to compute the metric
         attr: Categorical feature in SpatialOmics.obs to use for the grouping
+        q: The renyi coefficient as defined here_
         local: Whether to compute the metric on the observation or the sample level
         key_added: Key added to either obs or spl depending on the choice of `local`
         graph_key: Specifies the graph representation to use in so.G[spl] if `local=True`.
         inplace: Whether to add the metric to the current SpatialOmics instance or to return a new one.
 
-    Returns:
+    Examples:
 
+        .. code-block:: python
+
+            so = sh.dataset.imc()
+            spl = so.spl.index[0]
+
+            sh.metrics.renyi_entropy(so, spl, 'meta_id', q=2, local=False)
+            sh.metrics.renyi_entropy(so, spl, 'meta_id', q=2, local=True)
+
+    .. _here: https://ai4scr.github.io/ATHENA/source/methodology.html
     """
     if key_added is None:
         key_added = 'renyi'
@@ -181,8 +223,15 @@ def quadratic_entropy(so, spl: str, attr: str, *, metric='minkowski', metric_kwa
         The implementation computes an average feature vector for each group in attr based on all observations in the
         sample. Thus, if staining biases across samples exists this will directly distort this metric.
 
-    Returns:
-        float, quadratic entropy
+    Examples:
+
+        .. code-block:: python
+
+            so = sh.dataset.imc()
+            spl = so.spl.index[0]
+
+            sh.metrics.quadratic_entropy(so, spl, 'meta_id', local=False)
+            sh.metrics.quadratic_entropy(so, spl, 'meta_id', local=True)
 
     """
     if key_added is None:
@@ -226,7 +275,15 @@ def abundance(so, spl: str, attr: str, *, mode='proportion', key_added: str = No
         graph_key: Specifies the graph representation to use in so.G[spl] if `local=True`.
         inplace: Whether to add the metric to the current SpatialOmics instance or to return a new one.
 
-    Returns:
+    Examples:
+
+        .. code-block:: python
+
+            so = sh.dataset.imc()
+            spl = so.spl.index[0]
+
+            sh.metrics.abundance(so, spl, 'meta_id', local=False)
+            sh.metrics.abundance(so, spl, 'meta_id', local=True)
 
     """
 

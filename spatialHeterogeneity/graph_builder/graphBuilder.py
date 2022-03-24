@@ -4,19 +4,24 @@ import networkx as nx
 from pandas import DataFrame
 
 def build_graph(so, spl: str, builder_type = 'knn', mask_key = 'cellmasks', key_added=None, config = None, inplace=True):
-    """Build graph representation for a sample
+    """Build graph representation for a sample. A graph is constructed based on the provided segmentation masks
+    for the sample. For the `knn` and `radius` graph representation the centroid of each mask is used. For the `contact`
+    graph representation the segmentation masks are dilation_ is performed. The segmentation masks that overlap after
+    dilation are considered to be in physical contact and connected in the `contact` graph.
 
     Args:
-        so:
-        spl:
+        so: SpatialOmics object
+        spl: sample name in so.spl.index
         builder_type: graph type to construct {knn, radius, contact}
         mask_key: key in so.masks[spl] to use as segmentation masks
-        key_added:
+        key_added: key added in so.G[spl][key_add] to store the graph.
         config: dict containing a dict 'builder_params' that specifies the graph construction parameters
         inplace: whether to return a new SpatialOmics instance
 
     Returns:
         None or SpatialOmics if inplace = False
+
+    .. _dilation: https://scikit-image.org/docs/stable/api/skimage.morphology.html#skimage.morphology.binary_dilation
     """
     if builder_type not in GRAPH_BUILDERS:
         raise ValueError(f'invalid type {builder_type}. Available types are {GRAPH_BUILDERS.keys()}')

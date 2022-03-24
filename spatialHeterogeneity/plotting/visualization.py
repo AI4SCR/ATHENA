@@ -25,7 +25,13 @@ def spatial(so, spl: str, attr: str, *, mode: str = 'scatter', node_size: float 
             edge_color: str = 'black', edge_zorder: int = 2, background_color: str = 'white', ax: plt.Axes = None,
             norm=None, set_title: bool = True, cmap=None, cmap_labels: list = None, cbar: bool = True,
             cbar_title: bool = True, show: bool = True, save: str = None, tight_layout: bool = True):
-    """Visualisation of samples.
+    """Various functionalities to visualise samples.
+    Allows to visualise the samples and color observations according to features in either so.X or so.obs by setting the ``attr`` parameter accordingly.
+    Furthermore, observations (cells) within a sample can be quickly visualised using scatter plots (requires extraction of centroids with :func:`~.extract_centroids`)
+    or by their actual segmentatio mask by setting ``mode`` accordingly.
+    Finally, the graph representation of the sample can be overlayed by setting ``edges=True`` and specifing the ``graph_key`` as in ``so.G[spl][graph_key]``.
+
+    For more examples on how to use this function have a look at the tutorial_ section.
 
     Args:
         so: SpatialOmics instance
@@ -52,8 +58,16 @@ def spatial(so, spl: str, attr: str, *, mode: str = 'scatter', node_size: float 
         save: path to the file in which the plot is saved
         tight_layout: whether to apply tight_layout or not.
 
-    Returns:
+    Examples:
 
+        .. code-block:: python
+
+            so = sh.dataset.imc()
+            sh.pl.spatial(so, 'slide_7_Cy2x2', 'meta_id', mode='mask')
+            sh.pl.spatial(so, 'slide_7_Cy2x2', 'meta_id', mode='scatter', edges=True)
+
+
+    .. _tutorial: https://ai4scr.github.io/ATHENA/source/tutorial.html
     """
     # get attribute information
     data = None  # pd.Series/array holding the attr for colormapping
@@ -157,11 +171,15 @@ def spatial(so, spl: str, attr: str, *, mode: str = 'scatter', node_size: float 
         else:
             raise RuntimeError('Unknown case')
         mapping.update({0: 0})
+        mapping.update({np.nan: np.nan})
 
         # apply mapping vectorized
         otype = ['int'] if _is_categorical_flag else ['float']
         func = np.vectorize(lambda x: mapping[x], otypes=otype)
         im = func(mask)
+
+        # convert to masked array to handle np.nan values
+        im = np.ma.array(im, mask=np.isnan(im))
 
         # plot
         im = cmap(norm(im))
@@ -203,16 +221,36 @@ def spatial(so, spl: str, attr: str, *, mode: str = 'scatter', node_size: float 
 
 
 def napari_viewer(so, spl: str, attrs: list, censor: float = .95, add_masks='cellmasks', attrs_key='target', index_key:str='fullstack_index'):
-    """Starts interactive Napari viewer to visualise raw images
+    """Starts interactive Napari viewer to visualise raw images and explore samples.
+    ``attrs`` are measured features in the high dimensional images in ``so.images[spl]``.
+    All specified ``attrs`` should be in ``so.var[spl][attrs_key]`` along with the index in the high dimensional images.
+    The column with the index in the high dimensional image where the measurement of an attribute is stored.
 
     Args:
         so: SpatialOmics instance
         spl: sample to visualise
-        attrs: list of attributes to add as channels to the viewer
+        attrs: list of attributes/features to add as channels to the viewer
         censor: percentil to use to censore pixle values in the raw images
         add_masks: segmentation masks to add as channels to the viewer
+        attrs_key: key in ``so.var[spl]`` that defines the ``attrs`` names
+        index_key: key in ``so.var[spl]`` that specifies the layer index in the high dimensional image in ``so.images[spl]``.
 
-    Returns:
+
+    Examples:
+
+    .. code-block:: python
+
+        so = sh.dataset.imc()
+        spl = so.spl.index[0]
+
+        # add all measured features to the napari viewer
+        sh.pl.napari_viewer(so, spl, attrs=so.var[spl]['target'], add_masks=so.masks[spl].keys())
+
+        # specify the column containing the ``attrs`` names
+        sh.pl.napari_viewer(so, spl, attrs=so.var[spl]['target'], attrs_key='target')
+
+        # specify the column containing the ``attrs`` names and the columns that specifies the layer index
+        sh.pl.napari_viewer(so, spl, attrs=so.var[spl]['target'], attrs_key='target', index_key='fullstack_index')
 
     """
     attrs = list(make_iterable(attrs))
@@ -236,7 +274,7 @@ def napari_viewer(so, spl: str, attrs: list, censor: float = .95, add_masks='cel
             labels_layer = viewer.add_labels(mask, name=m)
 
 
-def channel(so, spl: str, attrs: str, ax=None, colors=None, censor: float = None, show=True):
+def _channel(so, spl: str, attrs: str, ax=None, colors=None, censor: float = None, show=True):
     """Plot challnels. Decreapted, will be removed.
 
     Args:
@@ -294,8 +332,8 @@ def channel(so, spl: str, attrs: str, ax=None, colors=None, censor: float = None
 
 
 def interactions(so, spl, attr, mode='proportion', prediction_type='diff', graph_key='knn', linewidths=.5, cmap=None,
-                 norm=None, ax=None, show=True):
-    """Visualise interaction results.
+                 norm=None, ax=None, show=True, cbar=True):
+    """Visualise results from :func:`~neigh.interactions` results.
 
     Args:
         so: SpatialOmics instance
@@ -309,8 +347,22 @@ def interactions(so, spl, attr, mode='proportion', prediction_type='diff', graph
         norm: normalisation to use
         ax: axes object to use
         show: whether to show the plot
+        cbar: wheter to show the colorbar
 
-    Returns:
+    Examples:
+
+        .. code-block:: python
+
+            # compute Ripley's K
+            so = sh.dataset.imc()
+            spl = so.spl.index[0]
+
+            # build graph
+            sh.graph.build_graph(so, spl, builder_type='knn', mask_key='cellmasks')
+
+            # compute & plot interactions
+            sh.neigh.interactions(so, spl, 'meta_id', mode='proportion', prediction_type='observation')
+            sh.pl.interactions(so, spl, 'meta_id', mode='proportion', prediction_type='observation')
 
     """
     if ax is None:
@@ -334,7 +386,7 @@ def interactions(so, spl, attr, mode='proportion', prediction_type='diff', graph
         v = np.abs(data).max().max()
         norm = Normalize(-v, v)
 
-    sns.heatmap(data=data, cmap=cmap, norm=norm, ax=ax, linewidths=linewidths)
+    sns.heatmap(data=data, cmap=cmap, norm=norm, ax=ax, linewidths=linewidths, cbar=cbar)
     ax.set_aspect(1)
     ax.set_yticklabels(ax.get_yticklabels(), rotation=0)
 
@@ -377,7 +429,7 @@ def get_cmap(so, attr: str, data):
 
 def ripleysK(so, spl: str, attr: str, ids, *, mode='K', correction='ripley',
              key=None, ax=None, legend='auto'):
-    """Plot results
+    """Visualise results from :func:`~neigh.ripleysK` results.
 
     Args:
         so: SpatialOmics instance
@@ -389,8 +441,15 @@ def ripleysK(so, spl: str, attr: str, ids, *, mode='K', correction='ripley',
         key: key to use in so.uns['ripleysK'] for the plot, if None it is constructed from spl,attr,ids,mode and correction
         ax: axes to use for the plot
 
-    Returns:
-        None
+    Examples:
+
+        .. code-block:: python
+
+            # compute Ripley's K
+            so = sh.dataset.imc()
+            sh.neigh.ripleysK(so, so.spl.index[0], 'meta_id', 1, mode='csr-deviation', radii=radii)
+            sh.pl.ripleysK(so, so.spl.index[0], 'meta_id', [1], mode='csr-deviation')
+
     """
 
     if key is None:
@@ -455,8 +514,18 @@ def infiltration(so, spl: str, attr: str ='infiltration', step_size: int = 10,
         ax: axes to use for the plot
         show: whether to show the plot or not. Will be set to False if axes is provided.
 
-    Returns:
-        None
+    Examples:
+
+        .. code-block:: python
+
+            so = sh.dataset.imc()
+            spl = so.spl.index[0]
+
+            # build graph
+            sh.graph.build_graph(so, spl, builder_type='knn', mask_key='cellmasks')
+
+            sh.neigh.infiltration(so, spl, 'meta_id', graph_key='knn')
+            sh.pl.infiltration(so, spl, step_size=10)
     Notes:
         .. [1] https://matplotlib.org/stable/gallery/images_contours_and_fields/interpolation_methods.html
     """

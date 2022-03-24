@@ -121,5 +121,4 @@ venv.bak/
 #docs/source/img/athena_*.png
 data/
 single_cell_values_visium_cellmasks.pkl
-
-
+/bench
