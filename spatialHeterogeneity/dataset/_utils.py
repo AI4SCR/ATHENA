@@ -27,17 +27,17 @@ class DataSet(ABC):
     def _extension(self) -> str:
         return '.h5py'
 
-    def __call__(self, path: PathLike = None):
-        return self.load(path)
+    def __call__(self, path: PathLike = None, force_download: bool = False):
+        return self.load(path, force_download)
 
-    def load(self, fpath: PathLike = None):
+    def load(self, fpath: PathLike = None, force_download: bool = False):
         """Download dataset form url"""
         fpath = str(self.path if fpath is None else fpath)
 
         if not fpath.endswith(self._extension):
             fpath += self._extension
 
-        if not os.path.isfile(fpath):
+        if not os.path.isfile(fpath) or force_download:
             # download file
             dirname = Path(fpath).parent
             if not dirname.is_dir():
