@@ -18,7 +18,6 @@ install:
   - pip install --progress-bar off -r dev_requirements.txt
   - pip install "git+https://github.com/AI4SCR/ATHENA.git@master"
   - pip install "git+https://github.com/AI4SCR/spatial-omics.git@master"
-  - pip install "Jinja2<3.1"
 
 script:
   # test import

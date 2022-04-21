@@ -13,3 +13,4 @@ six==1.16.0
 sphinx_rtd_theme==0.5.2
 myst-parser==0.14
 nbconvert
+Jinja2<3.1

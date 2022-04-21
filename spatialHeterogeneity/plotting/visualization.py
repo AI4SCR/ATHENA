@@ -89,7 +89,7 @@ def spatial(so, spl: str, attr: str, *, mode: str = 'scatter', node_size: float 
     # broadcast if necessary
     _is_categorical_flag = is_categorical(data)
 
-    loc = so.obs[spl][coordinate_keys]
+    loc = so.obs[spl][coordinate_keys].copy()
 
     # set colormap
     if cmap is None:
@@ -198,9 +198,9 @@ def spatial(so, spl: str, attr: str, *, mode: str = 'scatter', node_size: float 
         make_cbar(ax, title, norm, cmap, cmap_labels)
 
     # format plot
-    ax_pad = min(loc['x'].max() * .05, loc['y'].max() * .05, 10)
-    ax.set_xlim(loc['x'].min() - ax_pad, loc['x'].max() + ax_pad)
-    ax.set_ylim(loc['y'].min() - ax_pad, loc['y'].max() + ax_pad)
+    ax_pad = min(loc[coordinate_keys[0]].max() * .05, loc[coordinate_keys[1]].max() * .05, 10)
+    ax.set_xlim(loc[coordinate_keys[0]].min() - ax_pad, loc[coordinate_keys[0]].max() + ax_pad)
+    ax.set_ylim(loc[coordinate_keys[1]].min() - ax_pad, loc[coordinate_keys[1]].max() + ax_pad)
     ax.set_xticks([]);
     ax.set_yticks([])
     ax.set_xlabel('spatial x', label_fontdict)

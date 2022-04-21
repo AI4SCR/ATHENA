@@ -123,3 +123,5 @@ data/
 single_cell_values_visium_cellmasks.pkl
 /bench
 ~/
+/issues
+
