@@ -7,7 +7,7 @@ def imc(force_download=False):
     print('warning: to get the latest version of this dataset use `so = sh.dataset.imc(force_download=True)`')
     so = DataSet(
         name='imc',
-        url='https://figshare.com/ndownloader/files/34856607',
+        url='https://figshare.com/ndownloader/files/34877643',
         doc_header='Pre-processed subset IMC dataset from `Jackson et al '
     )
     return so(force_download=force_download)
