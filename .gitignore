@@ -115,6 +115,7 @@ venv.bak/
 
 # DS_Stores
 .DS_Store
+*/.DS_Store
 
 # ignore ATHENA doc
 #athena.md
