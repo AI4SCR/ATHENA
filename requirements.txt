@@ -1,14 +1,15 @@
 #pip package names required by the package, and exact versions you know to work
-scipy
-numpy
+scanpy==1.9.1
+scikit-image==0.19.2
+scikit-learn==1.0.2
+scipy==1.8.0
+numpy==1.21.6
 pandas==1.2
-networkx
-scikit-learn
-scikit-image
-h5py
-tables
-astropy
-tqdm
-napari[all]
-seaborn
-squidpy
+networkx==2.8
+h5py==3.6.0
+tables==3.7.0
+astropy==5.0.4
+tqdm==4.64.0
+napari[all]==0.4.15
+seaborn==0.11.2
+squidpy==1.2.0
