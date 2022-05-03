@@ -48,6 +48,16 @@ def install_requires():
                 req.append(l.replace('\n', ''))
     return req
 
+def dev_requires():
+    req = []
+    with open('dev_requirements.txt', 'r') as f:
+        for l in f:
+            if l.startswith('#'):
+                continue
+            else:
+                req.append(l.replace('\n', ''))
+    return req
+
 # TODO: Update these values according to the name of the module.
 setup(
     name="spatialHeterogeneity",
@@ -66,22 +76,7 @@ setup(
     extras_require={
         "vcs": VCS_REQUIREMENTS,
         "test": ["pytest", "pytest-cov"],
-        "dev": [
-            # tests
-            "pytest",
-            "pytest-cov",
-            # checks
-            "black==21.5b0",
-            "flake8",
-            "mypy",
-            # docs
-            "sphinx",
-            "sphinx-autodoc-typehints",
-            "better-apidoc",
-            "six",
-            "sphinx_rtd_theme",
-            "myst-parser",
-        ],
+        "dev": dev_requires()
     },
     # versions should be very loose here, just exclude unsuitable versions
     # because your dependencies also have dependencies and so on ...
