@@ -11,7 +11,9 @@ from tqdm import tqdm
 def interactions(so, spl: str, attr: str, mode: str ='classic', prediction_type: str ='observation', *, n_permutations: int =100,
                  random_seed=None, alpha: float =.01, try_load: bool =True, key_added: str =None, graph_key: str ='knn',
                  inplace: bool =True) -> None:
-    """Compute interaction strength between species.
+    """Compute interaction strength between species. This is done by counting the number of interactions (edges in the graph)
+        between pair-wise observation types as encdoded by `attr`. See notes for more information or the
+        `methodology <https://ai4scr.github.io/ATHENA/source/methodology.html>`_ section in the docs.
 
     Args:
         so: SpatialOmics instance
@@ -26,6 +28,10 @@ def interactions(so, spl: str, attr: str, mode: str ='classic', prediction_type:
         key_added: Key added to SpatialOmics.uns[spl][metric][key_added]
         graph_key: Specifies the graph representation to use in so.G[spl] if `local=True`.
         inplace: Whether to add the metric to the current SpatialOmics instance or to return a new one.
+
+    Notes:
+        `classic` and `histoCAT` are python implementations of the corresponding methods pubished by the Bodenmiller lab at UZH.
+        The `proportion` method is similar to the `classic` method but normalises the score by the number of edges and is thus bound [0,1].
 
     Returns:
 
@@ -54,19 +60,31 @@ def interactions(so, spl: str, attr: str, mode: str ='classic', prediction_type:
 
 def infiltration(so, spl: str, attr: str, *, interaction1=('tumor', 'immune'), interaction2=('immune', 'immune'),
                  add_key='infiltration', inplace=True, graph_key='knn', local=False) -> None:
-    """Compute infiltration score.
+    """Compute infiltration score. Generalises the infiltration score presented in
+    `A Structured Tumor-Immune Microenvironment in Triple Negative Breast Cancer Revealed by Multiplexed Ion Beam Imaging <https://pubmed.ncbi.nlm.nih.gov/30193111/>`_
+    The score comptes a ratio between the number of interactions observed between the observation types specified in `interactions1`
+    and `interaction2` as :math:`\\frac{\\texttt{number of interactions 1}}{\\texttt{number of interactions 2}}`. This ratio can
+    be undefined. See notes for more information.
 
     Args:
         so: SpatialOmics instance
         spl: Spl for which to compute the metric
         attr: Categorical feature in SpatialOmics.obs to use for the grouping
-        interaction1: labels of enumerator interaction
-        interaction2: labels of denominator interaction
+        interaction1: labels in `attr` of enumerator interaction
+        interaction2: labels in `attr` of denominator interaction
         key_added: Key added to SpatialOmics.uns[spl][metric][key_added]
         inplace: Whether to add the metric to the current SpatialOmics instance or to return a new one.
         graph_key: Specifies the graph representation to use in so.G[spl] if `local=True`.
 
     Returns:
+
+    Notes:
+        The default arguments are replicating the `immune infiltration score <infiltrationScore_>`_. However, you
+        can compute any kind of "infiltration" between observation types. The `attr` argument specifies the column
+        in the `obs` dataframe which encodes different observation types. `interaction{1,2}` argument defines between
+        which types the score should be computed.
+
+    .. _infiltrationScore: https://pubmed.ncbi.nlm.nih.gov/30193111/
 
     """
     so = so if inplace else so.copy()
@@ -111,7 +129,7 @@ def infiltration(so, spl: str, attr: str, *, interaction1=('tumor', 'immune'), i
 
 
 def ripleysK(so, spl: str, attr: str, id, *, mode='K', radii=None, correction='ripley', inplace=True, key_added=None):
-    """Compute Ripley's K as implemented by [1]_.
+    """Compute Ripley's K as implemented by `[1]`_.
 
     Args:
         so: SpatialOmics instance
@@ -128,7 +146,7 @@ def ripleysK(so, spl: str, attr: str, id, *, mode='K', radii=None, correction='r
         Ripley's K estimates
 
     References:
-        .. [1] https://docs.astropy.org/en/stable/stats/ripley.html
+        .. _[1]: https://docs.astropy.org/en/stable/stats/ripley.html
 
     """
     so = so if inplace else so.copy()
