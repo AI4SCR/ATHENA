@@ -16,33 +16,20 @@ install:
   - pip install -U pip
   - pip install --progress-bar off -r requirements.txt
   - pip install --progress-bar off -r dev_requirements.txt
-  - pip install "git+https://github.com/AI4SCR/ATHENA.git@master"
-  - pip install "git+https://github.com/AI4SCR/spatial-omics.git@master"
+  - pip install "git+https://github.com/AI4SCR-DEV/ATHENA.git@master"
+  - pip install "git+https://github.com/AI4SCR-DEV/spatial-omics.git@master"
 
 script:
   # test import
-  - python -c "import spatialHeterogeneity"
+  - python -c "import athena"
 
-  # run unit tests
-  - python -m pytest -sv --cov=spatialHeterogeneity --cov-fail-under=65
-
-  # static type checking
-  - python -m mypy spatialHeterogeneity
-
-  # style checking
-  - python -m black spatialHeterogeneity --check --diff --color
-  - python -m flake8 --per-file-ignores="__init__.py:F401" spatialHeterogeneity
-
-# the following stages only start if the "test" stage above all succeed
 jobs:
   include:
     - stage: Documentation
       python: 3.8
       script:
         # export tutorial as markdown to integrate it in the docs
-        #        - jupyter nbconvert --to markdown --output-dir=docs/source --output='athena.md' tutorials/getting-started.ipynb
         - jupyter nbconvert --to markdown --output-dir=docs/source --output='introduction-spatialOmics.md' tutorials/introduction-spatialOmics.ipynb
-        # - jupyter nbconvert --to markdown --output-dir=docs/source --output='documentation.md' tutorials/documentation.ipynb
         - jupyter nbconvert --to markdown --output-dir=docs/source --output='overview.md' tutorials/overview.ipynb
         - jupyter nbconvert --to markdown --output-dir=docs/source --output='tutorial.md' tutorials/tutorial.ipynb
         # build documentation pages
