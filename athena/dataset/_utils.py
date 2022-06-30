@@ -21,7 +21,7 @@ class DataSet(ABC):
 
     def __post_init__(self) -> None:
         if self.path is None:
-            object.__setattr__(self, "path", os.path.expanduser(f"~/.cache/spatialHeterogeneity/{self.name}"))
+            object.__setattr__(self, "path", os.path.expanduser(f"~/.cache/athena/{self.name}"))
 
     @property
     def _extension(self) -> str:

@@ -23,7 +23,6 @@ def read_version(filepath: str) -> str:
         raise SystemExit("Version number not found.")
     return match.group(1)
 
-
 # ease installation during development
 vcs = re.compile(r"(git|svn|hg|bzr)\+")
 try:
@@ -38,33 +37,13 @@ except FileNotFoundError:
     print("requirements.txt not found.")
     VCS_REQUIREMENTS = []
 
-def install_requires():
-    req = []
-    with open('requirements.txt', 'r') as f:
-        for l in f:
-            if l.startswith('#'):
-                continue
-            else:
-                req.append(l.replace('\n', ''))
-    return req
-
-def dev_requires():
-    req = []
-    with open('dev_requirements.txt', 'r') as f:
-        for l in f:
-            if l.startswith('#'):
-                continue
-            else:
-                req.append(l.replace('\n', ''))
-    return req
-
 # TODO: Update these values according to the name of the module.
 setup(
-    name="spatialHeterogeneity",
-    version=read_version("spatialHeterogeneity/__init__.py"),  # single place for version
-    description="spatialHeterogeneity package provides methods to analyse spatial heterogeneity in spatial omics data",
+    name="ai4scr-athena",
+    version=read_version("athena/__init__.py"),  # single place for version
+    description="ATHENA package provides methods to analyse spatial heterogeneity in spatial omics data",
     long_description=open("README.md").read(),
-    url="https://github.ibm.com/art-zurich/spatial-heterogeneity",
+    url="https://github.com/AI4SCR/ATHENA",
     author="Adriano Martinelli",
     author_email="art@zurich.ibm.com",
     # the following exclusion is to prevent shipping of tests.
@@ -76,10 +55,46 @@ setup(
     extras_require={
         "vcs": VCS_REQUIREMENTS,
         "test": ["pytest", "pytest-cov"],
-        "dev": dev_requires()
+        "dev": [
+            # tests
+            'pytest==6.2.4',
+            'pytest-cov==2.11.1',
+            # checks
+            'black==21.5b0',
+            'flake8==3.9.1',
+            'mypy==0.812',
+            # docs
+            'sphinx==3.5.4',
+            'sphinx-autodoc-typehints==1.12.0',
+            'better-apidoc==0.3.1',
+            'six==1.16.0',
+            'sphinx_rtd_theme==0.5.2',
+            'myst-parser==0.14',
+            #
+            'nbconvert==6.5.0',
+            'Jinja2<3.1',
+            'jupyterlab==3.3.4',
+            'colorcet==3.0.0',
+            'twine'
+        ]
     },
     # versions should be very loose here, just exclude unsuitable versions
     # because your dependencies also have dependencies and so on ...
     # being too strict here will make dependency resolution harder
-    install_requires=install_requires()
+    install_requires=[
+        'scanpy>=1.9.1',
+        'scikit-image>=0.19.2',
+        'scikit-learn>=1.0.2',
+        'scipy>=1.8.0',
+        'numpy>=1.21.6',
+        'pandas>=1.2',
+        'networkx>=2.8',
+        'h5py>=3.6.0',
+        'tables>=3.7.0',
+        'astropy>=5.0.4',
+        'tqdm>=4.64.0',
+        'napari[all]>=0.4.15',
+        'seaborn>=0.11.2',
+        'squidpy>=1.2.0',
+    ]
 )
