@@ -18,7 +18,7 @@ sys.path.insert(0, os.path.abspath(".."))
 
 # -- Project information -----------------------------------------------------
 
-project = "spatialHeterogeneity"
+project = "athena"
 copyright = "IBM Corp. 2021"
 author = "Adriano Martinelli (art@zurich.ibm.com)"
 
@@ -40,7 +40,7 @@ def run_apidoc(app):
             "--separate",
             "-o",
             os.path.join(".", "api"),
-            os.path.join("..", "spatialHeterogeneity"),
+            os.path.join("..", "athena"),
         ]
     )
 
