@@ -14,9 +14,9 @@ python:
 install:
   # install the package
   - pip install -U pip
+  - pip install git+ssh://git@github.ibm.com/AI4SCR-DEV/spatial-omics.git
   - pip install --progress-bar off -r requirements.txt
   - pip install --progress-bar off -r dev_requirements.txt
-  - pip install git+ssh://git@github.ibm.com/AI4SCR-DEV/spatial-omics.git
   - pip install -e .  # - pip install git+ssh://git@github.ibm.com/AI4SCR-DEV/ATHENA.git
 
 script:
