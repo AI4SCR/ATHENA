@@ -12,6 +12,17 @@ def imc(force_download=False):
     )
     return so(force_download=force_download)
 
+def imc_sample(force_download=False):
+    """Pre-processed samples from the cohort IMC dataset from *Jackson, H.W., Fischer, J.R., Zanotelli, V.R.T. et al. The single-cell pathology landscape of breast cancer.* `Nature <https://doi.org/10.1038/s41586-019-1876-x>`_
+    """
+    print('warning: to get the latest version of this dataset use `so = sh.dataset.imc(force_download=True)`')
+    so = DataSet(
+        name='imc',
+        url='',
+        doc_header='Pre-processed subset IMC dataset from `Jackson et al '
+    )
+    return so(force_download=force_download)
+
 # def imc_basel():
 #     """Pre-processed subset IMC dataset from *Jackson, H.W., Fischer, J.R., Zanotelli, V.R.T. et al. The single-cell pathology landscape of breast cancer.* `Nature <https://doi.org/10.1038/s41586-019-1876-x>`_
 #     """
