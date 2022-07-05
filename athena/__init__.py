@@ -1,6 +1,6 @@
 """Module initialization."""
 
-__version__ = "0.1.1"
+__version__ = "0.1.2"
 from . import metrics as metrics
 from . import graph_builder as graph
 from . import plotting as pl
