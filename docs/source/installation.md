@@ -9,5 +9,5 @@ conda activate athena
 pip install ai4scr-spatial-omics ai4scr-athena
 
 # install interactive tools
-pip jupyterlab
+pip install jupyterlab
 ```
