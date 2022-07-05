@@ -5,9 +5,9 @@
 conda create -y -n athena python=3.8
 conda activate athena
 
-# install spatialOmics data container
-pip install "git+https://github.com/AI4SCR/spatial-omics.git@master"
+# install athena, spatial omics
+pip install ai4scr-spatial-omics ai4scr-athena
 
-# install ATHENA package
-pip install "git+https://github.com/AI4SCR/ATHENA.git@master"
+# install interactive tools
+pip jupyterlab
 ```
