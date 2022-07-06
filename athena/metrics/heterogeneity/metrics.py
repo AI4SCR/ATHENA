@@ -341,7 +341,7 @@ def _compute_metric(so, spl: str, attr, key_added, graph_key, metric, kwargs_met
         else:
             res = pd.DataFrame({key_added: res}, index=observation_ids)
             if key_added in so.obs[spl]:  # drop previous computation of metric
-                so.obs[spl].drop(key_added, 1, inplace=True)
+                so.obs[spl].drop(key_added, axis=1, inplace=True)
             so.obs[spl] = pd.concat((so.obs[spl], res), axis=1)
     else:
         res = metric(Counter(data), **kwargs_metric)

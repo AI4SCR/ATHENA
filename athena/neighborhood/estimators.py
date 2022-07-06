@@ -115,7 +115,7 @@ def infiltration(so, spl: str, attr: str, *, interaction1=('tumor', 'immune'), i
         if add_key in so.obs[spl]:
             so.obs[spl] = so.obs[spl].drop(columns=[add_key])
 
-        so.obs[spl] = pd.concat((so.obs[spl], res), 1)
+        so.obs[spl] = pd.concat((so.obs[spl], res), axis=1)
 
     else:
         nint = get_node_interactions(G, data)
