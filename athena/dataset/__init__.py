@@ -1,1 +1,1 @@
-from .datasets import imc, mibi, imc_sample
+from .datasets import imc, mibi, imc_sample, imc_quickstart
