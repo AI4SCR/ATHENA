@@ -14,10 +14,10 @@ python:
 install:
   # install the package
   - pip install -U pip
-  - pip install git+ssh://git@github.ibm.com/AI4SCR-DEV/spatial-omics.git
+  - pip install ai4scr-spatial-omics
 #  - pip install git+ssh://git@github.ibm.com/AI4SCR-DEV/ATHENA.git
-  - pip install --progress-bar off -r requirements.txt
-  - pip install --progress-bar off -r dev_requirements.txt
+#  - pip install --progress-bar off -r requirements.txt
+#  - pip install --progress-bar off -r dev_requirements.txt
   - pip install -e .  # - pip install git+ssh://git@github.ibm.com/AI4SCR-DEV/ATHENA.git
 
 script:
@@ -33,6 +33,7 @@ jobs:
         - jupyter nbconvert --to markdown --output-dir=docs/source --output='introduction-spatialOmics.md' tutorials/introduction-spatialOmics.ipynb
         - jupyter nbconvert --to markdown --output-dir=docs/source --output='overview.md' tutorials/overview.ipynb
         - jupyter nbconvert --to markdown --output-dir=docs/source --output='tutorial.md' tutorials/tutorial.ipynb
+        - jupyter nbconvert --to markdown --output-dir=docs/source --output='quickstart.md' tutorials/quickstart.ipynb
         # build documentation pages
         - cp -r tutorials/img docs/source
         - cd docs && make clean && make html && cd ..
