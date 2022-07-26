@@ -19,13 +19,13 @@ Pre-processing
 Collection of common pre-processing functionalities.
 
 .. autosummary::
-    ~spatialHeterogeneity.preprocessing.preprocess.extract_centroids
-    ~spatialHeterogeneity.preprocessing.preprocess.arcsinh
+    ~athena.preprocessing.preprocess.extract_centroids
+    ~athena.preprocessing.preprocess.arcsinh
 
 
 Graph building
 ^^^^^^^^^^^^^^
-The :mod:`~.graph` submodule of SpatialHeterogeneity constructs a graph representation of the tissue using the
+The :mod:`athena.graph_builder` submodule of ATHENA constructs a graph representation of the tissue using the
 cell masks extracted from the high-dimensional images. The graph construction module implements three
 different graph flavors that capture different kinds of cell-cell communication:
 
@@ -38,15 +38,15 @@ different graph flavors that capture different kinds of cell-cell communication:
 
 Visualisation
 ^^^^^^^^^^^^^
-The plotting module (:mod:`~.plotting`) enables the user to visualise the data and provides out-of-the-box plots for some
+The plotting module (:mod:`athena.plotting`) enables the user to visualise the data and provides out-of-the-box plots for some
 of the metrics.
 
 .. autosummary::
-    ~spatialHeterogeneity.plotting.visualization.spatial
-    ~spatialHeterogeneity.plotting.visualization.napari_viewer
-    ~spatialHeterogeneity.plotting.visualization.interactions
-    ~spatialHeterogeneity.plotting.visualization.ripleysK
-    ~spatialHeterogeneity.plotting.visualization.infiltration
+    ~athena.plotting.visualization.spatial
+    ~athena.plotting.visualization.napari_viewer
+    ~athena.plotting.visualization.interactions
+    ~athena.plotting.visualization.ripleysK
+    ~athena.plotting.visualization.infiltration
 
 
 Entropic metrics
@@ -56,13 +56,13 @@ tumor heterogeneity in a spatially-aware manner, borrowing ideas from ecology, i
 statistics, and network analysis.
 
 .. autosummary::
-    ~spatialHeterogeneity.metrics.heterogeneity.metrics.richness
-    ~spatialHeterogeneity.metrics.heterogeneity.metrics.abundance
-    ~spatialHeterogeneity.metrics.heterogeneity.metrics.shannon
-    ~spatialHeterogeneity.metrics.heterogeneity.metrics.simpson
-    ~spatialHeterogeneity.metrics.heterogeneity.metrics.renyi_entropy
-    ~spatialHeterogeneity.metrics.heterogeneity.metrics.hill_number
-    ~spatialHeterogeneity.metrics.heterogeneity.metrics.quadratic_entropy
+    ~athena.metrics.heterogeneity.metrics.richness
+    ~athena.metrics.heterogeneity.metrics.abundance
+    ~athena.metrics.heterogeneity.metrics.shannon
+    ~athena.metrics.heterogeneity.metrics.simpson
+    ~athena.metrics.heterogeneity.metrics.renyi_entropy
+    ~athena.metrics.heterogeneity.metrics.hill_number
+    ~athena.metrics.heterogeneity.metrics.quadratic_entropy
 
 Graph metrics
 ^^^^^^^^^^^^^^^^^^
@@ -72,7 +72,7 @@ thought of as the degree of self-organization of the cells with the same phenoty
 communities.
 
 .. autosummary::
-    ~spatialHeterogeneity.metrics.graph.graph.modularity
+    ~athena.metrics.graph.graph.modularity
 
 Cell-cell interaction metrics
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -82,9 +82,9 @@ that encodes the cell’s phenotype. The cell interaction scores implemented in 
 include:
 
 .. autosummary::
-    ~spatialHeterogeneity.neighborhood.estimators.interactions
-    ~spatialHeterogeneity.neighborhood.estimators.infiltration
-    ~spatialHeterogeneity.neighborhood.estimators.ripleysK
+    ~athena.neighborhood.estimators.interactions
+    ~athena.neighborhood.estimators.infiltration
+    ~athena.neighborhood.estimators.ripleysK
 
 .. _datasets:
 
@@ -96,8 +96,8 @@ ATHENA provides two datasets that enables users to explore the implemented funct
     - An multiplexed ion beam imaging dataset [Keren]_
 
 .. autosummary::
-    ~spatialHeterogeneity.dataset.datasets.imc
-    ~spatialHeterogeneity.dataset.datasets.mibi
+    ~athena.dataset.datasets.imc
+    ~athena.dataset.datasets.mibi
 
 References
 ^^^^^^^^^^
