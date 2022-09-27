@@ -1,0 +1,389 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>athena.neighborhood.base_estimators module &mdash; athena  documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> athena
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">General</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../source/installation.html">Installation</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Gallery</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../source/overview.html">Overview of ATHENA</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../source/methodology.html">Methodology</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../source/quickstart.html">Quickstart</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../source/tutorial.html">Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../source/introduction-spatialOmics.html">SpatialOmics Tutorial</a></li>
+</ul>
+<p class="caption"><span class="caption-text">API</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../api_overview.html">API Overview</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">athena</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+      <li>athena.neighborhood.base_estimators module</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="../_sources/api/athena.neighborhood.base_estimators.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="module-athena.neighborhood.base_estimators">
+<span id="athena-neighborhood-base-estimators-module"></span><h1>athena.neighborhood.base_estimators module<a class="headerlink" href="#module-athena.neighborhood.base_estimators" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="summary">
+<h2>Summary<a class="headerlink" href="#summary" title="Permalink to this headline">¶</a></h2>
+<p>Classes:</p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#athena.neighborhood.base_estimators.Interactions" title="athena.neighborhood.base_estimators.Interactions"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Interactions</span></code></a></p></td>
+<td><p>Estimator to quantify interaction strength between different species in the sample.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#athena.neighborhood.base_estimators.RipleysK" title="athena.neighborhood.base_estimators.RipleysK"><code class="xref py py-obj docutils literal notranslate"><span class="pre">RipleysK</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="reference">
+<h2>Reference<a class="headerlink" href="#reference" title="Permalink to this headline">¶</a></h2>
+<dl class="py class">
+<dt id="athena.neighborhood.base_estimators.Interactions">
+<em class="property"><span class="pre">class</span> </em><code class="sig-name descname"><span class="pre">Interactions</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">so</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">spl</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">attr</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'meta_id'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'classic'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_permutations</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">500</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">random_seed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alpha</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.01</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">graph_key</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'knn'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/athena/neighborhood/base_estimators.html#Interactions"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#athena.neighborhood.base_estimators.Interactions" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Estimator to quantify interaction strength between different species in the sample.</p>
+<dl class="py attribute">
+<dt id="athena.neighborhood.base_estimators.Interactions.VALID_MODES">
+<code class="sig-name descname"><span class="pre">VALID_MODES</span></code><em class="property"> <span class="pre">=</span> <span class="pre">['classic',</span> <span class="pre">'histoCAT',</span> <span class="pre">'proportion']</span></em><a class="headerlink" href="#athena.neighborhood.base_estimators.Interactions.VALID_MODES" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="athena.neighborhood.base_estimators.Interactions.VALID_PREDICTION_TYPES">
+<code class="sig-name descname"><span class="pre">VALID_PREDICTION_TYPES</span></code><em class="property"> <span class="pre">=</span> <span class="pre">['pvalue',</span> <span class="pre">'observation',</span> <span class="pre">'diff']</span></em><a class="headerlink" href="#athena.neighborhood.base_estimators.Interactions.VALID_PREDICTION_TYPES" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="athena.neighborhood.base_estimators.Interactions.__init__">
+<code class="sig-name descname"><span class="pre">__init__</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">so</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">spl</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">attr</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'meta_id'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'classic'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_permutations</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">500</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">random_seed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alpha</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.01</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">graph_key</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'knn'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/athena/neighborhood/base_estimators.html#Interactions.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#athena.neighborhood.base_estimators.Interactions.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Estimator to quantify interaction strength between different species in the sample.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>so</strong> – SpatialOmics</p></li>
+<li><p><strong>spl</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – Sample for which to compute the interaction strength</p></li>
+<li><p><strong>attr</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – Categorical feature in SpatialOmics.obs to use for the grouping</p></li>
+<li><p><strong>mode</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – One of {classic, histoCAT, proportion}, see notes</p></li>
+<li><p><strong>n_permutations</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – Number of permutations to compute p-values and the interactions strength score (mode diff)</p></li>
+<li><p><strong>random_seed</strong> – Random seed for permutations</p></li>
+<li><p><strong>alpha</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>) – Threshold for significance</p></li>
+<li><p><strong>graph_key</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – Specifies the graph representation to use in so.G[spl] if <cite>local=True</cite>.</p></li>
+</ul>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>classic and histoCAT are python implementations of the corresponding methods pubished by the Bodenmiller lab at UZH.
+The proportion method is similar to the classic method but normalises the score by the number of edges and is thus bound [0,1].</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="athena.neighborhood.base_estimators.Interactions.fit">
+<code class="sig-name descname"><span class="pre">fit</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">prediction_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'observation'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">try_load</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/athena/neighborhood/base_estimators.html#Interactions.fit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#athena.neighborhood.base_estimators.Interactions.fit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute the interactions scores for the sample.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>prediction_type</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – One of {observation, pvalue, diff}, see Notes</p></li>
+<li><p><strong>try_load</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – load pre-computed permutation results if available</p></li>
+</ul>
+</dd>
+</dl>
+<p>Returns:</p>
+<p class="rubric">Notes</p>
+<p><cite>observation</cite>: computes the observed interaction strength in the sample</p>
+<p><cite>pvalue</cite>: computes the P-value of a two-sided t-test for the interactions strength based on the random permutations</p>
+<p><cite>diff</cite>: computes the difference between observed and average interaction strength (across permutations)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="athena.neighborhood.base_estimators.Interactions.predict">
+<code class="sig-name descname"><span class="pre">predict</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/athena/neighborhood/base_estimators.html#Interactions.predict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#athena.neighborhood.base_estimators.Interactions.predict" title="Permalink to this definition">¶</a></dt>
+<dd><p>Predict interactions strengths of observations.</p>
+<p>Returns: A dataframe with the interaction results.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">DataFrame</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="athena.neighborhood.base_estimators.Interactions.generate_h0">
+<code class="sig-name descname"><span class="pre">generate_h0</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">relative_freq</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">observed</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/athena/neighborhood/base_estimators.html#Interactions.generate_h0"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#athena.neighborhood.base_estimators.Interactions.generate_h0" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="athena.neighborhood.base_estimators.RipleysK">
+<em class="property"><span class="pre">class</span> </em><code class="sig-name descname"><span class="pre">RipleysK</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">so</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">spl</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">attr</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/athena/neighborhood/base_estimators.html#RipleysK"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#athena.neighborhood.base_estimators.RipleysK" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py method">
+<dt id="athena.neighborhood.base_estimators.RipleysK.__init__">
+<code class="sig-name descname"><span class="pre">__init__</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">so</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">spl</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">attr</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/athena/neighborhood/base_estimators.html#RipleysK.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#athena.neighborhood.base_estimators.RipleysK.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute Ripley’s K for a given sample and group.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>so</strong> – SpatialOmics</p></li>
+<li><p><strong>spl</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – Sample for which to compute the interaction strength</p></li>
+<li><p><strong>id</strong> – The category in the categorical feature <cite>attr</cite>, for which Ripley’s K should be computed</p></li>
+<li><p><strong>attr</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – Categorical feature in SpatialOmics.obs to use for the grouping</p></li>
+<li><p><strong>graph_key</strong> – Specifies the graph representation to use in so.G[spl] if <cite>local=True</cite>.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="athena.neighborhood.base_estimators.RipleysK.fit">
+<code class="sig-name descname"><span class="pre">fit</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/athena/neighborhood/base_estimators.html#RipleysK.fit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#athena.neighborhood.base_estimators.RipleysK.fit" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="athena.neighborhood.base_estimators.RipleysK.predict">
+<code class="sig-name descname"><span class="pre">predict</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">radii</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">correction</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'ripley'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'K'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/athena/neighborhood/base_estimators.html#RipleysK.predict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#athena.neighborhood.base_estimators.RipleysK.predict" title="Permalink to this definition">¶</a></dt>
+<dd><p>Estimate Ripley’s K</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>radii</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code>) – List of radiis for which Ripley’s K is computed</p></li>
+<li><p><strong>correction</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – Correction method to use to correct for boarder effects, see [1].</p></li>
+<li><p><strong>mode</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – {K, csr-deviation}. If <cite>K</cite>, Ripley’s K is estimated, with <cite>csr-deviation</cite> the deviation from a poission process is computed.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Ripley’s K estimates</p>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<dl class="footnote brackets">
+<dt class="label" id="id1"><span class="brackets">1</span></dt>
+<dd><p><a class="reference external" href="https://docs.astropy.org/en/stable/stats/ripley.html">https://docs.astropy.org/en/stable/stats/ripley.html</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="athena.neighborhood.base_estimators.RipleysK.csr_deviation">
+<code class="sig-name descname"><span class="pre">csr_deviation</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">radii</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">correction</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'ripley'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/athena/neighborhood/base_estimators.html#RipleysK.csr_deviation"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#athena.neighborhood.base_estimators.RipleysK.csr_deviation" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute deviation from random poisson process.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>radii</strong> – List of radiis for which Ripley’s K is computed</p></li>
+<li><p><strong>correction</strong> – Correction method to use to correct for boarder effects, see [1].</p></li>
+</ul>
+</dd>
+</dl>
+<p>Returns:</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright IBM Corp. 2021.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

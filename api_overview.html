@@ -1,0 +1,426 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>API Overview &mdash; athena  documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="prev" title="Tutorial - SpatialOmics" href="source/introduction-spatialOmics.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home"> athena
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">General</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="source/installation.html">Installation</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Gallery</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="source/overview.html">Overview of ATHENA</a></li>
+<li class="toctree-l1"><a class="reference internal" href="source/methodology.html">Methodology</a></li>
+<li class="toctree-l1"><a class="reference internal" href="source/quickstart.html">Quickstart</a></li>
+<li class="toctree-l1"><a class="reference internal" href="source/tutorial.html">Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="source/introduction-spatialOmics.html">SpatialOmics Tutorial</a></li>
+</ul>
+<p class="caption"><span class="caption-text">API</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">API Overview</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#methods">Methods</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#pre-processing">Pre-processing</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#graph-building">Graph building</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#visualisation">Visualisation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#entropic-metrics">Entropic metrics</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#graph-metrics">Graph metrics</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#cell-cell-interaction-metrics">Cell-cell interaction metrics</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#datasets">Datasets</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#references">References</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">athena</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+        
+      <li>API Overview</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="_sources/api_overview.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="api-overview">
+<h1>API Overview<a class="headerlink" href="#api-overview" title="Permalink to this headline">¶</a></h1>
+<p>Quick overview of the <a class="reference internal" href="#methods"><span class="std std-ref">Methods</span></a> and <a class="reference internal" href="#datasets"><span class="std std-ref">Datasets</span></a> available in ATHENA.</p>
+<div class="section" id="methods">
+<span id="id1"></span><h2>Methods<a class="headerlink" href="#methods" title="Permalink to this headline">¶</a></h2>
+<p>Depending on the underlying mathematical foundations, the heterogeneity
+scores included in ATHENA can be classified into the following categories: (i) spatial statistics scores that
+quantify the degree of clustering or dispersion of each phenotype individually, (ii) graph-theoretic scores that
+examine the topology of the tumor graph, (iii) information-theoretic scores that quantify how diverse the
+tumor is with respect to different phenotypes present and their relative proportions, and (iv) cell interaction
+scores that assess the pairwise connections between different phenotypes in the tumor ecosystem. The interested reader
+is advised to read the <em>Methodology</em> section.</p>
+<div class="section" id="pre-processing">
+<h3>Pre-processing<a class="headerlink" href="#pre-processing" title="Permalink to this headline">¶</a></h3>
+<p>Collection of common pre-processing functionalities.</p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="api/athena.preprocessing.preprocess.html#athena.preprocessing.preprocess.extract_centroids" title="athena.preprocessing.preprocess.extract_centroids"><code class="xref py py-obj docutils literal notranslate"><span class="pre">extract_centroids</span></code></a>(so, spl[, mask_key, inplace])</p></td>
+<td><p>Extract centroids from segementation masks.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="api/athena.preprocessing.preprocess.html#athena.preprocessing.preprocess.arcsinh" title="athena.preprocessing.preprocess.arcsinh"><code class="xref py py-obj docutils literal notranslate"><span class="pre">arcsinh</span></code></a>(so, spl, cofactor)</p></td>
+<td><p>Computes the arcsinh transformation of the expression values according to:</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="graph-building">
+<h3>Graph building<a class="headerlink" href="#graph-building" title="Permalink to this headline">¶</a></h3>
+<p>The <a class="reference internal" href="api/athena.graph_builder.html#module-athena.graph_builder" title="athena.graph_builder"><code class="xref py py-mod docutils literal notranslate"><span class="pre">athena.graph_builder</span></code></a> submodule of ATHENA constructs a graph representation of the tissue using the
+cell masks extracted from the high-dimensional images. The graph construction module implements three
+different graph flavors that capture different kinds of cell-cell communication:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><em>contact</em>-graph: juxtacrine signaling, where cells exchange information via membrane receptors, junctions or extracellular matrix glycoproteins</p></li>
+<li><p><em>radius</em>-graph: representation mimics paracrine signaling, where signaling molecules that are secreted into the extracellular environment interact with membrane receptors of neighboring cells and induce changes in their cellular state.</p></li>
+<li><p><em>knn</em>-graph: common graph topology, successfully used in digital pathology</p></li>
+</ul>
+</div></blockquote>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+</tbody>
+</table>
+</div>
+<div class="section" id="visualisation">
+<h3>Visualisation<a class="headerlink" href="#visualisation" title="Permalink to this headline">¶</a></h3>
+<p>The plotting module (<a class="reference internal" href="api/athena.plotting.html#module-athena.plotting" title="athena.plotting"><code class="xref py py-mod docutils literal notranslate"><span class="pre">athena.plotting</span></code></a>) enables the user to visualise the data and provides out-of-the-box plots for some
+of the metrics.</p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="api/athena.plotting.visualization.html#athena.plotting.visualization.spatial" title="athena.plotting.visualization.spatial"><code class="xref py py-obj docutils literal notranslate"><span class="pre">spatial</span></code></a>(so, spl, attr, *[, mode, node_size, …])</p></td>
+<td><p>Various functionalities to visualise samples.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="api/athena.plotting.visualization.html#athena.plotting.visualization.napari_viewer" title="athena.plotting.visualization.napari_viewer"><code class="xref py py-obj docutils literal notranslate"><span class="pre">napari_viewer</span></code></a>(so, spl, attrs[, censor, …])</p></td>
+<td><p>Starts interactive Napari viewer to visualise raw images and explore samples.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="api/athena.plotting.visualization.html#athena.plotting.visualization.interactions" title="athena.plotting.visualization.interactions"><code class="xref py py-obj docutils literal notranslate"><span class="pre">interactions</span></code></a>(so, spl, attr[, mode, …])</p></td>
+<td><p>Visualise results from <code class="xref py py-func docutils literal notranslate"><span class="pre">interactions()</span></code> results.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="api/athena.plotting.visualization.html#athena.plotting.visualization.ripleysK" title="athena.plotting.visualization.ripleysK"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ripleysK</span></code></a>(so, spl, attr, ids, *[, mode, …])</p></td>
+<td><p>Visualise results from <code class="xref py py-func docutils literal notranslate"><span class="pre">ripleysK()</span></code> results.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="api/athena.plotting.visualization.html#athena.plotting.visualization.infiltration" title="athena.plotting.visualization.infiltration"><code class="xref py py-obj docutils literal notranslate"><span class="pre">infiltration</span></code></a>(so, spl[, attr, step_size, …])</p></td>
+<td><p>Visualises a heatmap of the featuer intensity.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="entropic-metrics">
+<h3>Entropic metrics<a class="headerlink" href="#entropic-metrics" title="Permalink to this headline">¶</a></h3>
+<p>ATHENA brings together a number of established as well as novel scores that enable the quantification of
+tumor heterogeneity in a spatially-aware manner, borrowing ideas from ecology, information theory, spatial
+statistics, and network analysis.</p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="api/athena.metrics.heterogeneity.metrics.html#athena.metrics.heterogeneity.metrics.richness" title="athena.metrics.heterogeneity.metrics.richness"><code class="xref py py-obj docutils literal notranslate"><span class="pre">richness</span></code></a>(so, spl, attr, *[, local, …])</p></td>
+<td><p>Computes the richness on the observation or the sample level</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="api/athena.metrics.heterogeneity.metrics.html#athena.metrics.heterogeneity.metrics.abundance" title="athena.metrics.heterogeneity.metrics.abundance"><code class="xref py py-obj docutils literal notranslate"><span class="pre">abundance</span></code></a>(so, spl, attr, *[, mode, …])</p></td>
+<td><p>Computes the abundance of species on the observation or the sample level.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="api/athena.metrics.heterogeneity.metrics.html#athena.metrics.heterogeneity.metrics.shannon" title="athena.metrics.heterogeneity.metrics.shannon"><code class="xref py py-obj docutils literal notranslate"><span class="pre">shannon</span></code></a>(so, spl, attr, *[, local, …])</p></td>
+<td><p>Computes the Shannon Index on the observation or the sample level</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="api/athena.metrics.heterogeneity.metrics.html#athena.metrics.heterogeneity.metrics.simpson" title="athena.metrics.heterogeneity.metrics.simpson"><code class="xref py py-obj docutils literal notranslate"><span class="pre">simpson</span></code></a>(so, spl, attr, *[, local, …])</p></td>
+<td><p>Computes the Simpson Index on the observation or the sample level</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="api/athena.metrics.heterogeneity.metrics.html#athena.metrics.heterogeneity.metrics.renyi_entropy" title="athena.metrics.heterogeneity.metrics.renyi_entropy"><code class="xref py py-obj docutils literal notranslate"><span class="pre">renyi_entropy</span></code></a>(so, spl, attr, q, *[, local, …])</p></td>
+<td><p>Computes the Renyi-Entropy.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="api/athena.metrics.heterogeneity.metrics.html#athena.metrics.heterogeneity.metrics.hill_number" title="athena.metrics.heterogeneity.metrics.hill_number"><code class="xref py py-obj docutils literal notranslate"><span class="pre">hill_number</span></code></a>(so, spl, attr, q, *[, local, …])</p></td>
+<td><p>Computes the Hill Numbers on the observation or the sample level</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="api/athena.metrics.heterogeneity.metrics.html#athena.metrics.heterogeneity.metrics.quadratic_entropy" title="athena.metrics.heterogeneity.metrics.quadratic_entropy"><code class="xref py py-obj docutils literal notranslate"><span class="pre">quadratic_entropy</span></code></a>(so, spl, attr, *[, …])</p></td>
+<td><p>Computes the quadratic entropy, taking relative abundance and similarity between observations into account.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="graph-metrics">
+<h3>Graph metrics<a class="headerlink" href="#graph-metrics" title="Permalink to this headline">¶</a></h3>
+<p>Currently, this module only implements modularity which captures the structure of a graph by quantifying the degree at which it can
+be divided into communities of the same label. In the context of tumor heterogeneity, modularity can be
+thought of as the degree of self-organization of the cells with the same phenotype into spatially distinct
+communities.</p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="api/athena.metrics.graph.graph.html#athena.metrics.graph.graph.modularity" title="athena.metrics.graph.graph.modularity"><code class="xref py py-obj docutils literal notranslate"><span class="pre">modularity</span></code></a>(so, spl, community_id[, …])</p></td>
+<td><p>Computes the modularity of the sample graph.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="cell-cell-interaction-metrics">
+<h3>Cell-cell interaction metrics<a class="headerlink" href="#cell-cell-interaction-metrics" title="Permalink to this headline">¶</a></h3>
+<p>More sophisticated heterogeneity scores additionally consider cell-cell interactions by exploiting the cell-cell graph,
+where nodes encode cells, edges encode interactions, and each node is associated with a label
+that encodes the cell’s phenotype. The cell interaction scores implemented in ATHENA’s <code class="xref py py-mod docutils literal notranslate"><span class="pre">neighborhood</span></code> submodule
+include:</p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="api/athena.neighborhood.estimators.html#athena.neighborhood.estimators.interactions" title="athena.neighborhood.estimators.interactions"><code class="xref py py-obj docutils literal notranslate"><span class="pre">interactions</span></code></a>(so, spl, attr[, mode, …])</p></td>
+<td><p>Compute interaction strength between species. This is done by counting the number of interactions (edges in the graph)</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="api/athena.neighborhood.estimators.html#athena.neighborhood.estimators.infiltration" title="athena.neighborhood.estimators.infiltration"><code class="xref py py-obj docutils literal notranslate"><span class="pre">infiltration</span></code></a>(so, spl, attr, *[, …])</p></td>
+<td><p>Compute infiltration score.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="api/athena.neighborhood.estimators.html#athena.neighborhood.estimators.ripleysK" title="athena.neighborhood.estimators.ripleysK"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ripleysK</span></code></a>(so, spl, attr, id, *[, mode, …])</p></td>
+<td><p>Compute Ripley’s K as implemented by <a href="#id8"><span class="problematic" id="id9">`[1]`_</span></a>.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="section" id="datasets">
+<span id="id2"></span><h2>Datasets<a class="headerlink" href="#datasets" title="Permalink to this headline">¶</a></h2>
+<p>ATHENA provides two datasets that enables users to explore the implemented functionalities and analytical tools:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>An image mass cytometry dataset <a class="reference internal" href="#jackson" id="id3"><span>[Jackson]</span></a></p></li>
+<li><p>An multiplexed ion beam imaging dataset <a class="reference internal" href="#keren" id="id4"><span>[Keren]</span></a></p></li>
+</ul>
+</div></blockquote>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="api/athena.dataset.datasets.html#athena.dataset.datasets.imc" title="athena.dataset.datasets.imc"><code class="xref py py-obj docutils literal notranslate"><span class="pre">imc</span></code></a>([force_download])</p></td>
+<td><p>Pre-processed zurich cohort IMC dataset from <a href="#id5"><span class="problematic" id="id6">*</span></a>Jackson, H.W., Fischer, J.R., Zanotelli, V.R.T.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="api/athena.dataset.datasets.html#athena.dataset.datasets.mibi" title="athena.dataset.datasets.mibi"><code class="xref py py-obj docutils literal notranslate"><span class="pre">mibi</span></code></a>()</p></td>
+<td><p>Processed data from <em>A Structured Tumor-Immune Microenvironment in Triple Negative Breast Cancer Revealed by Multiplexed Ion Beam Imaging.</em> <a class="reference external" href="https://doi.org/10.1016/j.cell.2018.08.039">Cell</a>.</p></td>
+</tr>
+</tbody>
+</table>
+<div class="section" id="references">
+<h3>References<a class="headerlink" href="#references" title="Permalink to this headline">¶</a></h3>
+<dl class="citation">
+<dt class="label" id="jackson"><span class="brackets"><a class="fn-backref" href="#id3">Jackson</a></span></dt>
+<dd><p>Jackson, H. W. et al. The single-cell pathology landscape of breast cancer.
+<a class="reference external" href="https://www.nature.com/articles/s41586-019-1876-x">Nature.</a></p>
+</dd>
+<dt class="label" id="keren"><span class="brackets"><a class="fn-backref" href="#id4">Keren</a></span></dt>
+<dd><p>Keren, L. et al. A Structured Tumor-Immune Microenvironment in Triple Negative Breast Cancer Revealed by
+Multiplexed Ion Beam Imaging. Cell 174, 1373-1387.e19 (2018). <a class="reference external" href="https://doi.org/10.1016/j.cell.2018.08.039">Cell.</a></p>
+</dd>
+</dl>
+</div>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+        <a href="source/introduction-spatialOmics.html" class="btn btn-neutral float-left" title="Tutorial - SpatialOmics" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright IBM Corp. 2021.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

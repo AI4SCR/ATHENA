@@ -1,0 +1,302 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>athena.utils.tools.image module &mdash; athena  documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> athena
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">General</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../source/installation.html">Installation</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Gallery</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../source/overview.html">Overview of ATHENA</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../source/methodology.html">Methodology</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../source/quickstart.html">Quickstart</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../source/tutorial.html">Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../source/introduction-spatialOmics.html">SpatialOmics Tutorial</a></li>
+</ul>
+<p class="caption"><span class="caption-text">API</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../api_overview.html">API Overview</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">athena</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+      <li>athena.utils.tools.image module</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="../_sources/api/athena.utils.tools.image.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="module-athena.utils.tools.image">
+<span id="athena-utils-tools-image-module"></span><h1>athena.utils.tools.image module<a class="headerlink" href="#module-athena.utils.tools.image" title="Permalink to this headline">¶</a></h1>
+<p>Created on Sat Nov 28 14:50:24 2020</p>
+<p>&#64;author: art</p>
+<div class="section" id="summary">
+<h2>Summary<a class="headerlink" href="#summary" title="Permalink to this headline">¶</a></h2>
+<p>Functions:</p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#athena.utils.tools.image.extract_mask_expr_feat" title="athena.utils.tools.image.extract_mask_expr_feat"><code class="xref py py-obj docutils literal notranslate"><span class="pre">extract_mask_expr_feat</span></code></a></p></td>
+<td><p>Extracts the pixel values of the mask objects in the mask_file given the pixel intensities in the image for each channel.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#athena.utils.tools.image.extract_mask_morph_feat" title="athena.utils.tools.image.extract_mask_morph_feat"><code class="xref py py-obj docutils literal notranslate"><span class="pre">extract_mask_morph_feat</span></code></a></p></td>
+<td><p>Extracts morphological features form cell mask files.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#athena.utils.tools.image.get_shape_outline" title="athena.utils.tools.image.get_shape_outline"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_shape_outline</span></code></a></p></td>
+<td><p><dl class="field-list simple">
+<dt class="field-odd">param mask</dt>
+<dd class="field-odd"><p>Array in which objects are marked with labels &gt; 0. Background is 0.</p>
+</dd>
+</dl>
+</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="reference">
+<h2>Reference<a class="headerlink" href="#reference" title="Permalink to this headline">¶</a></h2>
+<dl class="py function">
+<dt id="athena.utils.tools.image.get_shape_outline">
+<code class="sig-name descname"><span class="pre">get_shape_outline</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mask</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/athena/utils/tools/image.html#get_shape_outline"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#athena.utils.tools.image.get_shape_outline" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>mask</strong> (<em>2d array</em>) – Array in which objects are marked with labels &gt; 0. Background is 0.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p></p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>The same as mask but with only the border of the masks, i.e. outline.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="athena.utils.tools.image.extract_mask_expr_feat">
+<code class="sig-name descname"><span class="pre">extract_mask_expr_feat</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="pre">mask_file</span></em>, <em class="sig-param"><span class="pre">img_file</span></em>, <em class="sig-param"><span class="pre">norm=None</span></em>, <em class="sig-param"><span class="pre">channels=None</span></em>, <em class="sig-param"><span class="pre">reducer=&lt;function</span> <span class="pre">mean&gt;</span></em>, <em class="sig-param"><span class="pre">mask_bg=0</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/athena/utils/tools/image.html#extract_mask_expr_feat"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#athena.utils.tools.image.extract_mask_expr_feat" title="Permalink to this definition">¶</a></dt>
+<dd><p>Extracts the pixel values of the mask objects in the mask_file given the pixel intensities in the image for each channel.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>mask_file</strong> (<em>str</em>) – path to cell mask file</p></li>
+<li><p><strong>img_file</strong> (<em>str</em>) – path to image file, usually this would be the tiff stack</p></li>
+<li><p><strong>norm</strong> – a instance that normalises the pixel values</p></li>
+<li><p><strong>channels</strong> (<em>list-like</em>) – indicates for which channels in the image the pixel values of the mask should be extracted, defaults to all channels</p></li>
+<li><p><strong>reducer</strong> – function to summarise the pixel values of a object in the mask, default np.mean</p></li>
+<li><p><strong>mask_bg</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – value which indicates background in the mask_file, defaults to 0</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p></p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>dataframe of shape n_objects x n_channels.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="athena.utils.tools.image.extract_mask_morph_feat">
+<code class="sig-name descname"><span class="pre">extract_mask_morph_feat</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mask_file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">properties</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">['label',</span> <span class="pre">'area',</span> <span class="pre">'extent',</span> <span class="pre">'eccentricity']</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">as_dict</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/athena/utils/tools/image.html#extract_mask_morph_feat"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#athena.utils.tools.image.extract_mask_morph_feat" title="Permalink to this definition">¶</a></dt>
+<dd><p>Extracts morphological features form cell mask files.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>mask_file</strong> (<em>str</em>) – path to cell mask file</p></li>
+<li><p><strong>properties</strong> (<em>list of properties</em><em>, </em><em>see</em><em> [</em><em>1</em><em>]</em>) – </p></li>
+<li><p><strong>as_dict</strong> – </p></li>
+</ul>
+</dd>
+</dl>
+<p class="rubric">References</p>
+</dd></dl>
+
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright IBM Corp. 2021.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

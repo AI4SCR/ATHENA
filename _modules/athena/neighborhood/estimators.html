@@ -1,0 +1,386 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>athena.neighborhood.estimators &mdash; athena  documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../index.html" class="icon icon-home"> athena
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">General</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../source/installation.html">Installation</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Gallery</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../source/overview.html">Overview of ATHENA</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../source/methodology.html">Methodology</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../source/quickstart.html">Quickstart</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../source/tutorial.html">Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../source/introduction-spatialOmics.html">SpatialOmics Tutorial</a></li>
+</ul>
+<p class="caption"><span class="caption-text">API</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../api_overview.html">API Overview</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">athena</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+        
+      <li>athena.neighborhood.estimators</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for athena.neighborhood.estimators</h1><div class="highlight"><pre>
+<span></span><span class="c1"># %%</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="kn">from</span> <span class="nn">.base_estimators</span> <span class="kn">import</span> <span class="n">Interactions</span><span class="p">,</span> <span class="n">_infiltration</span><span class="p">,</span> <span class="n">RipleysK</span>
+
+<span class="kn">from</span> <span class="nn">.utils</span> <span class="kn">import</span> <span class="n">get_node_interactions</span>
+<span class="kn">from</span> <span class="nn">..utils.general</span> <span class="kn">import</span> <span class="n">is_categorical</span>
+<span class="kn">from</span> <span class="nn">tqdm</span> <span class="kn">import</span> <span class="n">tqdm</span>
+<span class="c1"># %%</span>
+<div class="viewcode-block" id="interactions"><a class="viewcode-back" href="../../../api/athena.neighborhood.estimators.html#athena.neighborhood.estimators.interactions">[docs]</a><span class="k">def</span> <span class="nf">interactions</span><span class="p">(</span><span class="n">so</span><span class="p">,</span> <span class="n">spl</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">attr</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">mode</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span><span class="s1">&#39;classic&#39;</span><span class="p">,</span> <span class="n">prediction_type</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span><span class="s1">&#39;observation&#39;</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">n_permutations</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span><span class="mi">100</span><span class="p">,</span>
+                 <span class="n">random_seed</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">alpha</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span><span class="mf">.01</span><span class="p">,</span> <span class="n">try_load</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">key_added</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">graph_key</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span><span class="s1">&#39;knn&#39;</span><span class="p">,</span>
+                 <span class="n">inplace</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Compute interaction strength between species. This is done by counting the number of interactions (edges in the graph)</span>
+<span class="sd">        between pair-wise observation types as encdoded by `attr`. See notes for more information or the</span>
+<span class="sd">        `methodology &lt;https://ai4scr.github.io/ATHENA/source/methodology.html&gt;`_ section in the docs.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        so: SpatialOmics instance</span>
+<span class="sd">        spl: Spl for which to compute the metric</span>
+<span class="sd">        attr: Categorical feature in SpatialOmics.obs to use for the grouping</span>
+<span class="sd">        mode: One of {classic, histoCAT, proportion}, see notes</span>
+<span class="sd">        n_permutations: Number of permutations to compute p-values and the interactions strength score (mode diff)</span>
+<span class="sd">        random_seed: Random seed for permutations</span>
+<span class="sd">        alpha: Threshold for significance</span>
+<span class="sd">        prediction_type: One of {observation, pvalue, diff}, see Notes</span>
+<span class="sd">        try_load: load pre-computed permutation results if available</span>
+<span class="sd">        key_added: Key added to SpatialOmics.uns[spl][metric][key_added]</span>
+<span class="sd">        graph_key: Specifies the graph representation to use in so.G[spl] if `local=True`.</span>
+<span class="sd">        inplace: Whether to add the metric to the current SpatialOmics instance or to return a new one.</span>
+
+<span class="sd">    Notes:</span>
+<span class="sd">        `classic` and `histoCAT` are python implementations of the corresponding methods pubished by the Bodenmiller lab at UZH.</span>
+<span class="sd">        The `proportion` method is similar to the `classic` method but normalises the score by the number of edges and is thus bound [0,1].</span>
+
+<span class="sd">    Returns:</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">so</span> <span class="o">=</span> <span class="n">so</span> <span class="k">if</span> <span class="n">inplace</span> <span class="k">else</span> <span class="n">so</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+
+    <span class="c1"># NOTE: uns_path = f&#39;{spl}/interactions/&#39;</span>
+    <span class="k">if</span> <span class="n">key_added</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">key_added</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">attr</span><span class="si">}</span><span class="s1">_</span><span class="si">{</span><span class="n">mode</span><span class="si">}</span><span class="s1">_</span><span class="si">{</span><span class="n">prediction_type</span><span class="si">}</span><span class="s1">_</span><span class="si">{</span><span class="n">graph_key</span><span class="si">}</span><span class="s1">&#39;</span>
+
+    <span class="k">if</span> <span class="n">random_seed</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">random_seed</span> <span class="o">=</span> <span class="n">so</span><span class="o">.</span><span class="n">random_seed</span>
+
+    <span class="n">estimator</span> <span class="o">=</span> <span class="n">Interactions</span><span class="p">(</span><span class="n">so</span><span class="o">=</span><span class="n">so</span><span class="p">,</span> <span class="n">spl</span><span class="o">=</span><span class="n">spl</span><span class="p">,</span> <span class="n">attr</span><span class="o">=</span><span class="n">attr</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="n">mode</span><span class="p">,</span> <span class="n">n_permutations</span><span class="o">=</span><span class="n">n_permutations</span><span class="p">,</span>
+                             <span class="n">random_seed</span><span class="o">=</span><span class="n">random_seed</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="n">alpha</span><span class="p">,</span> <span class="n">graph_key</span><span class="o">=</span><span class="n">graph_key</span><span class="p">)</span>
+
+    <span class="n">estimator</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">prediction_type</span><span class="o">=</span><span class="n">prediction_type</span><span class="p">,</span> <span class="n">try_load</span><span class="o">=</span><span class="n">try_load</span><span class="p">)</span>
+    <span class="n">res</span> <span class="o">=</span> <span class="n">estimator</span><span class="o">.</span><span class="n">predict</span><span class="p">()</span>
+
+    <span class="c1"># add result to uns attribute</span>
+    <span class="n">add2uns</span><span class="p">(</span><span class="n">so</span><span class="p">,</span> <span class="n">res</span><span class="p">,</span> <span class="n">spl</span><span class="p">,</span> <span class="s1">&#39;interactions&#39;</span><span class="p">,</span> <span class="n">key_added</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">inplace</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">so</span></div>
+
+
+<div class="viewcode-block" id="infiltration"><a class="viewcode-back" href="../../../api/athena.neighborhood.estimators.html#athena.neighborhood.estimators.infiltration">[docs]</a><span class="k">def</span> <span class="nf">infiltration</span><span class="p">(</span><span class="n">so</span><span class="p">,</span> <span class="n">spl</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">attr</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">interaction1</span><span class="o">=</span><span class="p">(</span><span class="s1">&#39;tumor&#39;</span><span class="p">,</span> <span class="s1">&#39;immune&#39;</span><span class="p">),</span> <span class="n">interaction2</span><span class="o">=</span><span class="p">(</span><span class="s1">&#39;immune&#39;</span><span class="p">,</span> <span class="s1">&#39;immune&#39;</span><span class="p">),</span>
+                 <span class="n">add_key</span><span class="o">=</span><span class="s1">&#39;infiltration&#39;</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">graph_key</span><span class="o">=</span><span class="s1">&#39;knn&#39;</span><span class="p">,</span> <span class="n">local</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Compute infiltration score. Generalises the infiltration score presented in</span>
+<span class="sd">    `A Structured Tumor-Immune Microenvironment in Triple Negative Breast Cancer Revealed by Multiplexed Ion Beam Imaging &lt;https://pubmed.ncbi.nlm.nih.gov/30193111/&gt;`_</span>
+<span class="sd">    The score comptes a ratio between the number of interactions observed between the observation types specified in `interactions1`</span>
+<span class="sd">    and `interaction2` as :math:`\\frac{\\texttt{number of interactions 1}}{\\texttt{number of interactions 2}}`. This ratio can</span>
+<span class="sd">    be undefined. See notes for more information.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        so: SpatialOmics instance</span>
+<span class="sd">        spl: Spl for which to compute the metric</span>
+<span class="sd">        attr: Categorical feature in SpatialOmics.obs to use for the grouping</span>
+<span class="sd">        interaction1: labels in `attr` of enumerator interaction</span>
+<span class="sd">        interaction2: labels in `attr` of denominator interaction</span>
+<span class="sd">        key_added: Key added to SpatialOmics.uns[spl][metric][key_added]</span>
+<span class="sd">        inplace: Whether to add the metric to the current SpatialOmics instance or to return a new one.</span>
+<span class="sd">        graph_key: Specifies the graph representation to use in so.G[spl] if `local=True`.</span>
+
+<span class="sd">    Returns:</span>
+
+<span class="sd">    Notes:</span>
+<span class="sd">        The default arguments are replicating the `immune infiltration score &lt;infiltrationScore_&gt;`_. However, you</span>
+<span class="sd">        can compute any kind of &quot;infiltration&quot; between observation types. The `attr` argument specifies the column</span>
+<span class="sd">        in the `obs` dataframe which encodes different observation types. `interaction{1,2}` argument defines between</span>
+<span class="sd">        which types the score should be computed.</span>
+
+<span class="sd">    .. _infiltrationScore: https://pubmed.ncbi.nlm.nih.gov/30193111/</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">so</span> <span class="o">=</span> <span class="n">so</span> <span class="k">if</span> <span class="n">inplace</span> <span class="k">else</span> <span class="n">so</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+
+    <span class="n">data</span> <span class="o">=</span> <span class="n">so</span><span class="o">.</span><span class="n">obs</span><span class="p">[</span><span class="n">spl</span><span class="p">][</span><span class="n">attr</span><span class="p">]</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;multidimensional attr (</span><span class="si">{</span><span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s1">) is not supported.&#39;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">is_categorical</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;`attr` needs to be categorical&#39;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">np</span><span class="o">.</span><span class="n">in1d</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">interaction1</span> <span class="o">+</span> <span class="n">interaction2</span><span class="p">),</span> <span class="n">data</span><span class="o">.</span><span class="n">unique</span><span class="p">())</span><span class="o">.</span><span class="n">all</span><span class="p">():</span>
+        <span class="n">mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">in1d</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">interaction1</span> <span class="o">+</span> <span class="n">interaction2</span><span class="p">),</span> <span class="n">data</span><span class="o">.</span><span class="n">unique</span><span class="p">())</span>
+        <span class="n">missing</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">interaction1</span> <span class="o">+</span> <span class="n">interaction2</span><span class="p">)[</span><span class="o">~</span><span class="n">mask</span><span class="p">]</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;specified interaction categories are not all in `attr`. Missing </span><span class="si">{</span><span class="n">missing</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+
+    <span class="n">G</span> <span class="o">=</span> <span class="n">so</span><span class="o">.</span><span class="n">G</span><span class="p">[</span><span class="n">spl</span><span class="p">][</span><span class="n">graph_key</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">local</span><span class="p">:</span>
+        <span class="n">cont</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">node</span> <span class="ow">in</span> <span class="n">tqdm</span><span class="p">(</span><span class="n">G</span><span class="o">.</span><span class="n">nodes</span><span class="p">):</span>
+            <span class="n">neigh</span> <span class="o">=</span> <span class="n">G</span><span class="p">[</span><span class="n">node</span><span class="p">]</span>
+            <span class="n">g</span> <span class="o">=</span> <span class="n">G</span><span class="o">.</span><span class="n">subgraph</span><span class="p">(</span><span class="n">neigh</span><span class="p">)</span>
+            <span class="n">nint</span> <span class="o">=</span> <span class="n">get_node_interactions</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
+            <span class="n">res</span> <span class="o">=</span> <span class="n">_infiltration</span><span class="p">(</span><span class="n">node_interactions</span><span class="o">=</span><span class="n">nint</span><span class="p">,</span> <span class="n">interaction1</span><span class="o">=</span><span class="n">interaction1</span><span class="p">,</span> <span class="n">interaction2</span><span class="o">=</span><span class="n">interaction2</span><span class="p">)</span>
+            <span class="n">cont</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">res</span><span class="p">)</span>
+
+        <span class="n">res</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">cont</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="n">G</span><span class="o">.</span><span class="n">nodes</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="n">add_key</span><span class="p">])</span>
+        <span class="k">if</span> <span class="n">add_key</span> <span class="ow">in</span> <span class="n">so</span><span class="o">.</span><span class="n">obs</span><span class="p">[</span><span class="n">spl</span><span class="p">]:</span>
+            <span class="n">so</span><span class="o">.</span><span class="n">obs</span><span class="p">[</span><span class="n">spl</span><span class="p">]</span> <span class="o">=</span> <span class="n">so</span><span class="o">.</span><span class="n">obs</span><span class="p">[</span><span class="n">spl</span><span class="p">]</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="n">add_key</span><span class="p">])</span>
+
+        <span class="n">so</span><span class="o">.</span><span class="n">obs</span><span class="p">[</span><span class="n">spl</span><span class="p">]</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">((</span><span class="n">so</span><span class="o">.</span><span class="n">obs</span><span class="p">[</span><span class="n">spl</span><span class="p">],</span> <span class="n">res</span><span class="p">),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">nint</span> <span class="o">=</span> <span class="n">get_node_interactions</span><span class="p">(</span><span class="n">G</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
+
+        <span class="n">res</span> <span class="o">=</span> <span class="n">_infiltration</span><span class="p">(</span><span class="n">node_interactions</span><span class="o">=</span><span class="n">nint</span><span class="p">,</span> <span class="n">interaction1</span><span class="o">=</span><span class="n">interaction1</span><span class="p">,</span> <span class="n">interaction2</span><span class="o">=</span><span class="n">interaction2</span><span class="p">)</span>
+
+        <span class="n">so</span><span class="o">.</span><span class="n">spl</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">spl</span><span class="p">,</span> <span class="n">add_key</span><span class="p">]</span> <span class="o">=</span> <span class="n">res</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">inplace</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">so</span></div>
+
+
+<div class="viewcode-block" id="ripleysK"><a class="viewcode-back" href="../../../api/athena.neighborhood.estimators.html#athena.neighborhood.estimators.ripleysK">[docs]</a><span class="k">def</span> <span class="nf">ripleysK</span><span class="p">(</span><span class="n">so</span><span class="p">,</span> <span class="n">spl</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">attr</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="nb">id</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;K&#39;</span><span class="p">,</span> <span class="n">radii</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">correction</span><span class="o">=</span><span class="s1">&#39;ripley&#39;</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">key_added</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Compute Ripley&#39;s K as implemented by `[1]`_.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        so: SpatialOmics instance</span>
+<span class="sd">        spl: Spl for which to compute the metric</span>
+<span class="sd">        attr: Categorical feature in SpatialOmics.obs to use for the grouping</span>
+<span class="sd">        id: The category in the categorical feature `attr`, for which Ripley&#39;s K should be computed</span>
+<span class="sd">        mode: {K, csr-deviation}. If `K`, Ripley&#39;s K is estimated, with `csr-deviation` the deviation from a poission process is computed.</span>
+<span class="sd">        radii: List of radiis for which Ripley&#39;s K is computed</span>
+<span class="sd">        correction: Correction method to use to correct for boarder effects, see [1].</span>
+<span class="sd">        inplace: Whether to add the metric to the current SpatialOmics instance or to return a new one.</span>
+<span class="sd">        key_added: Key added to SpatialOmics.uns[spl][metric][key_added]</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        Ripley&#39;s K estimates</span>
+
+<span class="sd">    References:</span>
+<span class="sd">        .. _[1]: https://docs.astropy.org/en/stable/stats/ripley.html</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">so</span> <span class="o">=</span> <span class="n">so</span> <span class="k">if</span> <span class="n">inplace</span> <span class="k">else</span> <span class="n">so</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+
+    <span class="c1"># NOTE: uns_path = f&#39;{spl}/clustering/&#39;</span>
+    <span class="k">if</span> <span class="n">key_added</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">key_added</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="nb">id</span><span class="si">}</span><span class="s1">_</span><span class="si">{</span><span class="n">attr</span><span class="si">}</span><span class="s1">_</span><span class="si">{</span><span class="n">mode</span><span class="si">}</span><span class="s1">_</span><span class="si">{</span><span class="n">correction</span><span class="si">}</span><span class="s1">&#39;</span>
+
+    <span class="n">estimator</span> <span class="o">=</span> <span class="n">RipleysK</span><span class="p">(</span><span class="n">so</span><span class="o">=</span><span class="n">so</span><span class="p">,</span> <span class="n">spl</span><span class="o">=</span><span class="n">spl</span><span class="p">,</span> <span class="nb">id</span><span class="o">=</span><span class="nb">id</span><span class="p">,</span> <span class="n">attr</span><span class="o">=</span><span class="n">attr</span><span class="p">)</span>
+    <span class="n">res</span> <span class="o">=</span> <span class="n">estimator</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">radii</span><span class="o">=</span><span class="n">radii</span><span class="p">,</span> <span class="n">correction</span><span class="o">=</span><span class="n">correction</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="n">mode</span><span class="p">)</span>
+
+    <span class="c1"># add result to uns attribute</span>
+    <span class="n">add2uns</span><span class="p">(</span><span class="n">so</span><span class="p">,</span> <span class="n">res</span><span class="p">,</span> <span class="n">spl</span><span class="p">,</span> <span class="s1">&#39;ripleysK&#39;</span><span class="p">,</span> <span class="n">key_added</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">inplace</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">so</span></div>
+
+
+<div class="viewcode-block" id="add2uns"><a class="viewcode-back" href="../../../api/athena.neighborhood.estimators.html#athena.neighborhood.estimators.add2uns">[docs]</a><span class="k">def</span> <span class="nf">add2uns</span><span class="p">(</span><span class="n">so</span><span class="p">,</span> <span class="n">res</span><span class="p">,</span> <span class="n">spl</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">parent_key</span><span class="p">,</span> <span class="n">key_added</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">spl</span> <span class="ow">in</span> <span class="n">so</span><span class="o">.</span><span class="n">uns</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">parent_key</span> <span class="ow">in</span> <span class="n">so</span><span class="o">.</span><span class="n">uns</span><span class="p">[</span><span class="n">spl</span><span class="p">]:</span>
+            <span class="n">so</span><span class="o">.</span><span class="n">uns</span><span class="p">[</span><span class="n">spl</span><span class="p">][</span><span class="n">parent_key</span><span class="p">][</span><span class="n">key_added</span><span class="p">]</span> <span class="o">=</span> <span class="n">res</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">so</span><span class="o">.</span><span class="n">uns</span><span class="p">[</span><span class="n">spl</span><span class="p">]</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="n">parent_key</span><span class="p">:</span> <span class="p">{</span><span class="n">key_added</span><span class="p">:</span> <span class="n">res</span><span class="p">}})</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">so</span><span class="o">.</span><span class="n">uns</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="n">spl</span><span class="p">:</span> <span class="p">{</span><span class="n">parent_key</span><span class="p">:</span> <span class="p">{</span><span class="n">key_added</span><span class="p">:</span> <span class="n">res</span><span class="p">}}})</span></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright IBM Corp. 2021.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

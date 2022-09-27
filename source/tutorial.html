@@ -1,0 +1,1406 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>Tutorial on Imaging Mass Cytometry data &mdash; athena  documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["\\(", "\\)"]], "displayMath": [["\\[", "\\]"]], "processRefs": false, "processEnvironments": false}})</script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Tutorial - SpatialOmics" href="introduction-spatialOmics.html" />
+    <link rel="prev" title="Quickstart" href="quickstart.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> athena
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">General</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Gallery</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="overview.html">Overview of ATHENA</a></li>
+<li class="toctree-l1"><a class="reference internal" href="methodology.html">Methodology</a></li>
+<li class="toctree-l1"><a class="reference internal" href="quickstart.html">Quickstart</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Tutorial</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#import-needed-packages">Import needed packages</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#load-imc-data-into-a-spatialomics-object">Load IMC data into a <code class="docutils literal notranslate"><span class="pre">SpatialOmics</span></code> object</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#explore-spatialomics-object">Explore <code class="docutils literal notranslate"><span class="pre">SpatialOmics</span></code> object</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#visualize-raw-images-and-masks">Visualize raw images and masks</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#visualize-single-cell-data">Visualize single-cell data</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#set-colormaps">Set colormaps</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#plot-protein-intensity-or-single-cell-annotations">Plot protein intensity or single-cell annotations</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#graph-construction">Graph construction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#heterogeneity-quantification">Heterogeneity quantification</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#sample-level-scores">Sample-level scores</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#cell-level-scores">Cell-level scores</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#immune-infiltration">Immune infiltration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#cell-type-interactions">Cell type interactions</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#ripley-s-k">Ripley’s K</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#modularity">Modularity</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="introduction-spatialOmics.html">SpatialOmics Tutorial</a></li>
+</ul>
+<p class="caption"><span class="caption-text">API</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../api_overview.html">API Overview</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">athena</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+      <li>Tutorial on Imaging Mass Cytometry data</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="../_sources/source/tutorial.md.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="tutorial-on-imaging-mass-cytometry-data">
+<h1>Tutorial on Imaging Mass Cytometry data<a class="headerlink" href="#tutorial-on-imaging-mass-cytometry-data" title="Permalink to this headline">¶</a></h1>
+<p>In this tutorial we will showcase how ATHENA can be used to explore Imaging Mass Cytometry datasets. We will use the publicly available dataset of (Jackson et al., 2020 - <a class="reference external" href="https://www.nature.com/articles/s41586-019-1876-x">paper</a>), where the authors used a panel of 35 cancer and immune markers to spatially profile the breast cancer ecosystem using Tissue Microarrays (TMAs) from two cohorts of breast cancer patients.</p>
+<div class="section" id="import-needed-packages">
+<h2>Import needed packages<a class="headerlink" href="#import-needed-packages" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">athena</span> <span class="k">as</span> <span class="nn">ath</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">from</span> <span class="nn">tqdm</span> <span class="kn">import</span> <span class="n">tqdm</span>
+<span class="kn">from</span> <span class="nn">matplotlib</span> <span class="kn">import</span> <span class="n">cm</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">from</span> <span class="nn">matplotlib.colors</span> <span class="kn">import</span> <span class="n">ListedColormap</span><span class="p">,</span> <span class="n">Normalize</span>
+<span class="kn">import</span> <span class="nn">seaborn</span> <span class="k">as</span> <span class="nn">sns</span>
+
+<span class="n">pd</span><span class="o">.</span><span class="n">set_option</span><span class="p">(</span><span class="s1">&#39;display.max_columns&#39;</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="load-imc-data-into-a-spatialomics-object">
+<h2>Load IMC data into a <code class="docutils literal notranslate"><span class="pre">SpatialOmics</span></code> object<a class="headerlink" href="#load-imc-data-into-a-spatialomics-object" title="Permalink to this headline">¶</a></h2>
+<p>Although the dataset consists of a total of 720 tumor images from 352 patients with breast cancer, for this tutorial, we will work with 8 random TMA cores from the <em>zurich</em> cohort that can be easily loaded using the <code class="docutils literal notranslate"><span class="pre">.dataset</span></code> module of <code class="docutils literal notranslate"><span class="pre">Athena</span></code>:</p>
+<p>Note: Download the latest version of the data set by setting <code class="docutils literal notranslate"><span class="pre">force_download=True</span></code></p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># so = ath.dataset.imc(force_download=True) # 10GB, might take some time the first time. Data is cached at ~/.cache/athena</span>
+<span class="n">so</span> <span class="o">=</span> <span class="n">ath</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">imc</span><span class="p">()</span>
+<span class="n">so</span>
+</pre></div>
+</div>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>INFO:numexpr.utils:NumExpr defaulting to 8 threads.
+
+
+warning: to get the latest version of this dataset use `so = sh.dataset.imc(force_download=True)`
+
+
+
+
+
+
+SpatialOmics object with n_obs 395769
+    X: 347, (10, 3671) x (34, 34)
+    spl: 347, [&#39;pid&#39;, &#39;location&#39;, &#39;grade&#39;, &#39;tumor_type&#39;, &#39;tumor_size&#39;, &#39;gender&#39;, &#39;menopausal&#39;, &#39;PTNM_M&#39;, &#39;age&#39;, &#39;Patientstatus&#39;, &#39;treatment&#39;, &#39;PTNM_T&#39;, &#39;DiseaseStage&#39;, &#39;PTNM_N&#39;, &#39;AllSamplesSVSp4.Array&#39;, &#39;TMALocation&#39;, &#39;TMAxlocation&#39;, &#39;yLocation&#39;, &#39;DonorBlocklabel&#39;, &#39;diseasestatus&#39;, &#39;TMABlocklabel&#39;, &#39;UBTMAlocation&#39;, &#39;SupplierPatientID&#39;, &#39;Yearofsamplecollection&#39;, &#39;PrimarySite&#39;, &#39;histology&#39;, &#39;PTNM_Radicality&#39;, &#39;Lymphaticinvasion&#39;, &#39;Venousinvasion&#39;, &#39;ERStatus&#39;, &#39;PRStatus&#39;, &#39;HER2Status&#39;, &#39;Pre-surgeryTx&#39;, &#39;Post-surgeryTx&#39;, &#39;Tag&#39;, &#39;Ptdiagnosis&#39;, &#39;DFSmonth&#39;, &#39;OSmonth&#39;, &#39;Comment&#39;, &#39;ER+DuctalCa&#39;, &#39;TripleNegDuctal&#39;, &#39;hormonesensitive&#39;, &#39;hormonerefractory&#39;, &#39;hormoneresistantaftersenstive&#39;, &#39;Fulvestran&#39;, &#39;microinvasion&#39;, &#39;I_plus_neg&#39;, &#39;SN&#39;, &#39;MIC&#39;, &#39;Count_Cells&#39;, &#39;Height_FullStack&#39;, &#39;Width_FullStack&#39;, &#39;area&#39;, &#39;Subtype&#39;, &#39;HER2&#39;, &#39;ER&#39;, &#39;PR&#39;, &#39;clinical_type&#39;]
+    obs: 347, {&#39;core&#39;, &#39;id&#39;, &#39;phenograph_cluster&#39;, &#39;CellId&#39;, &#39;cell_type&#39;, &#39;cell_type_id&#39;, &#39;meta_label&#39;, &#39;meta_id&#39;}
+    var: 347, {&#39;full_target_name&#39;, &#39;target&#39;, &#39;fullstack_index&#39;, &#39;channel&#39;, &#39;metal_tag&#39;, &#39;feature_type&#39;}
+    G: 7, {&#39;knn&#39;, &#39;contact&#39;, &#39;radius&#39;}
+    masks: 347, {&#39;cellmasks&#39;}
+    images: 347
+</pre></div>
+</div>
+</div>
+<div class="section" id="explore-spatialomics-object">
+<h2>Explore <code class="docutils literal notranslate"><span class="pre">SpatialOmics</span></code> object<a class="headerlink" href="#explore-spatialomics-object" title="Permalink to this headline">¶</a></h2>
+<p>Various preprocessing steps (segmentation, single-cell quantification, phenotyping) have been applied to the data by the original authors and are included in the various attributes of the data. For example, <code class="docutils literal notranslate"><span class="pre">so.spl</span></code> contains sample-level metadata:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="n">so</span><span class="o">.</span><span class="n">spl</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">values</span><span class="p">)</span> <span class="c1">#see all available sample annotations</span>
+<span class="n">so</span><span class="o">.</span><span class="n">spl</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span> 
+</pre></div>
+</div>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>[&#39;pid&#39; &#39;location&#39; &#39;grade&#39; &#39;tumor_type&#39; &#39;tumor_size&#39; &#39;gender&#39; &#39;menopausal&#39;
+ &#39;PTNM_M&#39; &#39;age&#39; &#39;Patientstatus&#39; &#39;treatment&#39; &#39;PTNM_T&#39; &#39;DiseaseStage&#39;
+ &#39;PTNM_N&#39; &#39;AllSamplesSVSp4.Array&#39; &#39;TMALocation&#39; &#39;TMAxlocation&#39; &#39;yLocation&#39;
+ &#39;DonorBlocklabel&#39; &#39;diseasestatus&#39; &#39;TMABlocklabel&#39; &#39;UBTMAlocation&#39;
+ &#39;SupplierPatientID&#39; &#39;Yearofsamplecollection&#39; &#39;PrimarySite&#39; &#39;histology&#39;
+ &#39;PTNM_Radicality&#39; &#39;Lymphaticinvasion&#39; &#39;Venousinvasion&#39; &#39;ERStatus&#39;
+ &#39;PRStatus&#39; &#39;HER2Status&#39; &#39;Pre-surgeryTx&#39; &#39;Post-surgeryTx&#39; &#39;Tag&#39;
+ &#39;Ptdiagnosis&#39; &#39;DFSmonth&#39; &#39;OSmonth&#39; &#39;Comment&#39; &#39;ER+DuctalCa&#39;
+ &#39;TripleNegDuctal&#39; &#39;hormonesensitive&#39; &#39;hormonerefractory&#39;
+ &#39;hormoneresistantaftersenstive&#39; &#39;Fulvestran&#39; &#39;microinvasion&#39; &#39;I_plus_neg&#39;
+ &#39;SN&#39; &#39;MIC&#39; &#39;Count_Cells&#39; &#39;Height_FullStack&#39; &#39;Width_FullStack&#39; &#39;area&#39;
+ &#39;Subtype&#39; &#39;HER2&#39; &#39;ER&#39; &#39;PR&#39; &#39;clinical_type&#39;]
+</pre></div>
+</div>
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>.dataframe tbody tr th {
+    vertical-align: top;
+}
+
+.dataframe thead th {
+    text-align: right;
+}
+</pre></div>
+</div>
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>pid</th>
+      <th>location</th>
+      <th>...</th>
+      <th>PR</th>
+      <th>clinical_type</th>
+    </tr>
+    <tr>
+      <th>core</th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>slide_49_By3x1</th>
+      <td>49</td>
+      <td>[]</td>
+      <td>...</td>
+      <td>+</td>
+      <td>HR+HER2-</td>
+    </tr>
+    <tr>
+      <th>slide_53_By11x8</th>
+      <td>53</td>
+      <td>PERIPHERY</td>
+      <td>...</td>
+      <td>NaN</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>slide_62_By9x5</th>
+      <td>62</td>
+      <td>[]</td>
+      <td>...</td>
+      <td>+</td>
+      <td>HR+HER2-</td>
+    </tr>
+  </tbody>
+</table>
+<p>3 rows × 58 columns</p>
+</div>
+<p>… and <code class="docutils literal notranslate"><span class="pre">so.obs</span></code> contains all single-cell level metadata:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">spl</span> <span class="o">=</span> <span class="s1">&#39;slide_49_By2x5&#39;</span> <span class="c1">#for one specific sample</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">so</span><span class="o">.</span><span class="n">obs</span><span class="p">[</span><span class="n">spl</span><span class="p">]</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">values</span><span class="p">)</span> <span class="c1">#see all available sample annotations</span>
+<span class="n">so</span><span class="o">.</span><span class="n">obs</span><span class="p">[</span><span class="n">spl</span><span class="p">]</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span> 
+</pre></div>
+</div>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>[&#39;core&#39; &#39;meta_id&#39; &#39;meta_label&#39; &#39;cell_type_id&#39; &#39;cell_type&#39;
+ &#39;phenograph_cluster&#39; &#39;CellId&#39; &#39;id&#39;]
+</pre></div>
+</div>
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>.dataframe tbody tr th {
+    vertical-align: top;
+}
+
+.dataframe thead th {
+    text-align: right;
+}
+</pre></div>
+</div>
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>core</th>
+      <th>meta_id</th>
+      <th>...</th>
+      <th>CellId</th>
+      <th>id</th>
+    </tr>
+    <tr>
+      <th>cell_id</th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>1</th>
+      <td>slide_49_By2x5</td>
+      <td>11</td>
+      <td>...</td>
+      <td>1</td>
+      <td>ZTMA208_slide_49_By2x5_1</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>slide_49_By2x5</td>
+      <td>11</td>
+      <td>...</td>
+      <td>2</td>
+      <td>ZTMA208_slide_49_By2x5_2</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>slide_49_By2x5</td>
+      <td>11</td>
+      <td>...</td>
+      <td>3</td>
+      <td>ZTMA208_slide_49_By2x5_3</td>
+    </tr>
+  </tbody>
+</table>
+<p>3 rows × 8 columns</p>
+</div>
+<p>The <code class="docutils literal notranslate"><span class="pre">so.mask</span></code> attribute can store for each sample different segmentation masks. For this data set we have access to the segmentation into single cells (<code class="docutils literal notranslate"><span class="pre">cellmasks</span></code>).</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="n">so</span><span class="o">.</span><span class="n">masks</span><span class="p">[</span><span class="n">spl</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+</pre></div>
+</div>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>dict_keys([&#39;cellmasks&#39;])
+</pre></div>
+</div>
+</div>
+<div class="section" id="visualize-raw-images-and-masks">
+<h2>Visualize raw images and masks<a class="headerlink" href="#visualize-raw-images-and-masks" title="Permalink to this headline">¶</a></h2>
+<p>Run the cell below to launch the interactive <a class="reference external" href="https://napari.org">napari</a> viewer and explore the multiplexed raw images. In addition to the single protein expression levels, we also add segmentations masks (with <code class="docutils literal notranslate"><span class="pre">add_masks</span></code>) for the single-cells.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">ath</span><span class="o">.</span><span class="n">pl</span><span class="o">.</span><span class="n">napari_viewer</span><span class="p">(</span><span class="n">so</span><span class="p">,</span> <span class="n">spl</span><span class="p">,</span> <span class="n">attrs</span><span class="o">=</span><span class="n">so</span><span class="o">.</span><span class="n">var</span><span class="p">[</span><span class="n">spl</span><span class="p">][</span><span class="s1">&#39;target&#39;</span><span class="p">],</span> <span class="n">add_masks</span><span class="o">=</span><span class="n">so</span><span class="o">.</span><span class="n">masks</span><span class="p">[</span><span class="n">spl</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+</pre></div>
+</div>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>INFO:OpenGL.acceleratesupport:No OpenGL_accelerate module loaded: No module named &#39;OpenGL_accelerate&#39;
+</pre></div>
+</div>
+</div>
+<div class="section" id="visualize-single-cell-data">
+<h2>Visualize single-cell data<a class="headerlink" href="#visualize-single-cell-data" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="set-colormaps">
+<h3>Set colormaps<a class="headerlink" href="#set-colormaps" title="Permalink to this headline">¶</a></h3>
+<p>First, let us set up a colormap and save it in the <code class="docutils literal notranslate"><span class="pre">.uns</span></code> attribute of the <code class="docutils literal notranslate"><span class="pre">SpatialOmics</span></code> instance, where it will be accessed by the <code class="docutils literal notranslate"><span class="pre">.pl</span></code> submodules when plotting certain features of the data. If no colormap is defined, the <code class="docutils literal notranslate"><span class="pre">.pl</span></code> module uses the <code class="docutils literal notranslate"><span class="pre">default</span></code> colormap (<code class="docutils literal notranslate"><span class="pre">so.uns['colormap']['default']</span></code>). The loaded dataset already comes with a phenotype classification for each single cell (<code class="docutils literal notranslate"><span class="pre">meta_id</span></code> in <code class="docutils literal notranslate"><span class="pre">.obs</span></code>) and a more coarse classification into main cell types (<code class="docutils literal notranslate"><span class="pre">cell_type_id</span></code> in <code class="docutils literal notranslate"><span class="pre">.obs</span></code>).</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># define default colormap</span>
+<span class="n">so</span><span class="o">.</span><span class="n">uns</span><span class="p">[</span><span class="s1">&#39;cmaps&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="n">cm</span><span class="o">.</span><span class="n">Reds</span><span class="p">})</span>
+
+<span class="c1"># set up colormaps for meta_id</span>
+<span class="n">cmap_paper</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">255</span><span class="p">,</span> <span class="mi">255</span><span class="p">,</span> <span class="mi">255</span><span class="p">],</span> <span class="p">[</span><span class="mi">10</span><span class="p">,</span> <span class="mi">141</span><span class="p">,</span> <span class="mi">66</span><span class="p">],</span> <span class="p">[</span><span class="mi">62</span><span class="p">,</span> <span class="mi">181</span><span class="p">,</span> <span class="mi">86</span><span class="p">],</span> <span class="p">[</span><span class="mi">203</span><span class="p">,</span> <span class="mi">224</span><span class="p">,</span> <span class="mi">87</span><span class="p">],</span>  <span class="c1"># 0 1 2 3</span>
+                       <span class="p">[</span><span class="mi">84</span><span class="p">,</span> <span class="mi">108</span><span class="p">,</span> <span class="mi">47</span><span class="p">],</span> <span class="p">[</span><span class="mi">180</span><span class="p">,</span> <span class="mi">212</span><span class="p">,</span> <span class="mi">50</span><span class="p">],</span> <span class="p">[</span><span class="mi">23</span><span class="p">,</span> <span class="mi">101</span><span class="p">,</span> <span class="mi">54</span><span class="p">],</span>  <span class="c1"># 4 5 6</span>
+                       <span class="p">[</span><span class="mi">248</span><span class="p">,</span> <span class="mi">232</span><span class="p">,</span> <span class="mi">13</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">247</span><span class="p">,</span> <span class="mi">252</span><span class="p">],</span> <span class="p">[</span><span class="mi">190</span><span class="p">,</span> <span class="mi">252</span><span class="p">,</span> <span class="mi">252</span><span class="p">],</span>  <span class="c1"># 7 8 9</span>
+                       <span class="p">[</span><span class="mi">150</span><span class="p">,</span> <span class="mi">210</span><span class="p">,</span> <span class="mi">225</span><span class="p">],</span> <span class="p">[</span><span class="mi">151</span><span class="p">,</span> <span class="mi">254</span><span class="p">,</span> <span class="mi">255</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">255</span><span class="p">,</span> <span class="mi">250</span><span class="p">],</span>  <span class="c1"># 10 11 12</span>
+                       <span class="p">[</span><span class="mi">154</span><span class="p">,</span> <span class="mi">244</span><span class="p">,</span> <span class="mi">253</span><span class="p">],</span> <span class="p">[</span><span class="mi">19</span><span class="p">,</span> <span class="mi">76</span><span class="p">,</span> <span class="mi">144</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">251</span><span class="p">],</span>  <span class="c1"># 13 14 15</span>
+                       <span class="p">[</span><span class="mi">147</span><span class="p">,</span> <span class="mi">213</span><span class="p">,</span> <span class="mi">198</span><span class="p">],</span> <span class="p">[</span><span class="mi">67</span><span class="p">,</span> <span class="mi">140</span><span class="p">,</span> <span class="mi">114</span><span class="p">],</span> <span class="p">[</span><span class="mi">238</span><span class="p">,</span> <span class="mi">70</span><span class="p">,</span> <span class="mi">71</span><span class="p">],</span>  <span class="c1"># 16 17 18</span>
+                       <span class="p">[</span><span class="mi">80</span><span class="p">,</span> <span class="mi">45</span><span class="p">,</span> <span class="mi">143</span><span class="p">],</span> <span class="p">[</span><span class="mi">135</span><span class="p">,</span> <span class="mi">76</span><span class="p">,</span> <span class="mi">158</span><span class="p">],</span> <span class="p">[</span><span class="mi">250</span><span class="p">,</span> <span class="mi">179</span><span class="p">,</span> <span class="mi">195</span><span class="p">],</span>  <span class="c1"># 19 20 21</span>
+                       <span class="p">[</span><span class="mi">246</span><span class="p">,</span> <span class="mi">108</span><span class="p">,</span> <span class="mi">179</span><span class="p">],</span> <span class="p">[</span><span class="mi">207</span><span class="p">,</span> <span class="mi">103</span><span class="p">,</span> <span class="mi">43</span><span class="p">],</span> <span class="p">[</span><span class="mi">224</span><span class="p">,</span> <span class="mi">162</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span>  <span class="c1"># 22 23 24</span>
+                       <span class="p">[</span><span class="mi">246</span><span class="p">,</span> <span class="mi">131</span><span class="p">,</span> <span class="mi">110</span><span class="p">],</span> <span class="p">[</span><span class="mi">135</span><span class="p">,</span> <span class="mi">92</span><span class="p">,</span> <span class="mi">43</span><span class="p">],</span> <span class="p">[</span><span class="mi">178</span><span class="p">,</span> <span class="mi">33</span><span class="p">,</span> <span class="mi">28</span><span class="p">]])</span>
+
+
+<span class="c1"># define labels for meta_id</span>
+<span class="n">cmap_labels</span> <span class="o">=</span> <span class="p">{</span><span class="mi">0</span><span class="p">:</span> <span class="s1">&#39;Background&#39;</span><span class="p">,</span>
+               <span class="mi">1</span><span class="p">:</span> <span class="s1">&#39;B cells&#39;</span><span class="p">,</span>
+               <span class="mi">2</span><span class="p">:</span> <span class="s1">&#39;B and T cells&#39;</span><span class="p">,</span>
+               <span class="mi">3</span><span class="p">:</span> <span class="s1">&#39;T cell&#39;</span><span class="p">,</span>
+               <span class="mi">4</span><span class="p">:</span> <span class="s1">&#39;Macrophages&#39;</span><span class="p">,</span>
+               <span class="mi">5</span><span class="p">:</span> <span class="s1">&#39;T cell&#39;</span><span class="p">,</span>
+               <span class="mi">6</span><span class="p">:</span> <span class="s1">&#39;Macrophages&#39;</span><span class="p">,</span>
+               <span class="mi">7</span><span class="p">:</span> <span class="s1">&#39;Endothelial&#39;</span><span class="p">,</span>
+               <span class="mi">8</span><span class="p">:</span> <span class="s1">&#39;Vimentin Hi&#39;</span><span class="p">,</span>
+               <span class="mi">9</span><span class="p">:</span> <span class="s1">&#39;Small circular&#39;</span><span class="p">,</span>
+               <span class="mi">10</span><span class="p">:</span> <span class="s1">&#39;Small elongated&#39;</span><span class="p">,</span>
+               <span class="mi">11</span><span class="p">:</span> <span class="s1">&#39;Fibronectin Hi&#39;</span><span class="p">,</span>
+               <span class="mi">12</span><span class="p">:</span> <span class="s1">&#39;Larger elongated&#39;</span><span class="p">,</span>
+               <span class="mi">13</span><span class="p">:</span> <span class="s1">&#39;SMA Hi Vimentin&#39;</span><span class="p">,</span>
+               <span class="mi">14</span><span class="p">:</span> <span class="s1">&#39;Hypoxic&#39;</span><span class="p">,</span>
+               <span class="mi">15</span><span class="p">:</span> <span class="s1">&#39;Apopotic&#39;</span><span class="p">,</span>
+               <span class="mi">16</span><span class="p">:</span> <span class="s1">&#39;Proliferative&#39;</span><span class="p">,</span>
+               <span class="mi">17</span><span class="p">:</span> <span class="s1">&#39;p53 EGFR&#39;</span><span class="p">,</span> 
+               <span class="mi">18</span><span class="p">:</span> <span class="s1">&#39;Basal CK&#39;</span><span class="p">,</span>
+               <span class="mi">19</span><span class="p">:</span> <span class="s1">&#39;CK7 CK hi Cadherin&#39;</span><span class="p">,</span>
+               <span class="mi">20</span><span class="p">:</span> <span class="s1">&#39;CK7 CK&#39;</span><span class="p">,</span>
+               <span class="mi">21</span><span class="p">:</span> <span class="s1">&#39;Epithelial low&#39;</span><span class="p">,</span>
+               <span class="mi">22</span><span class="p">:</span> <span class="s1">&#39;CK low HR low&#39;</span><span class="p">,</span>                            
+               <span class="mi">23</span><span class="p">:</span> <span class="s1">&#39;HR hi CK&#39;</span><span class="p">,</span>               
+               <span class="mi">24</span><span class="p">:</span> <span class="s1">&#39;CK HR&#39;</span><span class="p">,</span> 
+               <span class="mi">25</span><span class="p">:</span> <span class="s1">&#39;HR low CK&#39;</span><span class="p">,</span>                             
+               <span class="mi">27</span><span class="p">:</span> <span class="s1">&#39;Myoepithalial&#39;</span><span class="p">,</span>
+               <span class="mi">26</span><span class="p">:</span> <span class="s1">&#39;CK low HR hi p53&#39;</span><span class="p">}</span>
+
+<span class="n">so</span><span class="o">.</span><span class="n">uns</span><span class="p">[</span><span class="s1">&#39;cmaps&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="s1">&#39;meta_id&#39;</span><span class="p">:</span> <span class="n">ListedColormap</span><span class="p">(</span><span class="n">cmap_paper</span> <span class="o">/</span> <span class="mi">255</span><span class="p">)})</span>
+<span class="n">so</span><span class="o">.</span><span class="n">uns</span><span class="p">[</span><span class="s1">&#39;cmap_labels&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="s1">&#39;meta_id&#39;</span><span class="p">:</span> <span class="n">cmap_labels</span><span class="p">})</span>
+
+<span class="c1"># cell_type_id colormap</span>
+<span class="n">cmap</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;white&#39;</span><span class="p">,</span> <span class="s1">&#39;darkgreen&#39;</span><span class="p">,</span> <span class="s1">&#39;gold&#39;</span><span class="p">,</span> <span class="s1">&#39;steelblue&#39;</span><span class="p">,</span> <span class="s1">&#39;darkred&#39;</span><span class="p">,</span> <span class="s1">&#39;coral&#39;</span><span class="p">]</span>
+<span class="n">cmap_labels</span> <span class="o">=</span> <span class="p">{</span><span class="mi">0</span><span class="p">:</span> <span class="s1">&#39;background&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">:</span> <span class="s1">&#39;immune&#39;</span><span class="p">,</span>  <span class="mi">2</span><span class="p">:</span> <span class="s1">&#39;endothelial&#39;</span><span class="p">,</span> <span class="mi">3</span><span class="p">:</span> <span class="s1">&#39;stromal&#39;</span><span class="p">,</span> <span class="mi">4</span><span class="p">:</span> <span class="s1">&#39;tumor&#39;</span><span class="p">,</span> <span class="mi">5</span><span class="p">:</span> <span class="s1">&#39;myoepithelial&#39;</span><span class="p">}</span>
+<span class="n">cmap</span> <span class="o">=</span> <span class="n">ListedColormap</span><span class="p">(</span><span class="n">cmap</span><span class="p">)</span>
+
+<span class="n">so</span><span class="o">.</span><span class="n">uns</span><span class="p">[</span><span class="s1">&#39;cmaps&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="s1">&#39;cell_type_id&#39;</span><span class="p">:</span> <span class="n">cmap</span><span class="p">})</span>
+<span class="n">so</span><span class="o">.</span><span class="n">uns</span><span class="p">[</span><span class="s1">&#39;cmap_labels&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="s1">&#39;cell_type_id&#39;</span><span class="p">:</span> <span class="n">cmap_labels</span><span class="p">})</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="plot-protein-intensity-or-single-cell-annotations">
+<h3>Plot protein intensity or single-cell annotations<a class="headerlink" href="#plot-protein-intensity-or-single-cell-annotations" title="Permalink to this headline">¶</a></h3>
+<p>Samples stored in the <code class="docutils literal notranslate"><span class="pre">SpatialOmics</span></code> object can be visualised with the plotting function <code class="docutils literal notranslate"><span class="pre">pl.spatial</span></code>.
+In a first step we extract the centroids of each cell segmentation masks with <code class="docutils literal notranslate"><span class="pre">pp.extract_centroids</span></code> and store the results in the <code class="docutils literal notranslate"><span class="pre">SpatialOmics</span></code> instance (<code class="docutils literal notranslate"><span class="pre">so.obs[spl]</span></code>). This is required to enable the full plotting functionalities.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="n">so</span><span class="o">.</span><span class="n">masks</span><span class="p">[</span><span class="n">spl</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+
+<span class="c1"># extract cell centroids across all samples</span>
+<span class="n">all_samples</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;slide_49_By2x5&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;slide_59_Cy7x7&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;slide_59_Cy7x8&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;slide_59_Cy8x1&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;slide_7_Cy2x2&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;slide_7_Cy2x3&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;slide_7_Cy2x4&#39;</span><span class="p">]</span>
+<span class="k">for</span> <span class="n">spl</span> <span class="ow">in</span> <span class="n">all_samples</span><span class="p">:</span>
+    <span class="n">ath</span><span class="o">.</span><span class="n">pp</span><span class="o">.</span><span class="n">extract_centroids</span><span class="p">(</span><span class="n">so</span><span class="p">,</span> <span class="n">spl</span><span class="p">,</span> <span class="n">mask_key</span><span class="o">=</span><span class="s1">&#39;cellmasks&#39;</span><span class="p">)</span>
+
+<span class="c1"># print results</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">so</span><span class="o">.</span><span class="n">obs</span><span class="p">[</span><span class="n">spl</span><span class="p">])</span>
+</pre></div>
+</div>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>dict_keys([&#39;cellmasks&#39;])
+                  core meta_id  ...           y           x
+cell_id                         ...                        
+1        slide_7_Cy2x4      19  ...   11.344660   72.325243
+2        slide_7_Cy2x4      19  ...    2.346154   85.961538
+3        slide_7_Cy2x4      19  ...    1.142857  209.809524
+4        slide_7_Cy2x4      19  ...    3.769912  219.769912
+5        slide_7_Cy2x4      19  ...    1.375000  260.166667
+...                ...     ...  ...         ...         ...
+1611     slide_7_Cy2x4       3  ...  518.425000  192.075000
+1612     slide_7_Cy2x4      19  ...  518.477612  233.283582
+1613     slide_7_Cy2x4      22  ...  520.000000  413.956522
+1614     slide_7_Cy2x4      22  ...  519.962963  421.962963
+1615     slide_7_Cy2x4       7  ...  514.229167  507.343750
+
+[1611 rows x 10 columns]
+</pre></div>
+</div>
+<p>If only the <code class="docutils literal notranslate"><span class="pre">SpatialOmics</span></code> instance and the sample id is provided, the sample is plotted as a scatter plot using the computed centroids. However, with <code class="docutils literal notranslate"><span class="pre">mode=mask</span></code>, the computed segmentation masks are used. The observations can be colored according to a specific feature from <code class="docutils literal notranslate"><span class="pre">so.obs[spl]</span></code> or <code class="docutils literal notranslate"><span class="pre">so.X[spl]</span></code> - see example below.</p>
+<p>Note: When plotting with <code class="docutils literal notranslate"><span class="pre">mode=mask</span></code> the plotted feature needs to be numeric.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">spl</span> <span class="o">=</span> <span class="s1">&#39;slide_49_By2x5&#39;</span>
+<span class="n">fig</span><span class="p">,</span> <span class="n">axs</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">15</span><span class="p">,</span> <span class="mi">6</span><span class="p">),</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">300</span><span class="p">)</span>
+<span class="n">ath</span><span class="o">.</span><span class="n">pl</span><span class="o">.</span><span class="n">spatial</span><span class="p">(</span><span class="n">so</span><span class="p">,</span> <span class="n">spl</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="o">.</span><span class="n">flat</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+<span class="n">ath</span><span class="o">.</span><span class="n">pl</span><span class="o">.</span><span class="n">spatial</span><span class="p">(</span><span class="n">so</span><span class="p">,</span> <span class="n">spl</span><span class="p">,</span> <span class="s1">&#39;cell_type_id&#39;</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;mask&#39;</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="o">.</span><span class="n">flat</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+<span class="n">ath</span><span class="o">.</span><span class="n">pl</span><span class="o">.</span><span class="n">spatial</span><span class="p">(</span><span class="n">so</span><span class="p">,</span> <span class="n">spl</span><span class="p">,</span> <span class="s1">&#39;meta_id&#39;</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;mask&#39;</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="o">.</span><span class="n">flat</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
+<span class="n">ath</span><span class="o">.</span><span class="n">pl</span><span class="o">.</span><span class="n">spatial</span><span class="p">(</span><span class="n">so</span><span class="p">,</span> <span class="n">spl</span><span class="p">,</span> <span class="s1">&#39;CytokeratinPan&#39;</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;mask&#39;</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="o">.</span><span class="n">flat</span><span class="p">[</span><span class="mi">3</span><span class="p">])</span>
+<span class="n">ath</span><span class="o">.</span><span class="n">pl</span><span class="o">.</span><span class="n">spatial</span><span class="p">(</span><span class="n">so</span><span class="p">,</span> <span class="n">spl</span><span class="p">,</span> <span class="s1">&#39;Cytokeratin5&#39;</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;mask&#39;</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="o">.</span><span class="n">flat</span><span class="p">[</span><span class="mi">4</span><span class="p">])</span>
+<span class="n">ath</span><span class="o">.</span><span class="n">pl</span><span class="o">.</span><span class="n">spatial</span><span class="p">(</span><span class="n">so</span><span class="p">,</span> <span class="n">spl</span><span class="p">,</span> <span class="s1">&#39;SMA&#39;</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;mask&#39;</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="o">.</span><span class="n">flat</span><span class="p">[</span><span class="mi">5</span><span class="p">])</span>
+</pre></div>
+</div>
+<p><img alt="png" src="../_images/tutorial_17_0.png" /></p>
+<p>Experiment with different colormaps or background colors:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">so</span><span class="o">.</span><span class="n">uns</span><span class="p">[</span><span class="s1">&#39;cmaps&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="n">cm</span><span class="o">.</span><span class="n">plasma</span><span class="p">})</span>
+<span class="n">fig</span><span class="p">,</span> <span class="n">axs</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">15</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span>
+<span class="n">ath</span><span class="o">.</span><span class="n">pl</span><span class="o">.</span><span class="n">spatial</span><span class="p">(</span><span class="n">so</span><span class="p">,</span> <span class="n">spl</span><span class="p">,</span> <span class="s1">&#39;CytokeratinPan&#39;</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;mask&#39;</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="o">.</span><span class="n">flat</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">background_color</span><span class="o">=</span><span class="s1">&#39;black&#39;</span><span class="p">)</span>
+<span class="n">ath</span><span class="o">.</span><span class="n">pl</span><span class="o">.</span><span class="n">spatial</span><span class="p">(</span><span class="n">so</span><span class="p">,</span> <span class="n">spl</span><span class="p">,</span> <span class="s1">&#39;Cytokeratin5&#39;</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;mask&#39;</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="o">.</span><span class="n">flat</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">background_color</span><span class="o">=</span><span class="s1">&#39;black&#39;</span><span class="p">)</span>
+<span class="n">ath</span><span class="o">.</span><span class="n">pl</span><span class="o">.</span><span class="n">spatial</span><span class="p">(</span><span class="n">so</span><span class="p">,</span> <span class="n">spl</span><span class="p">,</span> <span class="s1">&#39;SMA&#39;</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;mask&#39;</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="o">.</span><span class="n">flat</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">background_color</span><span class="o">=</span><span class="s1">&#39;black&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><img alt="png" src="../_images/tutorial_19_0.png" /></p>
+</div>
+</div>
+<div class="section" id="graph-construction">
+<h2>Graph construction<a class="headerlink" href="#graph-construction" title="Permalink to this headline">¶</a></h2>
+<p>Use the <code class="docutils literal notranslate"><span class="pre">.graph</span></code> submodule to construct 3 different graphs and experiment with the parameters (k, radius):</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># import default graph builder parameters</span>
+<span class="kn">from</span> <span class="nn">athena.graph_builder.constants</span> <span class="kn">import</span> <span class="n">GRAPH_BUILDER_DEFAULT_PARAMS</span>
+
+<span class="c1"># kNN graph</span>
+<span class="n">config</span> <span class="o">=</span> <span class="n">GRAPH_BUILDER_DEFAULT_PARAMS</span><span class="p">[</span><span class="s1">&#39;knn&#39;</span><span class="p">]</span>
+<span class="n">config</span><span class="p">[</span><span class="s1">&#39;builder_params&#39;</span><span class="p">][</span><span class="s1">&#39;n_neighbors&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">6</span> <span class="c1"># set parameter k</span>
+<span class="n">ath</span><span class="o">.</span><span class="n">graph</span><span class="o">.</span><span class="n">build_graph</span><span class="p">(</span><span class="n">so</span><span class="p">,</span> <span class="n">spl</span><span class="p">,</span> <span class="n">builder_type</span><span class="o">=</span><span class="s1">&#39;knn&#39;</span><span class="p">,</span> <span class="n">mask_key</span><span class="o">=</span><span class="s1">&#39;cellmasks&#39;</span><span class="p">,</span> <span class="n">config</span><span class="o">=</span><span class="n">config</span><span class="p">)</span>
+
+<span class="c1"># radius graph</span>
+<span class="n">config</span> <span class="o">=</span> <span class="n">GRAPH_BUILDER_DEFAULT_PARAMS</span><span class="p">[</span><span class="s1">&#39;radius&#39;</span><span class="p">]</span>
+<span class="n">config</span><span class="p">[</span><span class="s1">&#39;builder_params&#39;</span><span class="p">][</span><span class="s1">&#39;radius&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">20</span> <span class="c1"># set radius</span>
+<span class="n">ath</span><span class="o">.</span><span class="n">graph</span><span class="o">.</span><span class="n">build_graph</span><span class="p">(</span><span class="n">so</span><span class="p">,</span> <span class="n">spl</span><span class="p">,</span> <span class="n">builder_type</span><span class="o">=</span><span class="s1">&#39;radius&#39;</span><span class="p">,</span> <span class="n">mask_key</span><span class="o">=</span><span class="s1">&#39;cellmasks&#39;</span><span class="p">,</span> <span class="n">config</span><span class="o">=</span><span class="n">config</span><span class="p">)</span>
+
+<span class="c1"># contact graph - this takes some time</span>
+<span class="n">ath</span><span class="o">.</span><span class="n">graph</span><span class="o">.</span><span class="n">build_graph</span><span class="p">(</span><span class="n">so</span><span class="p">,</span> <span class="n">spl</span><span class="p">,</span> <span class="n">builder_type</span><span class="o">=</span><span class="s1">&#39;contact&#39;</span><span class="p">,</span> <span class="n">mask_key</span><span class="o">=</span><span class="s1">&#39;cellmasks&#39;</span><span class="p">)</span>
+
+<span class="c1"># the results are saved back into `.G`:</span>
+<span class="n">so</span><span class="o">.</span><span class="n">G</span><span class="p">[</span><span class="n">spl</span><span class="p">]</span>
+</pre></div>
+</div>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>100%|████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 1541/1541 [00:21&lt;00:00, 71.42it/s]
+
+
+
+
+
+{&#39;contact&#39;: &lt;networkx.classes.graph.Graph at 0x7face1237d60&gt;,
+ &#39;knn&#39;: &lt;networkx.classes.graph.Graph at 0x7facd0867520&gt;,
+ &#39;radius&#39;: &lt;networkx.classes.graph.Graph at 0x7face1165730&gt;}
+</pre></div>
+</div>
+<p>The results can be plotted again using the <code class="docutils literal notranslate"><span class="pre">.pl.spatial</span></code> submodule. Notice how different graph builders result in graphs with different properties:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">axs</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">15</span><span class="p">,</span> <span class="mi">6</span><span class="p">),</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span>
+<span class="n">ath</span><span class="o">.</span><span class="n">pl</span><span class="o">.</span><span class="n">spatial</span><span class="p">(</span><span class="n">so</span><span class="p">,</span> <span class="n">spl</span><span class="p">,</span> <span class="s1">&#39;meta_id&#39;</span><span class="p">,</span> <span class="n">edges</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">graph_key</span><span class="o">=</span><span class="s1">&#39;knn&#39;</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="o">.</span><span class="n">flat</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">cbar</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="n">ath</span><span class="o">.</span><span class="n">pl</span><span class="o">.</span><span class="n">spatial</span><span class="p">(</span><span class="n">so</span><span class="p">,</span> <span class="n">spl</span><span class="p">,</span> <span class="s1">&#39;meta_id&#39;</span><span class="p">,</span> <span class="n">edges</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">graph_key</span><span class="o">=</span><span class="s1">&#39;radius&#39;</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="o">.</span><span class="n">flat</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">cbar</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="n">ath</span><span class="o">.</span><span class="n">pl</span><span class="o">.</span><span class="n">spatial</span><span class="p">(</span><span class="n">so</span><span class="p">,</span> <span class="n">spl</span><span class="p">,</span> <span class="s1">&#39;meta_id&#39;</span><span class="p">,</span> <span class="n">edges</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">graph_key</span><span class="o">=</span><span class="s1">&#39;contact&#39;</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="o">.</span><span class="n">flat</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">cbar</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><img alt="png" src="../_images/tutorial_23_0.png" /></p>
+</div>
+<div class="section" id="heterogeneity-quantification">
+<h2>Heterogeneity quantification<a class="headerlink" href="#heterogeneity-quantification" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="sample-level-scores">
+<h3>Sample-level scores<a class="headerlink" href="#sample-level-scores" title="Permalink to this headline">¶</a></h3>
+<p>Sample-level scores estimate a single heterogeneity score for the whole tumor, saved in <code class="docutils literal notranslate"><span class="pre">so.spl</span></code>. Although they ignore the spatial topology and cell-cell interactions, they describe the heterogeneity attrbuted to the number of cell types present and their frequencies. Below we show how to compute some of the included metrics across all 8 samples:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># compute cell counts</span>
+<span class="n">so</span><span class="o">.</span><span class="n">spl</span><span class="p">[</span><span class="s1">&#39;cell_count&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">so</span><span class="o">.</span><span class="n">obs</span><span class="p">[</span><span class="n">s</span><span class="p">])</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">so</span><span class="o">.</span><span class="n">obs</span><span class="o">.</span><span class="n">keys</span><span class="p">()]</span>
+<span class="n">so</span><span class="o">.</span><span class="n">spl</span><span class="p">[</span><span class="s1">&#39;immune_cell_count&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">so</span><span class="o">.</span><span class="n">obs</span><span class="p">[</span><span class="n">s</span><span class="p">]</span><span class="o">.</span><span class="n">cell_type</span> <span class="o">==</span> <span class="s1">&#39;immune&#39;</span><span class="p">)</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">so</span><span class="o">.</span><span class="n">obs</span><span class="o">.</span><span class="n">keys</span><span class="p">()]</span>
+
+<span class="c1"># compute metrics at a sample level</span>
+<span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">all_samples</span><span class="p">:</span>
+    <span class="n">ath</span><span class="o">.</span><span class="n">metrics</span><span class="o">.</span><span class="n">richness</span><span class="p">(</span><span class="n">so</span><span class="p">,</span> <span class="n">s</span><span class="p">,</span> <span class="s1">&#39;meta_id&#39;</span><span class="p">,</span> <span class="n">local</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">ath</span><span class="o">.</span><span class="n">metrics</span><span class="o">.</span><span class="n">shannon</span><span class="p">(</span><span class="n">so</span><span class="p">,</span> <span class="n">s</span><span class="p">,</span> <span class="s1">&#39;meta_id&#39;</span><span class="p">,</span> <span class="n">local</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+<span class="c1"># estimated values are saved in so.spl    </span>
+<span class="n">so</span><span class="o">.</span><span class="n">spl</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">all_samples</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;cell_count&#39;</span><span class="p">,</span> <span class="s1">&#39;richness_meta_id&#39;</span><span class="p">,</span> <span class="s1">&#39;shannon_meta_id&#39;</span><span class="p">]]</span>
+</pre></div>
+</div>
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>.dataframe tbody tr th {
+    vertical-align: top;
+}
+
+.dataframe thead th {
+    text-align: right;
+}
+</pre></div>
+</div>
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>cell_count</th>
+      <th>richness_meta_id</th>
+      <th>shannon_meta_id</th>
+    </tr>
+    <tr>
+      <th>core</th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>slide_49_By2x5</th>
+      <td>118</td>
+      <td>19.0</td>
+      <td>3.333942</td>
+    </tr>
+    <tr>
+      <th>slide_59_Cy7x7</th>
+      <td>1410</td>
+      <td>13.0</td>
+      <td>2.155000</td>
+    </tr>
+    <tr>
+      <th>slide_59_Cy7x8</th>
+      <td>1678</td>
+      <td>15.0</td>
+      <td>1.899001</td>
+    </tr>
+    <tr>
+      <th>slide_59_Cy8x1</th>
+      <td>556</td>
+      <td>14.0</td>
+      <td>2.305581</td>
+    </tr>
+    <tr>
+      <th>slide_7_Cy2x2</th>
+      <td>562</td>
+      <td>15.0</td>
+      <td>3.113132</td>
+    </tr>
+    <tr>
+      <th>slide_7_Cy2x3</th>
+      <td>1468</td>
+      <td>13.0</td>
+      <td>2.821626</td>
+    </tr>
+    <tr>
+      <th>slide_7_Cy2x4</th>
+      <td>1465</td>
+      <td>19.0</td>
+      <td>1.814858</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+<p>To evaluate results, let’s look at two samples (<code class="docutils literal notranslate"><span class="pre">slide_7_Cy2x2</span></code> and <code class="docutils literal notranslate"><span class="pre">slide_7_Cy2x4</span></code>) from the same patient (<code class="docutils literal notranslate"><span class="pre">pid</span></code>=7). Although they have similar cell counts and richness, their Shannon entropy values are markedly different, indicating higher heterogeneity for sample <code class="docutils literal notranslate"><span class="pre">slide_7_Cy2x2</span></code>:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">axs</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">4</span><span class="p">),</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span>
+<span class="n">ath</span><span class="o">.</span><span class="n">pl</span><span class="o">.</span><span class="n">spatial</span><span class="p">(</span><span class="n">so</span><span class="p">,</span> <span class="s1">&#39;slide_7_Cy2x4&#39;</span><span class="p">,</span> <span class="s1">&#39;meta_id&#39;</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;mask&#39;</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="o">.</span><span class="n">flat</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+<span class="n">ath</span><span class="o">.</span><span class="n">pl</span><span class="o">.</span><span class="n">spatial</span><span class="p">(</span><span class="n">so</span><span class="p">,</span> <span class="s1">&#39;slide_7_Cy2x2&#39;</span><span class="p">,</span> <span class="s1">&#39;meta_id&#39;</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;mask&#39;</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="o">.</span><span class="n">flat</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+</pre></div>
+</div>
+<p><img alt="png" src="../_images/tutorial_27_0.png" /></p>
+<p>Indeed, we clearly see that while the first sample is dominated by one cell subpopulation (<code class="docutils literal notranslate"><span class="pre">CK7</span> <span class="pre">CK</span> <span class="pre">hi</span> <span class="pre">Cadherin</span></code>), in the second sample the <code class="docutils literal notranslate"><span class="pre">meta_id</span></code> distribution is more spread, resulting in a higher Shannon index.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">15</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">subplot</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+<span class="n">sns</span><span class="o">.</span><span class="n">histplot</span><span class="p">(</span><span class="n">so</span><span class="o">.</span><span class="n">obs</span><span class="p">[</span><span class="s1">&#39;slide_7_Cy2x4&#39;</span><span class="p">][</span><span class="s1">&#39;meta_label&#39;</span><span class="p">])</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xticks</span><span class="p">(</span><span class="n">rotation</span><span class="o">=</span><span class="mi">90</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">subplot</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+<span class="n">sns</span><span class="o">.</span><span class="n">histplot</span><span class="p">(</span><span class="n">so</span><span class="o">.</span><span class="n">obs</span><span class="p">[</span><span class="s1">&#39;slide_7_Cy2x2&#39;</span><span class="p">][</span><span class="s1">&#39;meta_label&#39;</span><span class="p">])</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xticks</span><span class="p">(</span><span class="n">rotation</span><span class="o">=</span><span class="mi">90</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+<p><img alt="png" src="../_images/tutorial_29_0.png" /></p>
+</div>
+<div class="section" id="cell-level-scores">
+<h3>Cell-level scores<a class="headerlink" href="#cell-level-scores" title="Permalink to this headline">¶</a></h3>
+<p>Cell-level scores quantify heterogeneity in a spatial manner, accounting for local effects, and return a value per single cell, saved in <code class="docutils literal notranslate"><span class="pre">so.obs</span></code>. To apply these scores to the data we use again <code class="docutils literal notranslate"><span class="pre">.metrics</span></code> but this time with <code class="docutils literal notranslate"><span class="pre">local=True</span></code>.  Since these scores heavily depend on the tumor topology, the graph type and occasionally additional parameters also need to be provided.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># compute metrics at a cell level for all samples - this will take some time</span>
+<span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">tqdm</span><span class="p">(</span><span class="n">all_samples</span><span class="p">):</span>
+    <span class="n">ath</span><span class="o">.</span><span class="n">metrics</span><span class="o">.</span><span class="n">richness</span><span class="p">(</span><span class="n">so</span><span class="p">,</span> <span class="n">s</span><span class="p">,</span> <span class="s1">&#39;meta_id&#39;</span><span class="p">,</span> <span class="n">local</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">graph_key</span><span class="o">=</span><span class="s1">&#39;contact&#39;</span><span class="p">)</span>
+    <span class="n">ath</span><span class="o">.</span><span class="n">metrics</span><span class="o">.</span><span class="n">shannon</span><span class="p">(</span><span class="n">so</span><span class="p">,</span> <span class="n">s</span><span class="p">,</span> <span class="s1">&#39;meta_id&#39;</span><span class="p">,</span> <span class="n">local</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">graph_key</span><span class="o">=</span><span class="s1">&#39;contact&#39;</span><span class="p">)</span>
+    <span class="n">ath</span><span class="o">.</span><span class="n">metrics</span><span class="o">.</span><span class="n">quadratic_entropy</span><span class="p">(</span><span class="n">so</span><span class="p">,</span> <span class="n">s</span><span class="p">,</span> <span class="s1">&#39;meta_id&#39;</span><span class="p">,</span> <span class="n">local</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">graph_key</span><span class="o">=</span><span class="s1">&#39;contact&#39;</span><span class="p">,</span> <span class="n">metric</span><span class="o">=</span><span class="s1">&#39;cosine&#39;</span><span class="p">)</span>
+
+<span class="c1"># estimated values are saved in so.obs</span>
+<span class="n">so</span><span class="o">.</span><span class="n">obs</span><span class="p">[</span><span class="n">spl</span><span class="p">]</span><span class="o">.</span><span class="n">columns</span>
+</pre></div>
+</div>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>100%|██████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 7/7 [00:36&lt;00:00,  5.24s/it]
+
+
+
+
+
+Index([&#39;core&#39;, &#39;meta_id&#39;, &#39;meta_label&#39;, &#39;cell_type_id&#39;, &#39;cell_type&#39;,
+       &#39;phenograph_cluster&#39;, &#39;CellId&#39;, &#39;id&#39;, &#39;y&#39;, &#39;x&#39;,
+       &#39;richness_meta_id_contact&#39;, &#39;shannon_meta_id_contact&#39;,
+       &#39;quadratic_meta_id_contact&#39;],
+      dtype=&#39;object&#39;)
+</pre></div>
+</div>
+<p>The results can be plotted again using the <code class="docutils literal notranslate"><span class="pre">.pl.spatial</span></code> submodule and passing the attribute we want to visualize. For example, let’s observe the spatial heterogeneity of a random sample using three different metrics in the cell below. While local richness highlights tumor neighborhoods with multiple cell phenotypes present, local Shannon  also takes into consideration the proportions of these phenotypes. Finally, local quadratic entropy additionally takes into consideration the similarity between these phenotypes using the single-cell proteomic data stored in <code class="docutils literal notranslate"><span class="pre">.X</span></code>. Notice how, in the last subplot, only regions where cell phenotypes with very different profiles (e.g., tumor - immune - stromal) are highlighted.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">so</span><span class="o">.</span><span class="n">uns</span><span class="p">[</span><span class="s1">&#39;cmaps&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="n">cm</span><span class="o">.</span><span class="n">plasma</span><span class="p">})</span>
+
+<span class="c1"># visualize cell-level scores</span>
+<span class="n">spl</span><span class="o">=</span><span class="s1">&#39;slide_49_By2x5&#39;</span>
+<span class="n">fig</span><span class="p">,</span> <span class="n">axs</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">25</span><span class="p">,</span> <span class="mi">12</span><span class="p">),</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">300</span><span class="p">)</span>
+<span class="n">axs</span> <span class="o">=</span> <span class="n">axs</span><span class="o">.</span><span class="n">flat</span>
+<span class="n">ath</span><span class="o">.</span><span class="n">pl</span><span class="o">.</span><span class="n">spatial</span><span class="p">(</span><span class="n">so</span><span class="p">,</span> <span class="n">spl</span><span class="p">,</span> <span class="s1">&#39;meta_id&#39;</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;mask&#39;</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+<span class="n">ath</span><span class="o">.</span><span class="n">pl</span><span class="o">.</span><span class="n">spatial</span><span class="p">(</span><span class="n">so</span><span class="p">,</span> <span class="n">spl</span><span class="p">,</span> <span class="s1">&#39;richness_meta_id_contact&#39;</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;mask&#39;</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">cbar_title</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">background_color</span><span class="o">=</span><span class="s1">&#39;black&#39;</span><span class="p">)</span>
+<span class="n">ath</span><span class="o">.</span><span class="n">pl</span><span class="o">.</span><span class="n">spatial</span><span class="p">(</span><span class="n">so</span><span class="p">,</span> <span class="n">spl</span><span class="p">,</span> <span class="s1">&#39;shannon_meta_id_contact&#39;</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;mask&#39;</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">cbar_title</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">background_color</span><span class="o">=</span><span class="s1">&#39;black&#39;</span><span class="p">)</span>
+<span class="n">ath</span><span class="o">.</span><span class="n">pl</span><span class="o">.</span><span class="n">spatial</span><span class="p">(</span><span class="n">so</span><span class="p">,</span> <span class="n">spl</span><span class="p">,</span> <span class="s1">&#39;quadratic_meta_id_contact&#39;</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;mask&#39;</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span> <span class="n">cbar_title</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">background_color</span><span class="o">=</span><span class="s1">&#39;black&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><img alt="png" src="../_images/tutorial_33_0.png" /></p>
+<p>We can also observe how different graph topologies strongly influence the results:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">so</span><span class="o">.</span><span class="n">uns</span><span class="p">[</span><span class="s1">&#39;cmaps&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="n">cm</span><span class="o">.</span><span class="n">plasma</span><span class="p">})</span>
+
+<span class="c1"># try out different graph topologies</span>
+<span class="n">ath</span><span class="o">.</span><span class="n">metrics</span><span class="o">.</span><span class="n">quadratic_entropy</span><span class="p">(</span><span class="n">so</span><span class="p">,</span> <span class="n">spl</span><span class="p">,</span> <span class="s1">&#39;meta_id&#39;</span><span class="p">,</span> <span class="n">local</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">graph_key</span><span class="o">=</span><span class="s1">&#39;radius&#39;</span><span class="p">)</span>
+<span class="n">ath</span><span class="o">.</span><span class="n">metrics</span><span class="o">.</span><span class="n">quadratic_entropy</span><span class="p">(</span><span class="n">so</span><span class="p">,</span> <span class="n">spl</span><span class="p">,</span> <span class="s1">&#39;meta_id&#39;</span><span class="p">,</span> <span class="n">local</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">graph_key</span><span class="o">=</span><span class="s1">&#39;knn&#39;</span><span class="p">)</span>
+
+<span class="c1"># visualize results</span>
+<span class="n">fig</span><span class="p">,</span> <span class="n">axs</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">25</span><span class="p">,</span> <span class="mi">12</span><span class="p">),</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">300</span><span class="p">)</span>
+<span class="n">axs</span> <span class="o">=</span> <span class="n">axs</span><span class="o">.</span><span class="n">flat</span>
+<span class="n">ath</span><span class="o">.</span><span class="n">pl</span><span class="o">.</span><span class="n">spatial</span><span class="p">(</span><span class="n">so</span><span class="p">,</span> <span class="n">spl</span><span class="p">,</span> <span class="s1">&#39;meta_id&#39;</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;mask&#39;</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+<span class="n">ath</span><span class="o">.</span><span class="n">pl</span><span class="o">.</span><span class="n">spatial</span><span class="p">(</span><span class="n">so</span><span class="p">,</span> <span class="n">spl</span><span class="p">,</span> <span class="s1">&#39;quadratic_meta_id_contact&#39;</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;mask&#39;</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">cbar_title</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">background_color</span><span class="o">=</span><span class="s1">&#39;black&#39;</span><span class="p">)</span>
+<span class="n">ath</span><span class="o">.</span><span class="n">pl</span><span class="o">.</span><span class="n">spatial</span><span class="p">(</span><span class="n">so</span><span class="p">,</span> <span class="n">spl</span><span class="p">,</span> <span class="s1">&#39;quadratic_meta_id_radius&#39;</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;mask&#39;</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">cbar_title</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">background_color</span><span class="o">=</span><span class="s1">&#39;black&#39;</span><span class="p">)</span>
+<span class="n">ath</span><span class="o">.</span><span class="n">pl</span><span class="o">.</span><span class="n">spatial</span><span class="p">(</span><span class="n">so</span><span class="p">,</span> <span class="n">spl</span><span class="p">,</span> <span class="s1">&#39;quadratic_meta_id_knn&#39;</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;mask&#39;</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span> <span class="n">cbar_title</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">background_color</span><span class="o">=</span><span class="s1">&#39;black&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><img alt="png" src="../_images/tutorial_35_0.png" /></p>
+<p>Since these scores are computed at the single-cell level, each tumor can now be represented by a <em>histogram</em> of values, as seen below for local quadratic entropy:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">25</span><span class="p">,</span> <span class="mi">12</span><span class="p">))</span>
+<span class="k">for</span> <span class="n">i</span><span class="p">,</span><span class="n">s</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">all_samples</span><span class="p">):</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">subplot</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">g</span><span class="o">=</span><span class="n">sns</span><span class="o">.</span><span class="n">histplot</span><span class="p">(</span><span class="n">so</span><span class="o">.</span><span class="n">obs</span><span class="p">[</span><span class="n">s</span><span class="p">][</span><span class="s1">&#39;quadratic_meta_id_contact&#39;</span><span class="p">],</span> <span class="n">stat</span><span class="o">=</span><span class="s1">&#39;probability&#39;</span><span class="p">)</span>
+    <span class="n">g</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="n">s</span> <span class="o">+</span> <span class="s1">&#39;, median quad entropy = &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="nb">round</span><span class="p">(</span><span class="n">so</span><span class="o">.</span><span class="n">obs</span><span class="p">[</span><span class="n">s</span><span class="p">][</span><span class="s1">&#39;quadratic_meta_id_contact&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">median</span><span class="p">(),</span><span class="mi">3</span><span class="p">)))</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">ylim</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span><span class="mf">0.32</span><span class="p">])</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">xlim</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">])</span>
+</pre></div>
+</div>
+<p><img alt="png" src="../_images/tutorial_37_0.png" /></p>
+<p>Let’s plot two of the samples with the smallest and highest median quadratic entropy to evaluate the results. We clearly see that <code class="docutils literal notranslate"><span class="pre">slide_7_Cy2x4</span></code> is mostly homogeneous, with few highly entropic regions, and <code class="docutils literal notranslate"><span class="pre">slide_59_Cy7x7</span></code> is highly heterogeneous, as most areas contain mixtures of immune, stromal, endothelial and cancer cells.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">axs</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">20</span><span class="p">,</span> <span class="mi">8</span><span class="p">),</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span>
+<span class="n">ath</span><span class="o">.</span><span class="n">pl</span><span class="o">.</span><span class="n">spatial</span><span class="p">(</span><span class="n">so</span><span class="p">,</span> <span class="s1">&#39;slide_7_Cy2x4&#39;</span><span class="p">,</span> <span class="s1">&#39;meta_id&#39;</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;mask&#39;</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="o">.</span><span class="n">flat</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+<span class="n">ath</span><span class="o">.</span><span class="n">pl</span><span class="o">.</span><span class="n">spatial</span><span class="p">(</span><span class="n">so</span><span class="p">,</span> <span class="s1">&#39;slide_7_Cy2x4&#39;</span><span class="p">,</span> <span class="s1">&#39;quadratic_meta_id_contact&#39;</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;mask&#39;</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="o">.</span><span class="n">flat</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
+              <span class="n">cbar</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">background_color</span><span class="o">=</span><span class="s1">&#39;black&#39;</span><span class="p">)</span>
+<span class="n">ath</span><span class="o">.</span><span class="n">pl</span><span class="o">.</span><span class="n">spatial</span><span class="p">(</span><span class="n">so</span><span class="p">,</span> <span class="s1">&#39;slide_59_Cy7x7&#39;</span><span class="p">,</span> <span class="s1">&#39;meta_id&#39;</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;mask&#39;</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="o">.</span><span class="n">flat</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
+<span class="n">ath</span><span class="o">.</span><span class="n">pl</span><span class="o">.</span><span class="n">spatial</span><span class="p">(</span><span class="n">so</span><span class="p">,</span> <span class="s1">&#39;slide_59_Cy7x7&#39;</span><span class="p">,</span> <span class="s1">&#39;quadratic_meta_id_contact&#39;</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;mask&#39;</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="o">.</span><span class="n">flat</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span>
+              <span class="n">cbar</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">background_color</span><span class="o">=</span><span class="s1">&#39;black&#39;</span><span class="p">)</span>
+
+</pre></div>
+</div>
+<p><img alt="png" src="../_images/tutorial_39_0.png" /></p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># if needed, we can retrieve selected single-cell score values </span>
+<span class="n">so</span><span class="o">.</span><span class="n">obs</span><span class="p">[</span><span class="n">spl</span><span class="p">]</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,[</span><span class="s1">&#39;richness_meta_id_contact&#39;</span><span class="p">,</span>
+                   <span class="s1">&#39;shannon_meta_id_contact&#39;</span><span class="p">,</span>
+                   <span class="s1">&#39;quadratic_meta_id_contact&#39;</span><span class="p">]]</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
+</pre></div>
+</div>
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>.dataframe tbody tr th {
+    vertical-align: top;
+}
+
+.dataframe thead th {
+    text-align: right;
+}
+</pre></div>
+</div>
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>richness_meta_id_contact</th>
+      <th>shannon_meta_id_contact</th>
+      <th>quadratic_meta_id_contact</th>
+    </tr>
+    <tr>
+      <th>cell_id</th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>1</th>
+      <td>1</td>
+      <td>-0.000000</td>
+      <td>1.110223e-16</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>1</td>
+      <td>-0.000000</td>
+      <td>1.110223e-16</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>1</td>
+      <td>-0.000000</td>
+      <td>1.110223e-16</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>2</td>
+      <td>1.000000</td>
+      <td>2.959280e-01</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>2</td>
+      <td>0.811278</td>
+      <td>2.388933e-01</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+</div>
+<div class="section" id="immune-infiltration">
+<h3>Immune infiltration<a class="headerlink" href="#immune-infiltration" title="Permalink to this headline">¶</a></h3>
+<p>The infiltration score included in the <code class="docutils literal notranslate"><span class="pre">.neigh</span></code> submodule quantifies the degree of tumor-immune mixing (as defined in Keren, L. et al. - <a class="reference external" href="https://www.cell.com/cell/fulltext/S0092-8674(18)31100-0?_returnURL=https%3A%2F%2Flinkinghub.elsevier.com%2Fretrieve%2Fpii%2FS0092867418311000%3Fshowall%3Dtrue">paper</a>). Let us compute it across all patients:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">tqdm</span><span class="p">(</span><span class="n">all_samples</span><span class="p">):</span>
+    <span class="n">ath</span><span class="o">.</span><span class="n">neigh</span><span class="o">.</span><span class="n">infiltration</span><span class="p">(</span><span class="n">so</span><span class="p">,</span> <span class="n">s</span><span class="p">,</span> <span class="s1">&#39;cell_type&#39;</span><span class="p">,</span> <span class="n">graph_key</span><span class="o">=</span><span class="s1">&#39;contact&#39;</span><span class="p">)</span>
+
+<span class="n">so</span><span class="o">.</span><span class="n">spl</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">all_samples</span><span class="p">]</span><span class="o">.</span><span class="n">infiltration</span>
+</pre></div>
+</div>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>100%|██████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 7/7 [00:00&lt;00:00, 33.60it/s]
+
+
+
+
+
+core
+slide_49_By2x5    0.144172
+slide_59_Cy7x7    0.128205
+slide_59_Cy7x8    0.195796
+slide_59_Cy8x1    0.182798
+slide_7_Cy2x2     0.067273
+slide_7_Cy2x3     0.106984
+slide_7_Cy2x4     0.611321
+Name: infiltration, dtype: float64
+</pre></div>
+</div>
+<p>Now let’s sort all samples by increasing immune infiltration:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># sort samples by increasing infiltration</span>
+<span class="n">ind1</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">argsort</span><span class="p">(</span><span class="n">so</span><span class="o">.</span><span class="n">spl</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">all_samples</span><span class="p">]</span><span class="o">.</span><span class="n">infiltration</span><span class="o">.</span><span class="n">values</span><span class="p">)</span>
+
+<span class="c1"># update colormap to show only immune and tumor cells </span>
+<span class="n">cmap</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;white&#39;</span><span class="p">,</span> <span class="s1">&#39;darkgreen&#39;</span><span class="p">,</span> <span class="s1">&#39;lightgrey&#39;</span><span class="p">,</span> <span class="s1">&#39;lightgrey&#39;</span><span class="p">,</span> <span class="s1">&#39;darkred&#39;</span><span class="p">,</span> <span class="s1">&#39;lightgrey&#39;</span><span class="p">]</span>
+<span class="n">cmap_labels</span> <span class="o">=</span> <span class="p">{</span><span class="mi">0</span><span class="p">:</span> <span class="s1">&#39;background&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">:</span> <span class="s1">&#39;immune&#39;</span><span class="p">,</span>  <span class="mi">2</span><span class="p">:</span> <span class="s1">&#39;endothelial&#39;</span><span class="p">,</span> <span class="mi">3</span><span class="p">:</span> <span class="s1">&#39;stromal&#39;</span><span class="p">,</span> <span class="mi">4</span><span class="p">:</span> <span class="s1">&#39;tumor&#39;</span><span class="p">,</span> <span class="mi">5</span><span class="p">:</span> <span class="s1">&#39;myoepithelial&#39;</span><span class="p">}</span>
+<span class="n">cmap</span> <span class="o">=</span> <span class="n">ListedColormap</span><span class="p">(</span><span class="n">cmap</span><span class="p">)</span>
+<span class="n">so</span><span class="o">.</span><span class="n">uns</span><span class="p">[</span><span class="s1">&#39;cmaps&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="s1">&#39;cell_type_id&#39;</span><span class="p">:</span> <span class="n">cmap</span><span class="p">})</span>
+<span class="n">so</span><span class="o">.</span><span class="n">uns</span><span class="p">[</span><span class="s1">&#39;cmap_labels&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="s1">&#39;cell_type_id&#39;</span><span class="p">:</span> <span class="n">cmap_labels</span><span class="p">})</span>
+
+<span class="n">fig</span><span class="p">,</span> <span class="n">axs</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">14</span><span class="p">,</span> <span class="mi">7</span><span class="p">),</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">300</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">i</span><span class="p">,</span><span class="n">s</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">ind1</span><span class="p">):</span>
+    <span class="n">ath</span><span class="o">.</span><span class="n">pl</span><span class="o">.</span><span class="n">spatial</span><span class="p">(</span><span class="n">so</span><span class="p">,</span> <span class="n">all_samples</span><span class="p">[</span><span class="n">s</span><span class="p">],</span> <span class="s1">&#39;cell_type_id&#39;</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;mask&#39;</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="o">.</span><span class="n">flat</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+    <span class="n">d</span> <span class="o">=</span> <span class="n">so</span><span class="o">.</span><span class="n">spl</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">all_samples</span><span class="p">[</span><span class="n">s</span><span class="p">]]</span>
+    <span class="n">axs</span><span class="o">.</span><span class="n">flat</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Patient </span><span class="si">{</span><span class="n">d</span><span class="o">.</span><span class="n">pid</span><span class="si">}</span><span class="s1">, infiltration: </span><span class="si">{</span><span class="n">d</span><span class="o">.</span><span class="n">infiltration</span><span class="si">:</span><span class="s1">.2f</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">fontdict</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;size&#39;</span><span class="p">:</span> <span class="mi">10</span><span class="p">})</span>
+<span class="n">axs</span><span class="o">.</span><span class="n">flat</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_axis_off</span><span class="p">()</span>
+</pre></div>
+</div>
+<p><img alt="png" src="../_images/tutorial_44_0.png" /></p>
+<p>We observe that, as expected, as infiltration increases, immune cells penetrate more into the tumor area. One notable exception is the sample from Patient 7 with the highest infiltration score (0.55). Notice how, in this sample, the number of immune cells is much lower than that of tumor cells, resulting in multiple immune-tumor interactions by chance alone. Since the infiltration score is computed as the ratio of the number of tumor-immune interactions to immune-immune interactions, this high imbalance artificially inflates the infiltration score.</p>
+<p>In a next step we compute the infiltration on a cell-level. Since this method extracts the neighborhood subgraph of each cell it is recommended to use the <code class="docutils literal notranslate"><span class="pre">radius</span></code> graph representation with a reasonable radius.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">config</span> <span class="o">=</span> <span class="n">GRAPH_BUILDER_DEFAULT_PARAMS</span><span class="p">[</span><span class="s1">&#39;radius&#39;</span><span class="p">]</span>
+<span class="n">config</span><span class="p">[</span><span class="s1">&#39;builder_params&#39;</span><span class="p">][</span><span class="s1">&#39;radius&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">36</span>
+<span class="n">ath</span><span class="o">.</span><span class="n">graph</span><span class="o">.</span><span class="n">build_graph</span><span class="p">(</span><span class="n">so</span><span class="p">,</span> <span class="n">spl</span><span class="p">,</span> <span class="n">builder_type</span><span class="o">=</span><span class="s1">&#39;radius&#39;</span><span class="p">,</span> <span class="n">config</span><span class="o">=</span><span class="n">config</span><span class="p">)</span>
+
+<span class="n">attr</span> <span class="o">=</span> <span class="s1">&#39;cell_type&#39;</span>
+<span class="n">ath</span><span class="o">.</span><span class="n">neigh</span><span class="o">.</span><span class="n">infiltration</span><span class="p">(</span><span class="n">so</span><span class="p">,</span> <span class="n">spl</span><span class="p">,</span> <span class="n">attr</span><span class="p">,</span> <span class="n">graph_key</span><span class="o">=</span><span class="s1">&#39;radius&#39;</span><span class="p">,</span> <span class="n">local</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>100%|███████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 1541/1541 [00:14&lt;00:00, 106.59it/s]
+</pre></div>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">axs</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">16</span><span class="p">,</span><span class="mi">8</span><span class="p">))</span>
+<span class="n">ath</span><span class="o">.</span><span class="n">pl</span><span class="o">.</span><span class="n">spatial</span><span class="p">(</span><span class="n">so</span><span class="p">,</span> <span class="n">spl</span><span class="p">,</span> <span class="s1">&#39;cell_type_id&#39;</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+<span class="n">ath</span><span class="o">.</span><span class="n">pl</span><span class="o">.</span><span class="n">infiltration</span><span class="p">(</span><span class="n">so</span><span class="p">,</span> <span class="n">spl</span><span class="p">,</span> <span class="n">step_size</span><span class="o">=</span> <span class="mi">10</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+<span class="n">ath</span><span class="o">.</span><span class="n">pl</span><span class="o">.</span><span class="n">infiltration</span><span class="p">(</span><span class="n">so</span><span class="p">,</span> <span class="n">spl</span><span class="p">,</span> <span class="n">step_size</span><span class="o">=</span> <span class="mi">5</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
+</pre></div>
+</div>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>WARNING:root:`step_size` is to granular, 271 observed infiltration values mapped to same grid square
+WARNING:root:computing mean for collisions
+WARNING:root:`step_size` is to granular, 6 observed infiltration values mapped to same grid square
+WARNING:root:computing mean for collisions
+</pre></div>
+</div>
+<p><img alt="png" src="../_images/tutorial_48_1.png" /></p>
+</div>
+<div class="section" id="cell-type-interactions">
+<h3>Cell type interactions<a class="headerlink" href="#cell-type-interactions" title="Permalink to this headline">¶</a></h3>
+<p>We will then quantify tumor heterogeneity by looking into interactions between cell (pheno)types. First, let’s compute the interaction strength using both the <code class="docutils literal notranslate"><span class="pre">meta_ids</span></code> and the <code class="docutils literal notranslate"><span class="pre">cell_type_ids</span></code> across all 8 samples using the <code class="docutils literal notranslate"><span class="pre">.neigh.interactions</span></code> submodule:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">logging</span>
+<span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">()</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">ERROR</span><span class="p">)</span>  <span class="c1"># set logger to logging.INFO if you want to see more progress information</span>
+
+<span class="c1"># this will take some time...</span>
+<span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">tqdm</span><span class="p">(</span><span class="n">all_samples</span><span class="p">):</span>
+    <span class="n">ath</span><span class="o">.</span><span class="n">neigh</span><span class="o">.</span><span class="n">interactions</span><span class="p">(</span><span class="n">so</span><span class="p">,</span> <span class="n">s</span><span class="p">,</span> <span class="s1">&#39;meta_id&#39;</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;proportion&#39;</span><span class="p">,</span> <span class="n">prediction_type</span><span class="o">=</span><span class="s1">&#39;diff&#39;</span><span class="p">,</span> <span class="n">graph_key</span><span class="o">=</span><span class="s1">&#39;contact&#39;</span><span class="p">,</span> <span class="n">try_load</span><span class="o">=</span><span class="kc">False</span><span class="p">);</span>
+    <span class="n">ath</span><span class="o">.</span><span class="n">neigh</span><span class="o">.</span><span class="n">interactions</span><span class="p">(</span><span class="n">so</span><span class="p">,</span> <span class="n">s</span><span class="p">,</span> <span class="s1">&#39;cell_type_id&#39;</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;proportion&#39;</span><span class="p">,</span> <span class="n">prediction_type</span><span class="o">=</span><span class="s1">&#39;diff&#39;</span><span class="p">,</span> <span class="n">graph_key</span><span class="o">=</span><span class="s1">&#39;contact&#39;</span><span class="p">,</span> <span class="n">try_load</span><span class="o">=</span><span class="kc">False</span><span class="p">);</span>
+</pre></div>
+</div>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>  0%|                                                                                                                                                                          | 0/7 [00:00&lt;?, ?it/s]
+
+Wed Jun 29 16:32:32 2022: 10/100, duration: 0.29) sec
+Wed Jun 29 16:32:34 2022: 20/100, duration: 0.29) sec
+Wed Jun 29 16:32:37 2022: 30/100, duration: 0.29) sec
+Wed Jun 29 16:32:40 2022: 40/100, duration: 0.29) sec
+Wed Jun 29 16:32:43 2022: 50/100, duration: 0.29) sec
+Wed Jun 29 16:32:46 2022: 60/100, duration: 0.28) sec
+Wed Jun 29 16:32:49 2022: 70/100, duration: 0.28) sec
+Wed Jun 29 16:32:51 2022: 80/100, duration: 0.28) sec
+Wed Jun 29 16:32:54 2022: 90/100, duration: 0.28) sec
+Wed Jun 29 16:32:57 2022: 100/100, duration: 0.28) sec
+Wed Jun 29 16:32:57 2022: Finished, duration: 0.47 min (0.28sec/it)
+Wed Jun 29 16:32:58 2022: 10/100, duration: 0.09) sec
+Wed Jun 29 16:32:59 2022: 20/100, duration: 0.11) sec
+Wed Jun 29 16:33:00 2022: 30/100, duration: 0.10) sec
+Wed Jun 29 16:33:02 2022: 40/100, duration: 0.11) sec
+Wed Jun 29 16:33:03 2022: 50/100, duration: 0.11) sec
+Wed Jun 29 16:33:04 2022: 60/100, duration: 0.11) sec
+Wed Jun 29 16:33:05 2022: 70/100, duration: 0.11) sec
+Wed Jun 29 16:33:06 2022: 80/100, duration: 0.10) sec
+Wed Jun 29 16:33:07 2022: 90/100, duration: 0.11) sec
+
+
+ 14%|███████████████████████▏                                                                                                                                          | 1/7 [00:39&lt;03:57, 39.50s/it]
+
+Wed Jun 29 16:33:08 2022: 100/100, duration: 0.11) sec
+Wed Jun 29 16:33:08 2022: Finished, duration: 0.18 min (0.11sec/it)
+Wed Jun 29 16:33:11 2022: 10/100, duration: 0.30) sec
+Wed Jun 29 16:33:15 2022: 20/100, duration: 0.31) sec
+Wed Jun 29 16:33:18 2022: 30/100, duration: 0.31) sec
+Wed Jun 29 16:33:21 2022: 40/100, duration: 0.32) sec
+Wed Jun 29 16:33:24 2022: 50/100, duration: 0.31) sec
+Wed Jun 29 16:33:27 2022: 60/100, duration: 0.32) sec
+Wed Jun 29 16:33:31 2022: 70/100, duration: 0.32) sec
+Wed Jun 29 16:33:34 2022: 80/100, duration: 0.32) sec
+Wed Jun 29 16:33:37 2022: 90/100, duration: 0.32) sec
+Wed Jun 29 16:33:40 2022: 100/100, duration: 0.32) sec
+Wed Jun 29 16:33:40 2022: Finished, duration: 0.53 min (0.32sec/it)
+Wed Jun 29 16:33:41 2022: 10/100, duration: 0.07) sec
+Wed Jun 29 16:33:42 2022: 20/100, duration: 0.07) sec
+Wed Jun 29 16:33:42 2022: 30/100, duration: 0.07) sec
+Wed Jun 29 16:33:43 2022: 40/100, duration: 0.07) sec
+Wed Jun 29 16:33:44 2022: 50/100, duration: 0.07) sec
+Wed Jun 29 16:33:44 2022: 60/100, duration: 0.07) sec
+Wed Jun 29 16:33:45 2022: 70/100, duration: 0.07) sec
+Wed Jun 29 16:33:45 2022: 80/100, duration: 0.06) sec
+Wed Jun 29 16:33:46 2022: 90/100, duration: 0.06) sec
+
+
+ 29%|██████████████████████████████████████████████▎                                                                                                                   | 2/7 [01:18&lt;03:15, 39.14s/it]
+
+Wed Jun 29 16:33:47 2022: 100/100, duration: 0.06) sec
+Wed Jun 29 16:33:47 2022: Finished, duration: 0.11 min (0.06sec/it)
+Wed Jun 29 16:33:51 2022: 10/100, duration: 0.36) sec
+Wed Jun 29 16:33:55 2022: 20/100, duration: 0.37) sec
+Wed Jun 29 16:33:58 2022: 30/100, duration: 0.37) sec
+Wed Jun 29 16:34:02 2022: 40/100, duration: 0.37) sec
+Wed Jun 29 16:34:06 2022: 50/100, duration: 0.37) sec
+Wed Jun 29 16:34:10 2022: 60/100, duration: 0.37) sec
+Wed Jun 29 16:34:13 2022: 70/100, duration: 0.37) sec
+Wed Jun 29 16:34:17 2022: 80/100, duration: 0.37) sec
+Wed Jun 29 16:34:21 2022: 90/100, duration: 0.37) sec
+Wed Jun 29 16:34:25 2022: 100/100, duration: 0.38) sec
+Wed Jun 29 16:34:25 2022: Finished, duration: 0.63 min (0.38sec/it)
+Wed Jun 29 16:34:26 2022: 10/100, duration: 0.07) sec
+Wed Jun 29 16:34:27 2022: 20/100, duration: 0.07) sec
+Wed Jun 29 16:34:27 2022: 30/100, duration: 0.07) sec
+Wed Jun 29 16:34:28 2022: 40/100, duration: 0.08) sec
+Wed Jun 29 16:34:29 2022: 50/100, duration: 0.07) sec
+Wed Jun 29 16:34:30 2022: 60/100, duration: 0.07) sec
+Wed Jun 29 16:34:30 2022: 70/100, duration: 0.07) sec
+Wed Jun 29 16:34:31 2022: 80/100, duration: 0.07) sec
+Wed Jun 29 16:34:32 2022: 90/100, duration: 0.07) sec
+
+
+ 43%|█████████████████████████████████████████████████████████████████████▍                                                                                            | 3/7 [02:03&lt;02:48, 42.06s/it]
+
+Wed Jun 29 16:34:32 2022: 100/100, duration: 0.07) sec
+Wed Jun 29 16:34:32 2022: Finished, duration: 0.12 min (0.07sec/it)
+Wed Jun 29 16:34:36 2022: 10/100, duration: 0.34) sec
+Wed Jun 29 16:34:39 2022: 20/100, duration: 0.34) sec
+Wed Jun 29 16:34:43 2022: 30/100, duration: 0.33) sec
+Wed Jun 29 16:34:46 2022: 40/100, duration: 0.33) sec
+Wed Jun 29 16:34:49 2022: 50/100, duration: 0.33) sec
+Wed Jun 29 16:34:53 2022: 60/100, duration: 0.34) sec
+Wed Jun 29 16:34:56 2022: 70/100, duration: 0.34) sec
+Wed Jun 29 16:35:00 2022: 80/100, duration: 0.34) sec
+Wed Jun 29 16:35:03 2022: 90/100, duration: 0.34) sec
+Wed Jun 29 16:35:07 2022: 100/100, duration: 0.34) sec
+Wed Jun 29 16:35:07 2022: Finished, duration: 0.57 min (0.34sec/it)
+Wed Jun 29 16:35:07 2022: 10/100, duration: 0.07) sec
+Wed Jun 29 16:35:08 2022: 20/100, duration: 0.07) sec
+Wed Jun 29 16:35:09 2022: 30/100, duration: 0.06) sec
+Wed Jun 29 16:35:09 2022: 40/100, duration: 0.06) sec
+Wed Jun 29 16:35:10 2022: 50/100, duration: 0.06) sec
+Wed Jun 29 16:35:11 2022: 60/100, duration: 0.06) sec
+Wed Jun 29 16:35:11 2022: 70/100, duration: 0.06) sec
+Wed Jun 29 16:35:12 2022: 80/100, duration: 0.06) sec
+Wed Jun 29 16:35:12 2022: 90/100, duration: 0.06) sec
+
+
+ 57%|████████████████████████████████████████████████████████████████████████████████████████████▌                                                                     | 4/7 [02:44&lt;02:04, 41.54s/it]
+
+Wed Jun 29 16:35:13 2022: 100/100, duration: 0.06) sec
+Wed Jun 29 16:35:13 2022: Finished, duration: 0.10 min (0.06sec/it)
+Wed Jun 29 16:35:16 2022: 10/100, duration: 0.24) sec
+Wed Jun 29 16:35:18 2022: 20/100, duration: 0.23) sec
+Wed Jun 29 16:35:20 2022: 30/100, duration: 0.23) sec
+Wed Jun 29 16:35:22 2022: 40/100, duration: 0.23) sec
+Wed Jun 29 16:35:26 2022: 50/100, duration: 0.25) sec
+Wed Jun 29 16:35:28 2022: 60/100, duration: 0.25) sec
+Wed Jun 29 16:35:31 2022: 70/100, duration: 0.25) sec
+Wed Jun 29 16:35:33 2022: 80/100, duration: 0.25) sec
+Wed Jun 29 16:35:35 2022: 90/100, duration: 0.25) sec
+Wed Jun 29 16:35:38 2022: 100/100, duration: 0.25) sec
+Wed Jun 29 16:35:38 2022: Finished, duration: 0.41 min (0.25sec/it)
+Wed Jun 29 16:35:39 2022: 10/100, duration: 0.06) sec
+Wed Jun 29 16:35:39 2022: 20/100, duration: 0.05) sec
+Wed Jun 29 16:35:39 2022: 30/100, duration: 0.04) sec
+Wed Jun 29 16:35:40 2022: 40/100, duration: 0.05) sec
+Wed Jun 29 16:35:40 2022: 50/100, duration: 0.04) sec
+Wed Jun 29 16:35:40 2022: 60/100, duration: 0.04) sec
+Wed Jun 29 16:35:41 2022: 70/100, duration: 0.05) sec
+Wed Jun 29 16:35:41 2022: 80/100, duration: 0.04) sec
+Wed Jun 29 16:35:42 2022: 90/100, duration: 0.04) sec
+
+
+ 71%|███████████████████████████████████████████████████████████████████████████████████████████████████████████████████▋                                              | 5/7 [03:14&lt;01:14, 37.17s/it]
+
+Wed Jun 29 16:35:42 2022: 100/100, duration: 0.04) sec
+Wed Jun 29 16:35:42 2022: Finished, duration: 0.07 min (0.04sec/it)
+Wed Jun 29 16:35:44 2022: 10/100, duration: 0.15) sec
+Wed Jun 29 16:35:46 2022: 20/100, duration: 0.16) sec
+Wed Jun 29 16:35:48 2022: 30/100, duration: 0.16) sec
+Wed Jun 29 16:35:49 2022: 40/100, duration: 0.16) sec
+Wed Jun 29 16:35:51 2022: 50/100, duration: 0.16) sec
+Wed Jun 29 16:35:52 2022: 60/100, duration: 0.16) sec
+Wed Jun 29 16:35:54 2022: 70/100, duration: 0.16) sec
+Wed Jun 29 16:35:56 2022: 80/100, duration: 0.16) sec
+Wed Jun 29 16:35:57 2022: 90/100, duration: 0.16) sec
+Wed Jun 29 16:35:59 2022: 100/100, duration: 0.16) sec
+Wed Jun 29 16:35:59 2022: Finished, duration: 0.27 min (0.16sec/it)
+Wed Jun 29 16:35:59 2022: 10/100, duration: 0.03) sec
+Wed Jun 29 16:36:00 2022: 20/100, duration: 0.03) sec
+Wed Jun 29 16:36:00 2022: 30/100, duration: 0.03) sec
+Wed Jun 29 16:36:00 2022: 40/100, duration: 0.04) sec
+Wed Jun 29 16:36:01 2022: 50/100, duration: 0.03) sec
+Wed Jun 29 16:36:01 2022: 60/100, duration: 0.03) sec
+Wed Jun 29 16:36:01 2022: 70/100, duration: 0.03) sec
+Wed Jun 29 16:36:02 2022: 80/100, duration: 0.04) sec
+Wed Jun 29 16:36:02 2022: 90/100, duration: 0.04) sec
+
+
+ 86%|██████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████▊                       | 6/7 [03:34&lt;00:31, 31.36s/it]
+
+Wed Jun 29 16:36:02 2022: 100/100, duration: 0.03) sec
+Wed Jun 29 16:36:02 2022: Finished, duration: 0.06 min (0.03sec/it)
+Wed Jun 29 16:36:05 2022: 10/100, duration: 0.26) sec
+Wed Jun 29 16:36:08 2022: 20/100, duration: 0.27) sec
+Wed Jun 29 16:36:11 2022: 30/100, duration: 0.27) sec
+Wed Jun 29 16:36:13 2022: 40/100, duration: 0.27) sec
+Wed Jun 29 16:36:16 2022: 50/100, duration: 0.26) sec
+Wed Jun 29 16:36:19 2022: 60/100, duration: 0.26) sec
+Wed Jun 29 16:36:21 2022: 70/100, duration: 0.26) sec
+Wed Jun 29 16:36:24 2022: 80/100, duration: 0.26) sec
+Wed Jun 29 16:36:26 2022: 90/100, duration: 0.26) sec
+Wed Jun 29 16:36:29 2022: 100/100, duration: 0.26) sec
+Wed Jun 29 16:36:29 2022: Finished, duration: 0.44 min (0.26sec/it)
+Wed Jun 29 16:36:30 2022: 10/100, duration: 0.07) sec
+Wed Jun 29 16:36:31 2022: 20/100, duration: 0.08) sec
+Wed Jun 29 16:36:32 2022: 30/100, duration: 0.08) sec
+Wed Jun 29 16:36:33 2022: 40/100, duration: 0.08) sec
+Wed Jun 29 16:36:33 2022: 50/100, duration: 0.08) sec
+Wed Jun 29 16:36:34 2022: 60/100, duration: 0.08) sec
+Wed Jun 29 16:36:35 2022: 70/100, duration: 0.08) sec
+Wed Jun 29 16:36:36 2022: 80/100, duration: 0.08) sec
+Wed Jun 29 16:36:37 2022: 90/100, duration: 0.08) sec
+
+
+100%|██████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 7/7 [04:08&lt;00:00, 35.55s/it]
+
+Wed Jun 29 16:36:37 2022: 100/100, duration: 0.08) sec
+Wed Jun 29 16:36:37 2022: Finished, duration: 0.13 min (0.08sec/it)
+</pre></div>
+</div>
+<p>Let’s look at the results for sample <code class="docutils literal notranslate"><span class="pre">slide_7_Cy2x4</span></code> below. We notice multiple interactions between the few immune, stromal and endothelial cells (red squares in the first 13 rows and columns). At the same time, most of these cell phenotypes strongly avoid the dominant tumor cell population <code class="docutils literal notranslate"><span class="pre">19</span></code>, indicated by the blue squares in its respective column.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">norm</span> <span class="o">=</span> <span class="n">Normalize</span><span class="p">(</span><span class="o">-</span><span class="mf">.3</span><span class="p">,</span> <span class="mf">.3</span><span class="p">)</span>
+<span class="n">fig</span><span class="p">,</span> <span class="n">axs</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">15</span><span class="p">,</span> <span class="mi">6</span><span class="p">),</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span>
+<span class="n">ath</span><span class="o">.</span><span class="n">pl</span><span class="o">.</span><span class="n">spatial</span><span class="p">(</span><span class="n">so</span><span class="p">,</span> <span class="s1">&#39;slide_7_Cy2x4&#39;</span><span class="p">,</span> <span class="s1">&#39;meta_id&#39;</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;mask&#39;</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+<span class="n">ath</span><span class="o">.</span><span class="n">pl</span><span class="o">.</span><span class="n">interactions</span><span class="p">(</span><span class="n">so</span><span class="p">,</span> <span class="s1">&#39;slide_7_Cy2x4&#39;</span><span class="p">,</span> <span class="s1">&#39;meta_id&#39;</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;proportion&#39;</span><span class="p">,</span> <span class="n">prediction_type</span><span class="o">=</span><span class="s1">&#39;diff&#39;</span><span class="p">,</span> <span class="n">graph_key</span><span class="o">=</span><span class="s1">&#39;contact&#39;</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
+                   <span class="n">norm</span><span class="o">=</span><span class="n">norm</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><img alt="png" src="../_images/tutorial_52_0.png" /></p>
+<p>Observing sample <code class="docutils literal notranslate"><span class="pre">slide_7_Cy2x2</span></code> from the same patient <code class="docutils literal notranslate"><span class="pre">7</span></code> shows again the same immune, endothelial and stromal co-occurence, but this time we notice strongly self-clustered tumor phenotypes (<code class="docutils literal notranslate"><span class="pre">18</span></code>).</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">axs</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">15</span><span class="p">,</span> <span class="mi">6</span><span class="p">),</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span>
+<span class="n">ath</span><span class="o">.</span><span class="n">pl</span><span class="o">.</span><span class="n">spatial</span><span class="p">(</span><span class="n">so</span><span class="p">,</span> <span class="s1">&#39;slide_7_Cy2x2&#39;</span><span class="p">,</span> <span class="s1">&#39;meta_id&#39;</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;mask&#39;</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+<span class="n">ath</span><span class="o">.</span><span class="n">pl</span><span class="o">.</span><span class="n">interactions</span><span class="p">(</span><span class="n">so</span><span class="p">,</span> <span class="s1">&#39;slide_7_Cy2x2&#39;</span><span class="p">,</span> <span class="s1">&#39;meta_id&#39;</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;proportion&#39;</span><span class="p">,</span> <span class="n">prediction_type</span><span class="o">=</span><span class="s1">&#39;diff&#39;</span><span class="p">,</span> <span class="n">graph_key</span><span class="o">=</span><span class="s1">&#39;contact&#39;</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
+                   <span class="n">norm</span><span class="o">=</span><span class="n">norm</span><span class="p">)</span>
+
+<span class="n">fig</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+<span class="c1"># fig.show()</span>
+</pre></div>
+</div>
+<p><img alt="png" src="../_images/tutorial_54_0.png" /></p>
+<p>Last, these interaction matrices can also be visualized per <code class="docutils literal notranslate"><span class="pre">cell_type_ids</span></code>, as shown below, where we clearly see again how all immune, stromal and endothelial cells of sample <code class="docutils literal notranslate"><span class="pre">slide_7_Cy2x4</span></code> strongly avoid all tumor cells.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># cell_type_id colormap</span>
+<span class="n">cmap</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;white&#39;</span><span class="p">,</span> <span class="s1">&#39;darkgreen&#39;</span><span class="p">,</span> <span class="s1">&#39;gold&#39;</span><span class="p">,</span> <span class="s1">&#39;steelblue&#39;</span><span class="p">,</span> <span class="s1">&#39;darkred&#39;</span><span class="p">,</span> <span class="s1">&#39;coral&#39;</span><span class="p">]</span>
+<span class="n">cmap_labels</span> <span class="o">=</span> <span class="p">{</span><span class="mi">0</span><span class="p">:</span> <span class="s1">&#39;background&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">:</span> <span class="s1">&#39;immune&#39;</span><span class="p">,</span>  <span class="mi">2</span><span class="p">:</span> <span class="s1">&#39;endothelial&#39;</span><span class="p">,</span> <span class="mi">3</span><span class="p">:</span> <span class="s1">&#39;stromal&#39;</span><span class="p">,</span> <span class="mi">4</span><span class="p">:</span> <span class="s1">&#39;tumor&#39;</span><span class="p">,</span> <span class="mi">5</span><span class="p">:</span> <span class="s1">&#39;myoepithelial&#39;</span><span class="p">}</span>
+<span class="n">cmap</span> <span class="o">=</span> <span class="n">ListedColormap</span><span class="p">(</span><span class="n">cmap</span><span class="p">)</span>
+
+<span class="n">so</span><span class="o">.</span><span class="n">uns</span><span class="p">[</span><span class="s1">&#39;cmaps&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="s1">&#39;cell_type_id&#39;</span><span class="p">:</span> <span class="n">cmap</span><span class="p">})</span>
+<span class="n">so</span><span class="o">.</span><span class="n">uns</span><span class="p">[</span><span class="s1">&#39;cmap_labels&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="s1">&#39;cell_type_id&#39;</span><span class="p">:</span> <span class="n">cmap_labels</span><span class="p">})</span>
+
+<span class="n">fig</span><span class="p">,</span> <span class="n">axs</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">15</span><span class="p">,</span> <span class="mi">6</span><span class="p">),</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">300</span><span class="p">)</span>
+<span class="n">ath</span><span class="o">.</span><span class="n">pl</span><span class="o">.</span><span class="n">spatial</span><span class="p">(</span><span class="n">so</span><span class="p">,</span> <span class="s1">&#39;slide_7_Cy2x4&#39;</span><span class="p">,</span> <span class="s1">&#39;cell_type_id&#39;</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;mask&#39;</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+<span class="n">norm</span> <span class="o">=</span> <span class="n">Normalize</span><span class="p">(</span><span class="o">-</span><span class="mf">.3</span><span class="p">,</span> <span class="mf">.3</span><span class="p">)</span>
+<span class="n">ath</span><span class="o">.</span><span class="n">pl</span><span class="o">.</span><span class="n">interactions</span><span class="p">(</span><span class="n">so</span><span class="p">,</span> <span class="s1">&#39;slide_7_Cy2x4&#39;</span><span class="p">,</span> <span class="s1">&#39;cell_type_id&#39;</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;proportion&#39;</span><span class="p">,</span> <span class="n">prediction_type</span><span class="o">=</span><span class="s1">&#39;diff&#39;</span><span class="p">,</span> <span class="n">graph_key</span><span class="o">=</span><span class="s1">&#39;contact&#39;</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+<span class="n">fig</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+<span class="c1"># fig.show()</span>
+</pre></div>
+</div>
+<p><img alt="png" src="../_images/tutorial_56_0.png" /></p>
+<p>Last, we can use the interaction score of immune to tumor cells to sort our samples by increasing attraction:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">mixing_score</span><span class="o">=</span><span class="p">[]</span>
+<span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">all_samples</span><span class="p">:</span>
+    <span class="n">interaction_res</span> <span class="o">=</span> <span class="n">so</span><span class="o">.</span><span class="n">uns</span><span class="p">[</span><span class="n">s</span><span class="p">][</span><span class="s1">&#39;interactions&#39;</span><span class="p">][</span><span class="s1">&#39;cell_type_id_proportion_diff_contact&#39;</span><span class="p">]</span> <span class="c1"># get interaction results</span>
+    <span class="n">diff</span> <span class="o">=</span> <span class="n">interaction_res</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="mi">4</span><span class="p">][</span><span class="s1">&#39;diff&#39;</span><span class="p">]</span> <span class="c1"># interactions between source id 1 (immune), target id 4 (tumor)</span>
+    <span class="n">mixing_score</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">diff</span><span class="p">)</span>
+
+<span class="c1"># cell_type_id colormap</span>
+<span class="n">cmap</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;white&#39;</span><span class="p">,</span> <span class="s1">&#39;darkgreen&#39;</span><span class="p">,</span> <span class="s1">&#39;lightgrey&#39;</span><span class="p">,</span> <span class="s1">&#39;lightgrey&#39;</span><span class="p">,</span> <span class="s1">&#39;darkred&#39;</span><span class="p">,</span> <span class="s1">&#39;lightgrey&#39;</span><span class="p">]</span>
+<span class="n">cmap_labels</span> <span class="o">=</span> <span class="p">{</span><span class="mi">0</span><span class="p">:</span> <span class="s1">&#39;background&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">:</span> <span class="s1">&#39;immune&#39;</span><span class="p">,</span>  <span class="mi">2</span><span class="p">:</span> <span class="s1">&#39;endothelial&#39;</span><span class="p">,</span> <span class="mi">3</span><span class="p">:</span> <span class="s1">&#39;stromal&#39;</span><span class="p">,</span> <span class="mi">4</span><span class="p">:</span> <span class="s1">&#39;tumor&#39;</span><span class="p">,</span> <span class="mi">5</span><span class="p">:</span> <span class="s1">&#39;myoepithelial&#39;</span><span class="p">}</span>
+<span class="n">cmap</span> <span class="o">=</span> <span class="n">ListedColormap</span><span class="p">(</span><span class="n">cmap</span><span class="p">)</span>
+<span class="n">so</span><span class="o">.</span><span class="n">uns</span><span class="p">[</span><span class="s1">&#39;cmaps&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="s1">&#39;cell_type_id&#39;</span><span class="p">:</span> <span class="n">cmap</span><span class="p">})</span>
+<span class="n">so</span><span class="o">.</span><span class="n">uns</span><span class="p">[</span><span class="s1">&#39;cmap_labels&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="s1">&#39;cell_type_id&#39;</span><span class="p">:</span> <span class="n">cmap_labels</span><span class="p">})</span>
+
+<span class="n">ind</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">argsort</span><span class="p">(</span><span class="n">mixing_score</span><span class="p">)</span>
+
+<span class="n">fig</span><span class="p">,</span> <span class="n">axs</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">14</span><span class="p">,</span> <span class="mi">7</span><span class="p">),</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">300</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">i</span><span class="p">,</span><span class="n">s</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">ind</span><span class="p">):</span>
+    <span class="n">ath</span><span class="o">.</span><span class="n">pl</span><span class="o">.</span><span class="n">spatial</span><span class="p">(</span><span class="n">so</span><span class="p">,</span> <span class="n">all_samples</span><span class="p">[</span><span class="n">s</span><span class="p">],</span> <span class="s1">&#39;cell_type_id&#39;</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;mask&#39;</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="o">.</span><span class="n">flat</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+
+<span class="n">axs</span><span class="o">.</span><span class="n">flat</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_axis_off</span><span class="p">()</span>
+</pre></div>
+</div>
+<p><img alt="png" src="../_images/tutorial_58_0.png" /></p>
+</div>
+<div class="section" id="ripley-s-k">
+<h3>Ripley’s K<a class="headerlink" href="#ripley-s-k" title="Permalink to this headline">¶</a></h3>
+<p>Ripley’s <span class="math notranslate nohighlight">\(K(t)\)</span> function is used to analyse spatial point processes, i.e., if observed events are regularly dis- tributed in space. The computational framework implements this metric to give insight in whether a certain cell type clusters at different spatial scales or not. Often it is usefull to look at the variance stabilising transform <span class="math notranslate nohighlight">\(L(t)\)</span> which is expected to be equal to <span class="math notranslate nohighlight">\(t\)</span> under a homogeneous Poisson process.</p>
+<p>In a frist step we need to compute the widht, height and area of the samples because this is used to determine the different radii at which Ripley’s K is computed as well as for edge-corrections of the values.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">so</span><span class="o">.</span><span class="n">spl</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">all_samples</span><span class="p">]</span>
+</pre></div>
+</div>
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>.dataframe tbody tr th {
+    vertical-align: top;
+}
+
+.dataframe thead th {
+    text-align: right;
+}
+</pre></div>
+</div>
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>pid</th>
+      <th>location</th>
+      <th>...</th>
+      <th>shannon_meta_id</th>
+      <th>infiltration</th>
+    </tr>
+    <tr>
+      <th>core</th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>slide_49_By2x5</th>
+      <td>49</td>
+      <td>CENTER</td>
+      <td>...</td>
+      <td>3.333942</td>
+      <td>0.144172</td>
+    </tr>
+    <tr>
+      <th>slide_59_Cy7x7</th>
+      <td>59</td>
+      <td>CENTER</td>
+      <td>...</td>
+      <td>2.155000</td>
+      <td>0.128205</td>
+    </tr>
+    <tr>
+      <th>slide_59_Cy7x8</th>
+      <td>59</td>
+      <td>CENTER</td>
+      <td>...</td>
+      <td>1.899001</td>
+      <td>0.195796</td>
+    </tr>
+    <tr>
+      <th>slide_59_Cy8x1</th>
+      <td>59</td>
+      <td>PERIPHERY</td>
+      <td>...</td>
+      <td>2.305581</td>
+      <td>0.182798</td>
+    </tr>
+    <tr>
+      <th>slide_7_Cy2x2</th>
+      <td>7</td>
+      <td>CENTER</td>
+      <td>...</td>
+      <td>3.113132</td>
+      <td>0.067273</td>
+    </tr>
+    <tr>
+      <th>slide_7_Cy2x3</th>
+      <td>7</td>
+      <td>CENTER</td>
+      <td>...</td>
+      <td>2.821626</td>
+      <td>0.106984</td>
+    </tr>
+    <tr>
+      <th>slide_7_Cy2x4</th>
+      <td>7</td>
+      <td>PERIPHERY</td>
+      <td>...</td>
+      <td>1.814858</td>
+      <td>0.611321</td>
+    </tr>
+  </tbody>
+</table>
+<p>7 rows × 63 columns</p>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">widths</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="n">heights</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">so</span><span class="o">.</span><span class="n">spl</span><span class="o">.</span><span class="n">index</span><span class="p">:</span>
+    <span class="n">heights</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">so</span><span class="o">.</span><span class="n">images</span><span class="p">[</span><span class="n">s</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+    <span class="n">widths</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">so</span><span class="o">.</span><span class="n">images</span><span class="p">[</span><span class="n">s</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
+    
+<span class="n">widths</span><span class="p">,</span> <span class="n">heights</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">widths</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">heights</span><span class="p">)</span>
+<span class="n">areas</span> <span class="o">=</span> <span class="n">widths</span> <span class="o">*</span> <span class="n">heights</span>
+
+<span class="n">so</span><span class="o">.</span><span class="n">spl</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="s1">&#39;width&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">widths</span>
+<span class="n">so</span><span class="o">.</span><span class="n">spl</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="s1">&#39;height&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">heights</span>
+<span class="n">so</span><span class="o">.</span><span class="n">spl</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="s1">&#39;area&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">areas</span>
+</pre></div>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># compute estimated deviation from random poisson process L(t)-t </span>
+<span class="n">spl</span> <span class="o">=</span> <span class="s1">&#39;slide_7_Cy2x2&#39;</span>
+<span class="n">spl</span> <span class="o">=</span> <span class="s1">&#39;slide_49_By2x5&#39;</span>
+<span class="n">attr</span> <span class="o">=</span> <span class="s1">&#39;meta_id&#39;</span>
+<span class="n">radii</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">400</span><span class="p">,</span><span class="mi">100</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">_id</span> <span class="ow">in</span> <span class="n">so</span><span class="o">.</span><span class="n">obs</span><span class="p">[</span><span class="n">spl</span><span class="p">][</span><span class="n">attr</span><span class="p">]</span><span class="o">.</span><span class="n">unique</span><span class="p">():</span> 
+    <span class="k">if</span> <span class="s1">&#39;x&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">so</span><span class="o">.</span><span class="n">obs</span><span class="p">[</span><span class="n">spl</span><span class="p">]</span> <span class="ow">and</span> <span class="s1">&#39;y&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">so</span><span class="o">.</span><span class="n">obs</span><span class="p">[</span><span class="n">spl</span><span class="p">]:</span>
+        <span class="n">ath</span><span class="o">.</span><span class="n">pp</span><span class="o">.</span><span class="n">extract_centroids</span><span class="p">(</span><span class="n">so</span><span class="p">,</span> <span class="n">spl</span><span class="p">)</span>
+    <span class="n">ath</span><span class="o">.</span><span class="n">neigh</span><span class="o">.</span><span class="n">ripleysK</span><span class="p">(</span><span class="n">so</span><span class="p">,</span> <span class="n">spl</span><span class="p">,</span> <span class="n">attr</span><span class="p">,</span> <span class="n">_id</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;csr-deviation&#39;</span><span class="p">,</span> <span class="n">radii</span><span class="o">=</span><span class="n">radii</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">cmap</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;white&#39;</span><span class="p">,</span> <span class="s1">&#39;darkgreen&#39;</span><span class="p">,</span> <span class="s1">&#39;gold&#39;</span><span class="p">,</span> <span class="s1">&#39;steelblue&#39;</span><span class="p">,</span> <span class="s1">&#39;darkred&#39;</span><span class="p">,</span> <span class="s1">&#39;coral&#39;</span><span class="p">]</span>
+<span class="n">cmap_labels</span> <span class="o">=</span> <span class="p">{</span><span class="mi">0</span><span class="p">:</span> <span class="s1">&#39;background&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">:</span> <span class="s1">&#39;immune&#39;</span><span class="p">,</span>  <span class="mi">2</span><span class="p">:</span> <span class="s1">&#39;endothelial&#39;</span><span class="p">,</span> <span class="mi">3</span><span class="p">:</span> <span class="s1">&#39;stromal&#39;</span><span class="p">,</span> <span class="mi">4</span><span class="p">:</span> <span class="s1">&#39;tumor&#39;</span><span class="p">,</span> <span class="mi">5</span><span class="p">:</span> <span class="s1">&#39;myoepithelial&#39;</span><span class="p">}</span>
+<span class="n">cmap</span> <span class="o">=</span> <span class="n">ListedColormap</span><span class="p">(</span><span class="n">cmap</span><span class="p">)</span>
+<span class="n">so</span><span class="o">.</span><span class="n">uns</span><span class="p">[</span><span class="s1">&#39;cmaps&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="s1">&#39;cell_type_id&#39;</span><span class="p">:</span> <span class="n">cmap</span><span class="p">})</span>
+<span class="n">so</span><span class="o">.</span><span class="n">uns</span><span class="p">[</span><span class="s1">&#39;cmap_labels&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="s1">&#39;cell_type_id&#39;</span><span class="p">:</span> <span class="n">cmap_labels</span><span class="p">})</span>
+
+<span class="c1"># plot estimated deviation from random poisson process L(t)-t </span>
+<span class="n">fig</span><span class="p">,</span> <span class="n">axs</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span><span class="mi">4</span><span class="p">),</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">300</span><span class="p">)</span>
+<span class="n">ath</span><span class="o">.</span><span class="n">pl</span><span class="o">.</span><span class="n">spatial</span><span class="p">(</span><span class="n">so</span><span class="p">,</span> <span class="n">spl</span><span class="p">,</span> <span class="n">attr</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+<span class="n">ath</span><span class="o">.</span><span class="n">pl</span><span class="o">.</span><span class="n">ripleysK</span><span class="p">(</span><span class="n">so</span><span class="p">,</span> <span class="n">spl</span><span class="p">,</span> <span class="n">attr</span><span class="p">,</span> <span class="n">ids</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">so</span><span class="o">.</span><span class="n">obs</span><span class="p">[</span><span class="n">spl</span><span class="p">]</span><span class="o">.</span><span class="n">meta_id</span><span class="o">.</span><span class="n">unique</span><span class="p">()),</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;csr-deviation&#39;</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">legend</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>/Users/art/Documents/projects/athena/athena/plotting/visualization.py:492: UserWarning: Matplotlib is currently using module://matplotlib_inline.backend_inline, which is a non-GUI backend, so cannot show the figure.
+  fig.show()
+</pre></div>
+</div>
+<p><img alt="png" src="../_images/tutorial_64_1.png" /></p>
+<p>In the plot above we can see how all cell types except <code class="docutils literal notranslate"><span class="pre">15</span></code> and <code class="docutils literal notranslate"><span class="pre">20</span></code> cluster on smaller distances (radii in pixel). Spatial cluster analysis scores quantify the degree of spatial clustering or dispersion of different phenotypes as a function of distance, revealing a strong clustering of Apoptotic cells at a short distance (high deviation from 0 for the <span class="math notranslate nohighlight">\(L(t)-t\)</span>), clustering of Basal CK and Myoepithelial cells at medium distance and dispersion at higher distance, and random distribution of immune and stromal cells (<span class="math notranslate nohighlight">\(L(t)-t\)</span> close to 0).</p>
+</div>
+<div class="section" id="modularity">
+<h3>Modularity<a class="headerlink" href="#modularity" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">for</span> <span class="n">spl</span> <span class="ow">in</span> <span class="n">all_samples</span><span class="p">:</span>
+    <span class="n">ath</span><span class="o">.</span><span class="n">graph</span><span class="o">.</span><span class="n">build_graph</span><span class="p">(</span><span class="n">so</span><span class="p">,</span> <span class="n">spl</span><span class="p">,</span> <span class="n">builder_type</span><span class="o">=</span><span class="s1">&#39;knn&#39;</span><span class="p">,</span> <span class="n">mask_key</span><span class="o">=</span><span class="s1">&#39;cellmasks&#39;</span><span class="p">)</span>
+    <span class="n">ath</span><span class="o">.</span><span class="n">metrics</span><span class="o">.</span><span class="n">modularity</span><span class="p">(</span><span class="n">so</span><span class="p">,</span> <span class="n">spl</span><span class="p">,</span> <span class="s1">&#39;cell_type_id&#39;</span><span class="p">)</span>
+<span class="n">so</span><span class="o">.</span><span class="n">spl</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">all_samples</span><span class="p">,</span> <span class="s1">&#39;modularity_cell_type_id_res1&#39;</span><span class="p">]</span>
+</pre></div>
+</div>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>core
+slide_49_By2x5    0.423157
+slide_59_Cy7x7    0.216871
+slide_59_Cy7x8    0.338307
+slide_59_Cy8x1    0.334125
+slide_7_Cy2x2     0.430619
+slide_7_Cy2x3     0.381590
+slide_7_Cy2x4     0.143625
+Name: modularity_cell_type_id_res1, dtype: float64
+</pre></div>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">axs</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="mi">8</span><span class="p">))</span>
+<span class="n">ath</span><span class="o">.</span><span class="n">pl</span><span class="o">.</span><span class="n">spatial</span><span class="p">(</span><span class="n">so</span><span class="p">,</span> <span class="s1">&#39;slide_7_Cy2x2&#39;</span><span class="p">,</span> <span class="s1">&#39;cell_type_id&#39;</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">edges</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">graph_key</span><span class="o">=</span><span class="s1">&#39;knn&#39;</span><span class="p">)</span>
+<span class="n">ath</span><span class="o">.</span><span class="n">pl</span><span class="o">.</span><span class="n">spatial</span><span class="p">(</span><span class="n">so</span><span class="p">,</span> <span class="s1">&#39;slide_7_Cy2x4&#39;</span><span class="p">,</span> <span class="s1">&#39;cell_type_id&#39;</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">edges</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">graph_key</span><span class="o">=</span><span class="s1">&#39;knn&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><img alt="png" src="../_images/tutorial_68_0.png" /></p>
+</div>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+        <a href="introduction-spatialOmics.html" class="btn btn-neutral float-right" title="Tutorial - SpatialOmics" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="quickstart.html" class="btn btn-neutral float-left" title="Quickstart" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright IBM Corp. 2021.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

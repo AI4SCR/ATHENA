@@ -1,0 +1,463 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>athena.metrics.heterogeneity.metrics module &mdash; athena  documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> athena
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">General</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../source/installation.html">Installation</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Gallery</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../source/overview.html">Overview of ATHENA</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../source/methodology.html">Methodology</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../source/quickstart.html">Quickstart</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../source/tutorial.html">Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../source/introduction-spatialOmics.html">SpatialOmics Tutorial</a></li>
+</ul>
+<p class="caption"><span class="caption-text">API</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../api_overview.html">API Overview</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">athena</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+      <li>athena.metrics.heterogeneity.metrics module</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="../_sources/api/athena.metrics.heterogeneity.metrics.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="module-athena.metrics.heterogeneity.metrics">
+<span id="athena-metrics-heterogeneity-metrics-module"></span><h1>athena.metrics.heterogeneity.metrics module<a class="headerlink" href="#module-athena.metrics.heterogeneity.metrics" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="summary">
+<h2>Summary<a class="headerlink" href="#summary" title="Permalink to this headline">¶</a></h2>
+<p>Functions:</p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#athena.metrics.heterogeneity.metrics.abundance" title="athena.metrics.heterogeneity.metrics.abundance"><code class="xref py py-obj docutils literal notranslate"><span class="pre">abundance</span></code></a></p></td>
+<td><p>Computes the abundance of species on the observation or the sample level.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#athena.metrics.heterogeneity.metrics.hill_number" title="athena.metrics.heterogeneity.metrics.hill_number"><code class="xref py py-obj docutils literal notranslate"><span class="pre">hill_number</span></code></a></p></td>
+<td><p>Computes the Hill Numbers on the observation or the sample level</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#athena.metrics.heterogeneity.metrics.quadratic_entropy" title="athena.metrics.heterogeneity.metrics.quadratic_entropy"><code class="xref py py-obj docutils literal notranslate"><span class="pre">quadratic_entropy</span></code></a></p></td>
+<td><p>Computes the quadratic entropy, taking relative abundance and similarity between observations into account.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#athena.metrics.heterogeneity.metrics.renyi_entropy" title="athena.metrics.heterogeneity.metrics.renyi_entropy"><code class="xref py py-obj docutils literal notranslate"><span class="pre">renyi_entropy</span></code></a></p></td>
+<td><p>Computes the Renyi-Entropy.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#athena.metrics.heterogeneity.metrics.richness" title="athena.metrics.heterogeneity.metrics.richness"><code class="xref py py-obj docutils literal notranslate"><span class="pre">richness</span></code></a></p></td>
+<td><p>Computes the richness on the observation or the sample level</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#athena.metrics.heterogeneity.metrics.shannon" title="athena.metrics.heterogeneity.metrics.shannon"><code class="xref py py-obj docutils literal notranslate"><span class="pre">shannon</span></code></a></p></td>
+<td><p>Computes the Shannon Index on the observation or the sample level</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#athena.metrics.heterogeneity.metrics.simpson" title="athena.metrics.heterogeneity.metrics.simpson"><code class="xref py py-obj docutils literal notranslate"><span class="pre">simpson</span></code></a></p></td>
+<td><p>Computes the Simpson Index on the observation or the sample level</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="reference">
+<h2>Reference<a class="headerlink" href="#reference" title="Permalink to this headline">¶</a></h2>
+<dl class="py function">
+<dt id="athena.metrics.heterogeneity.metrics.richness">
+<code class="sig-name descname"><span class="pre">richness</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">so</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">spl</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">attr</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">local</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">key_added</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">graph_key</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'knn'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">inplace</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/athena/metrics/heterogeneity/metrics.html#richness"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#athena.metrics.heterogeneity.metrics.richness" title="Permalink to this definition">¶</a></dt>
+<dd><p>Computes the richness on the observation or the sample level</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>so</strong> – SpatialOmics instance</p></li>
+<li><p><strong>spl</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – Spl for which to compute the metric</p></li>
+<li><p><strong>attr</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – Categorical feature in SpatialOmics.obs to use for the grouping</p></li>
+<li><p><strong>local</strong> – Whether to compute the metric on the observation or the sample level</p></li>
+<li><p><strong>key_added</strong> – Key added to either obs or spl depending on the choice of <cite>local</cite></p></li>
+<li><p><strong>graph_key</strong> – Specifies the graph representation to use in so.G[spl] if <cite>local=True</cite>.</p></li>
+<li><p><strong>inplace</strong> – Whether to add the metric to the current SpatialOmics instance or to return a new one.</p></li>
+</ul>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">so</span> <span class="o">=</span> <span class="n">sh</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">imc</span><span class="p">()</span>
+<span class="n">spl</span> <span class="o">=</span> <span class="n">so</span><span class="o">.</span><span class="n">spl</span><span class="o">.</span><span class="n">index</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+<span class="n">sh</span><span class="o">.</span><span class="n">metrics</span><span class="o">.</span><span class="n">richness</span><span class="p">(</span><span class="n">so</span><span class="p">,</span> <span class="n">spl</span><span class="p">,</span> <span class="s1">&#39;meta_id&#39;</span><span class="p">,</span> <span class="n">local</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="n">sh</span><span class="o">.</span><span class="n">metrics</span><span class="o">.</span><span class="n">richness</span><span class="p">(</span><span class="n">so</span><span class="p">,</span> <span class="n">spl</span><span class="p">,</span> <span class="s1">&#39;meta_id&#39;</span><span class="p">,</span> <span class="n">local</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="athena.metrics.heterogeneity.metrics.shannon">
+<code class="sig-name descname"><span class="pre">shannon</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">so</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">spl</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">attr</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">local</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">key_added</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">graph_key</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'knn'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">base</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">inplace</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/athena/metrics/heterogeneity/metrics.html#shannon"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#athena.metrics.heterogeneity.metrics.shannon" title="Permalink to this definition">¶</a></dt>
+<dd><p>Computes the Shannon Index on the observation or the sample level</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>so</strong> – SpatialOmics instance</p></li>
+<li><p><strong>spl</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – Spl for which to compute the metric</p></li>
+<li><p><strong>attr</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – Categorical feature in SpatialOmics.obs to use for the grouping</p></li>
+<li><p><strong>local</strong> – Whether to compute the metric on the observation or the sample level</p></li>
+<li><p><strong>key_added</strong> – Key added to either obs or spl depending on the choice of <cite>local</cite></p></li>
+<li><p><strong>graph_key</strong> – Specifies the graph representation to use in so.G[spl] if <cite>local=True</cite>.</p></li>
+<li><p><strong>inplace</strong> – Whether to add the metric to the current SpatialOmics instance or to return a new one.</p></li>
+</ul>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">so</span> <span class="o">=</span> <span class="n">sh</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">imc</span><span class="p">()</span>
+<span class="n">spl</span> <span class="o">=</span> <span class="n">so</span><span class="o">.</span><span class="n">spl</span><span class="o">.</span><span class="n">index</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+<span class="n">sh</span><span class="o">.</span><span class="n">metrics</span><span class="o">.</span><span class="n">shannon</span><span class="p">(</span><span class="n">so</span><span class="p">,</span> <span class="n">spl</span><span class="p">,</span> <span class="s1">&#39;meta_id&#39;</span><span class="p">,</span> <span class="n">local</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="n">sh</span><span class="o">.</span><span class="n">metrics</span><span class="o">.</span><span class="n">shannon</span><span class="p">(</span><span class="n">so</span><span class="p">,</span> <span class="n">spl</span><span class="p">,</span> <span class="s1">&#39;meta_id&#39;</span><span class="p">,</span> <span class="n">local</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="athena.metrics.heterogeneity.metrics.simpson">
+<code class="sig-name descname"><span class="pre">simpson</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">so</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">spl</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">attr</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">local</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">key_added</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">graph_key</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'knn'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">inplace</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/athena/metrics/heterogeneity/metrics.html#simpson"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#athena.metrics.heterogeneity.metrics.simpson" title="Permalink to this definition">¶</a></dt>
+<dd><p>Computes the Simpson Index on the observation or the sample level</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>so</strong> – SpatialOmics instance</p></li>
+<li><p><strong>spl</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – Spl for which to compute the metric</p></li>
+<li><p><strong>attr</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – Categorical feature in SpatialOmics.obs to use for the grouping</p></li>
+<li><p><strong>local</strong> – Whether to compute the metric on the observation or the sample level</p></li>
+<li><p><strong>key_added</strong> – Key added to either obs or spl depending on the choice of <cite>local</cite></p></li>
+<li><p><strong>graph_key</strong> – Specifies the graph representation to use in so.G[spl] if <cite>local=True</cite>.</p></li>
+<li><p><strong>inplace</strong> – Whether to add the metric to the current SpatialOmics instance or to return a new one.</p></li>
+</ul>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">so</span> <span class="o">=</span> <span class="n">sh</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">imc</span><span class="p">()</span>
+<span class="n">spl</span> <span class="o">=</span> <span class="n">so</span><span class="o">.</span><span class="n">spl</span><span class="o">.</span><span class="n">index</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+<span class="n">sh</span><span class="o">.</span><span class="n">metrics</span><span class="o">.</span><span class="n">simpson</span><span class="p">(</span><span class="n">so</span><span class="p">,</span> <span class="n">spl</span><span class="p">,</span> <span class="s1">&#39;meta_id&#39;</span><span class="p">,</span> <span class="n">local</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="n">sh</span><span class="o">.</span><span class="n">metrics</span><span class="o">.</span><span class="n">simpson</span><span class="p">(</span><span class="n">so</span><span class="p">,</span> <span class="n">spl</span><span class="p">,</span> <span class="s1">&#39;meta_id&#39;</span><span class="p">,</span> <span class="n">local</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="athena.metrics.heterogeneity.metrics.hill_number">
+<code class="sig-name descname"><span class="pre">hill_number</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">so</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">spl</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">attr</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">q</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">local</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">key_added</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">graph_key</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'knn'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">inplace</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/athena/metrics/heterogeneity/metrics.html#hill_number"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#athena.metrics.heterogeneity.metrics.hill_number" title="Permalink to this definition">¶</a></dt>
+<dd><p>Computes the Hill Numbers on the observation or the sample level</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>so</strong> – SpatialOmics instance</p></li>
+<li><p><strong>spl</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – Spl for which to compute the metric</p></li>
+<li><p><strong>attr</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – Categorical feature in SpatialOmics.obs to use for the grouping</p></li>
+<li><p><strong>q</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>) – The hill coefficient as defined <a class="reference external" href="https://ai4scr.github.io/ATHENA/source/methodology.html">here</a>.</p></li>
+<li><p><strong>local</strong> – Whether to compute the metric on the observation or the sample level</p></li>
+<li><p><strong>key_added</strong> – Key added to either obs or spl depending on the choice of <cite>local</cite></p></li>
+<li><p><strong>graph_key</strong> – Specifies the graph representation to use in so.G[spl] if <cite>local=True</cite>.</p></li>
+<li><p><strong>inplace</strong> – Whether to add the metric to the current SpatialOmics instance or to return a new one.</p></li>
+</ul>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">so</span> <span class="o">=</span> <span class="n">sh</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">imc</span><span class="p">()</span>
+<span class="n">spl</span> <span class="o">=</span> <span class="n">so</span><span class="o">.</span><span class="n">spl</span><span class="o">.</span><span class="n">index</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+<span class="n">sh</span><span class="o">.</span><span class="n">metrics</span><span class="o">.</span><span class="n">hill_number</span><span class="p">(</span><span class="n">so</span><span class="p">,</span> <span class="n">spl</span><span class="p">,</span> <span class="s1">&#39;meta_id&#39;</span><span class="p">,</span> <span class="n">q</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">local</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="n">sh</span><span class="o">.</span><span class="n">metrics</span><span class="o">.</span><span class="n">hill_number</span><span class="p">(</span><span class="n">so</span><span class="p">,</span> <span class="n">spl</span><span class="p">,</span> <span class="s1">&#39;meta_id&#39;</span><span class="p">,</span> <span class="n">q</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">local</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt id="athena.metrics.heterogeneity.metrics.renyi_entropy">
+<code class="sig-name descname"><span class="pre">renyi_entropy</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">so</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">spl</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">attr</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">q</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">local</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">key_added</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">graph_key</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'knn'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">base</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">inplace</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/athena/metrics/heterogeneity/metrics.html#renyi_entropy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#athena.metrics.heterogeneity.metrics.renyi_entropy" title="Permalink to this definition">¶</a></dt>
+<dd><p>Computes the Renyi-Entropy.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>so</strong> – SpatialOmics instance</p></li>
+<li><p><strong>spl</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – Spl for which to compute the metric</p></li>
+<li><p><strong>attr</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – Categorical feature in SpatialOmics.obs to use for the grouping</p></li>
+<li><p><strong>q</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>) – The renyi coefficient as defined <a class="reference external" href="https://ai4scr.github.io/ATHENA/source/methodology.html">here</a></p></li>
+<li><p><strong>local</strong> – Whether to compute the metric on the observation or the sample level</p></li>
+<li><p><strong>key_added</strong> – Key added to either obs or spl depending on the choice of <cite>local</cite></p></li>
+<li><p><strong>graph_key</strong> – Specifies the graph representation to use in so.G[spl] if <cite>local=True</cite>.</p></li>
+<li><p><strong>inplace</strong> – Whether to add the metric to the current SpatialOmics instance or to return a new one.</p></li>
+</ul>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">so</span> <span class="o">=</span> <span class="n">sh</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">imc</span><span class="p">()</span>
+<span class="n">spl</span> <span class="o">=</span> <span class="n">so</span><span class="o">.</span><span class="n">spl</span><span class="o">.</span><span class="n">index</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+<span class="n">sh</span><span class="o">.</span><span class="n">metrics</span><span class="o">.</span><span class="n">renyi_entropy</span><span class="p">(</span><span class="n">so</span><span class="p">,</span> <span class="n">spl</span><span class="p">,</span> <span class="s1">&#39;meta_id&#39;</span><span class="p">,</span> <span class="n">q</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">local</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="n">sh</span><span class="o">.</span><span class="n">metrics</span><span class="o">.</span><span class="n">renyi_entropy</span><span class="p">(</span><span class="n">so</span><span class="p">,</span> <span class="n">spl</span><span class="p">,</span> <span class="s1">&#39;meta_id&#39;</span><span class="p">,</span> <span class="n">q</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">local</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt id="athena.metrics.heterogeneity.metrics.quadratic_entropy">
+<code class="sig-name descname"><span class="pre">quadratic_entropy</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">so</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">spl</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">attr</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metric</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'minkowski'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metric_kwargs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{}</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scale</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">local</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">key_added</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">graph_key</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'knn'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">inplace</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/athena/metrics/heterogeneity/metrics.html#quadratic_entropy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#athena.metrics.heterogeneity.metrics.quadratic_entropy" title="Permalink to this definition">¶</a></dt>
+<dd><p>Computes the quadratic entropy, taking relative abundance and similarity between observations into account.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>so</strong> – SpatialOmics instance</p></li>
+<li><p><strong>spl</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – Spl for which to compute the metric</p></li>
+<li><p><strong>attr</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – Categorical feature in SpatialOmics.obs to use for the grouping</p></li>
+<li><p><strong>metric</strong> – metric used to compute distance of observations in the features space so.X[spl]</p></li>
+<li><p><strong>metric_kwargs</strong> – key word arguments for metric</p></li>
+<li><p><strong>scale</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – whether to scale features of observations to unit variance and 0 mean</p></li>
+<li><p><strong>local</strong> – whether to compute the metric on the observation or the sample level</p></li>
+<li><p><strong>key_added</strong> – Key added to either obs or spl depending on the choice of <cite>local</cite></p></li>
+<li><p><strong>graph_key</strong> – Specifies the graph representation to use in so.G[spl] if <cite>local=True</cite>.</p></li>
+<li><p><strong>inplace</strong> – Whether to add the metric to the current SpatialOmics instance or to return a new one.</p></li>
+</ul>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>The implementation computes an average feature vector for each group in attr based on all observations in the
+sample. Thus, if staining biases across samples exists this will directly distort this metric.</p>
+<p class="rubric">Examples</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">so</span> <span class="o">=</span> <span class="n">sh</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">imc</span><span class="p">()</span>
+<span class="n">spl</span> <span class="o">=</span> <span class="n">so</span><span class="o">.</span><span class="n">spl</span><span class="o">.</span><span class="n">index</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+<span class="n">sh</span><span class="o">.</span><span class="n">metrics</span><span class="o">.</span><span class="n">quadratic_entropy</span><span class="p">(</span><span class="n">so</span><span class="p">,</span> <span class="n">spl</span><span class="p">,</span> <span class="s1">&#39;meta_id&#39;</span><span class="p">,</span> <span class="n">local</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="n">sh</span><span class="o">.</span><span class="n">metrics</span><span class="o">.</span><span class="n">quadratic_entropy</span><span class="p">(</span><span class="n">so</span><span class="p">,</span> <span class="n">spl</span><span class="p">,</span> <span class="s1">&#39;meta_id&#39;</span><span class="p">,</span> <span class="n">local</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt id="athena.metrics.heterogeneity.metrics.abundance">
+<code class="sig-name descname"><span class="pre">abundance</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">so</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">spl</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">attr</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'proportion'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">key_added</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">graph_key</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'knn'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">local</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">inplace</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/athena/metrics/heterogeneity/metrics.html#abundance"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#athena.metrics.heterogeneity.metrics.abundance" title="Permalink to this definition">¶</a></dt>
+<dd><p>Computes the abundance of species on the observation or the sample level.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>so</strong> – SpatialOmics instance</p></li>
+<li><p><strong>spl</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – Spl for which to compute the metric</p></li>
+<li><p><strong>attr</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – Categorical feature in SpatialOmics.obs to use for the grouping</p></li>
+<li><p><strong>local</strong> – Whether to compute the metric on the observation or the sample level</p></li>
+<li><p><strong>key_added</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]) – Key added to either uns[spl] or obs depending on the choice of <cite>local</cite></p></li>
+<li><p><strong>graph_key</strong> – Specifies the graph representation to use in so.G[spl] if <cite>local=True</cite>.</p></li>
+<li><p><strong>inplace</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – Whether to add the metric to the current SpatialOmics instance or to return a new one.</p></li>
+</ul>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">so</span> <span class="o">=</span> <span class="n">sh</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">imc</span><span class="p">()</span>
+<span class="n">spl</span> <span class="o">=</span> <span class="n">so</span><span class="o">.</span><span class="n">spl</span><span class="o">.</span><span class="n">index</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+<span class="n">sh</span><span class="o">.</span><span class="n">metrics</span><span class="o">.</span><span class="n">abundance</span><span class="p">(</span><span class="n">so</span><span class="p">,</span> <span class="n">spl</span><span class="p">,</span> <span class="s1">&#39;meta_id&#39;</span><span class="p">,</span> <span class="n">local</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="n">sh</span><span class="o">.</span><span class="n">metrics</span><span class="o">.</span><span class="n">abundance</span><span class="p">(</span><span class="n">so</span><span class="p">,</span> <span class="n">spl</span><span class="p">,</span> <span class="s1">&#39;meta_id&#39;</span><span class="p">,</span> <span class="n">local</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright IBM Corp. 2021.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

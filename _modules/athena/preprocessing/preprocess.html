@@ -1,0 +1,298 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>athena.preprocessing.preprocess &mdash; athena  documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../index.html" class="icon icon-home"> athena
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">General</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../source/installation.html">Installation</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Gallery</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../source/overview.html">Overview of ATHENA</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../source/methodology.html">Methodology</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../source/quickstart.html">Quickstart</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../source/tutorial.html">Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../source/introduction-spatialOmics.html">SpatialOmics Tutorial</a></li>
+</ul>
+<p class="caption"><span class="caption-text">API</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../api_overview.html">API Overview</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">athena</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+        
+      <li>athena.preprocessing.preprocess</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for athena.preprocessing.preprocess</h1><div class="highlight"><pre>
+<span></span><span class="c1"># %%</span>
+<span class="c1"># from ._preprocessors import CensorData, Arcsinh, ReduceLocal</span>
+<span class="c1"># from ..utils.general import make_iterable, _check_is_fitted, is_fitted</span>
+
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">warnings</span>
+<span class="kn">from</span> <span class="nn">skimage.measure</span> <span class="kn">import</span> <span class="n">regionprops</span><span class="p">,</span> <span class="n">regionprops_table</span>
+
+<span class="c1"># from sklearn.preprocessing import StandardScaler</span>
+
+<span class="c1"># %%</span>
+
+<div class="viewcode-block" id="extract_centroids"><a class="viewcode-back" href="../../../api/athena.preprocessing.preprocess.html#athena.preprocessing.preprocess.extract_centroids">[docs]</a><span class="k">def</span> <span class="nf">extract_centroids</span><span class="p">(</span><span class="n">so</span><span class="p">,</span> <span class="n">spl</span><span class="p">,</span> <span class="n">mask_key</span><span class="o">=</span><span class="s1">&#39;cellmasks&#39;</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Extract centroids from segementation masks.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        so: SpatialOmics instance</span>
+<span class="sd">        spl: sample for which to extract centroids</span>
+<span class="sd">        mask_key: segmentation masks to use</span>
+<span class="sd">        inplace: Whether to add the metric to the current SpatialOmics instance or to return a new one.</span>
+
+<span class="sd">    Returns:</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">so</span> <span class="o">=</span> <span class="n">so</span> <span class="k">if</span> <span class="n">inplace</span> <span class="k">else</span> <span class="n">so</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+
+    <span class="n">mask</span> <span class="o">=</span> <span class="n">so</span><span class="o">.</span><span class="n">get_mask</span><span class="p">(</span><span class="n">spl</span><span class="p">,</span> <span class="n">mask_key</span><span class="p">)</span>
+
+    <span class="n">ndata</span> <span class="o">=</span> <span class="n">regionprops_table</span><span class="p">(</span><span class="n">mask</span><span class="p">,</span> <span class="n">properties</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;label&#39;</span><span class="p">,</span> <span class="s1">&#39;centroid&#39;</span><span class="p">])</span>
+    <span class="n">ndata</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="o">.</span><span class="n">from_dict</span><span class="p">(</span><span class="n">ndata</span><span class="p">)</span>
+    <span class="n">ndata</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;cell_id&#39;</span><span class="p">,</span> <span class="s1">&#39;y&#39;</span><span class="p">,</span> <span class="s1">&#39;x&#39;</span><span class="p">]</span>  <span class="c1"># NOTE: axis 0 is y and axis 1 is x</span>
+    <span class="n">ndata</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="s1">&#39;cell_id&#39;</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">ndata</span><span class="o">.</span><span class="n">sort_index</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">ascending</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">spl</span> <span class="ow">in</span> <span class="n">so</span><span class="o">.</span><span class="n">obs</span><span class="p">:</span>
+        <span class="k">if</span> <span class="s1">&#39;x&#39;</span> <span class="ow">in</span> <span class="n">so</span><span class="o">.</span><span class="n">obs</span><span class="p">[</span><span class="n">spl</span><span class="p">]</span> <span class="ow">and</span> <span class="s1">&#39;y&#39;</span> <span class="ow">in</span> <span class="n">so</span><span class="o">.</span><span class="n">obs</span><span class="p">[</span><span class="n">spl</span><span class="p">]:</span>
+            <span class="n">so</span><span class="o">.</span><span class="n">obs</span><span class="p">[</span><span class="n">spl</span><span class="p">]</span> <span class="o">=</span> <span class="n">so</span><span class="o">.</span><span class="n">obs</span><span class="p">[</span><span class="n">spl</span><span class="p">]</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;x&#39;</span><span class="p">,</span> <span class="s1">&#39;y&#39;</span><span class="p">])</span>
+        <span class="n">so</span><span class="o">.</span><span class="n">obs</span><span class="p">[</span><span class="n">spl</span><span class="p">]</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">((</span><span class="n">so</span><span class="o">.</span><span class="n">obs</span><span class="p">[</span><span class="n">spl</span><span class="p">],</span> <span class="n">ndata</span><span class="p">),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">so</span><span class="o">.</span><span class="n">obs</span><span class="p">[</span><span class="n">spl</span><span class="p">]</span> <span class="o">=</span> <span class="n">ndata</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">inplace</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">so</span></div>
+
+<div class="viewcode-block" id="arcsinh"><a class="viewcode-back" href="../../../api/athena.preprocessing.preprocess.html#athena.preprocessing.preprocess.arcsinh">[docs]</a><span class="k">def</span> <span class="nf">arcsinh</span><span class="p">(</span><span class="n">so</span><span class="p">,</span> <span class="n">spl</span><span class="p">,</span> <span class="n">cofactor</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Computes the arcsinh transformation of the expression values according to:</span>
+
+<span class="sd">    .. math::</span>
+
+<span class="sd">        X = \\mathtt{arcsinh}(\\frac{X}{\\mathtt{cofactor}})</span>
+
+
+<span class="sd">    Args:</span>
+<span class="sd">        so: spatialOmics instance</span>
+<span class="sd">        spl: sample name</span>
+<span class="sd">        cofactor: cofactor used for transformation</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">X</span> <span class="o">=</span> <span class="n">so</span><span class="o">.</span><span class="n">X</span><span class="p">[</span><span class="n">spl</span><span class="p">]</span>
+    <span class="n">np</span><span class="o">.</span><span class="n">divide</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">cofactor</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="n">X</span><span class="p">)</span>
+    <span class="n">np</span><span class="o">.</span><span class="n">arcsinh</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="n">X</span><span class="p">)</span></div>
+
+
+<span class="k">def</span> <span class="nf">_extract_image_properties</span><span class="p">(</span><span class="n">so</span><span class="p">,</span> <span class="n">spl</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Extract image properties from the high-dimensional images.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        so: SpatialOmics instance</span>
+<span class="sd">        spl: sample for which to extract centroids</span>
+<span class="sd">        inplace: Whether to add the metric to the current SpatialOmics instance or to return a new one.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">so</span> <span class="o">=</span> <span class="n">so</span> <span class="k">if</span> <span class="n">inplace</span> <span class="k">else</span> <span class="n">so</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+
+    <span class="n">img</span> <span class="o">=</span> <span class="n">so</span><span class="o">.</span><span class="n">get_image</span><span class="p">(</span><span class="n">spl</span><span class="p">)</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">img</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">:])</span>
+    <span class="n">data</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">*</span><span class="n">data</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">np</span><span class="o">.</span><span class="n">all</span><span class="p">([</span><span class="n">i</span> <span class="ow">in</span> <span class="n">so</span><span class="o">.</span><span class="n">spl</span><span class="o">.</span><span class="n">columns</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;height&#39;</span><span class="p">,</span> <span class="s1">&#39;width&#39;</span><span class="p">,</span> <span class="s1">&#39;area&#39;</span><span class="p">]]):</span>
+        <span class="n">so</span><span class="o">.</span><span class="n">spl</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">((</span><span class="n">so</span><span class="o">.</span><span class="n">spl</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">columns</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;height&#39;</span><span class="p">,</span> <span class="s1">&#39;width&#39;</span><span class="p">,</span> <span class="s1">&#39;area&#39;</span><span class="p">])),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+    <span class="n">so</span><span class="o">.</span><span class="n">spl</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">spl</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;height&#39;</span><span class="p">,</span> <span class="s1">&#39;width&#39;</span><span class="p">,</span><span class="s1">&#39;area&#39;</span><span class="p">]]</span> <span class="o">=</span> <span class="n">data</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">inplace</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">so</span>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright IBM Corp. 2021.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

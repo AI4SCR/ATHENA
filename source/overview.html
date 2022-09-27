@@ -1,0 +1,284 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>Overview &mdash; athena  documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["\\(", "\\)"]], "displayMath": [["\\[", "\\]"]], "processRefs": false, "processEnvironments": false}})</script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Methodology" href="methodology.html" />
+    <link rel="prev" title="Install ATHENA" href="installation.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> athena
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">General</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Gallery</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Overview of ATHENA</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#main-components">Main components</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#spatialomics-data-structure"><code class="docutils literal notranslate"><span class="pre">SpatialOmics</span></code> Data Structure</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#athena"><code class="docutils literal notranslate"><span class="pre">Athena</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#further-resources">Further Resources</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="methodology.html">Methodology</a></li>
+<li class="toctree-l1"><a class="reference internal" href="quickstart.html">Quickstart</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorial.html">Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="introduction-spatialOmics.html">SpatialOmics Tutorial</a></li>
+</ul>
+<p class="caption"><span class="caption-text">API</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../api_overview.html">API Overview</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">athena</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+      <li>Overview</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="../_sources/source/overview.md.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <p><img alt="athena logo" src="../_images/athena_logo.png" /></p>
+<div class="section" id="overview">
+<h1>Overview<a class="headerlink" href="#overview" title="Permalink to this headline">¶</a></h1>
+<p>ATHENA is an open-source computational framework written in Python that facilitates the visualization, processing and analysis of (spatial) heterogeneity from spatial omics data. ATHENA supports any spatially resolved dataset that contains spatial transcriptomic or proteomic measurements, including Imaging Mass Cytometry (IMC), Multiplexed Ion Beam Imaging (MIBI), multiplexed Immunohistochemisty (mIHC) or Immunofluorescence (mIF), seqFISH, MERFISH, Visium.</p>
+<p><img alt="overview" src="../_images/overview.png" /></p>
+<ol class="simple">
+<li><p>ATHENA accomodates raw multiplexed images from spatial omics measurements. Together with the images, segmentation masks, cell-level, feature-level and sample-level annotations can be uploaded.</p></li>
+<li><p>Based on the cell masks, ATHENA constructs graph representations of the data. The framework currently supports three flavors, namely radius, knn, and contact graphs.</p></li>
+<li><p>ATHENA incorporates a variety of methods to quantify heterogeneity, such as global and local entropic scores. Furthermore, cell type interaction strength scores or measures of spatial clustering and dispersion.</p></li>
+<li><p>Finally, the large collection of computed scores can be extracted and used as input in downstream machine learning models to perform tasks such as clinical data prediction, patient stratification or discovery of new (spatial) biomarkers.</p></li>
+</ol>
+<div class="section" id="main-components">
+<h2>Main components<a class="headerlink" href="#main-components" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">SpatialOmics</span></code>, a new data structure inspired by <a class="reference external" href="https://anndata.readthedocs.io/en/latest/">AnnData</a>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Athena</span></code>, a module that enables the computation of various heterogeneity scores.</p></li>
+</ul>
+<div class="section" id="spatialomics-data-structure">
+<h3><code class="docutils literal notranslate"><span class="pre">SpatialOmics</span></code> Data Structure<a class="headerlink" href="#spatialomics-data-structure" title="Permalink to this headline">¶</a></h3>
+<p>The <code class="docutils literal notranslate"><span class="pre">SpatialOmics</span></code> class is designed to accommodate storing and processing spatial omics datasets in a technology-agnostic and memory-efficient way. A <code class="docutils literal notranslate"><span class="pre">SpatialOmics</span></code> instance incorporates multiple attributes that bundle together the multiplexed raw images with the segmentation masks, cell-cell graphs, single-cell values, and sample-, feature- and cell-level annotations, as outlined in the figure below. Since ATHENA works with multiplexed images, memory complexity is a problem. <code class="docutils literal notranslate"><span class="pre">SpatialOmics</span></code> stores data in a HDF5 file and lazily loads the required images on the fly to keep the memory consumption low. The <code class="docutils literal notranslate"><span class="pre">SpatialOmics</span></code> structure is sample-centric, i.e., all samples from a spatial omics experiment are stored separately by heavily using Python dictionaries.</p>
+<p><img alt="overview" src="../_images/spatialOmics.png" /></p>
+<p>Specifically, each <code class="docutils literal notranslate"><span class="pre">SpatialOmics</span></code> instance contains the following attributes:</p>
+<ol class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">.images</span></code>: A Python dictionary (length: <code class="docutils literal notranslate"><span class="pre">#samples</span></code>) of raw multiplexed images, where each sample is mapped to a <a class="reference external" href="https://numpy.org/">numpy</a> array of shape: <code class="docutils literal notranslate"><span class="pre">#features</span> <span class="pre">x</span> <span class="pre">image_width</span> <span class="pre">x</span> <span class="pre">image_height</span></code>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">.masks</span></code>: A nested Python dictionary (length: <code class="docutils literal notranslate"><span class="pre">#samples</span></code>) supporting different types of segmentation masks (e.g., cell and tissue masks), where each sample is mapped to an inner dictionary (length: <code class="docutils literal notranslate"><span class="pre">#mask_types</span></code>), and each value of the inner dictionary is a binary <a class="reference external" href="https://numpy.org/">numpy</a> array of shape: <code class="docutils literal notranslate"><span class="pre">#image_width</span> <span class="pre">x</span> <span class="pre">image_height</span></code>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">.G</span></code>: A nested Python dictionary (length: <code class="docutils literal notranslate"><span class="pre">#samples</span></code>) supporting different topologies of graphs (e.g., knn, contact or radius graph), where each sample is mapped to an inner dictionary (length: <code class="docutils literal notranslate"><span class="pre">#graph_types</span></code>), and each value of the inner dictionary is a <a class="reference external" href="https://networkx.org/">networkx</a> graph.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">.X</span></code>: A Python dictionary of single-cell measurements (length: <code class="docutils literal notranslate"><span class="pre">#samples</span></code>), where each sample is mapped to a <a class="reference external" href="https://pandas.pydata.org/">pandas</a> dataframe of shape: <code class="docutils literal notranslate"><span class="pre">#single_cells</span> <span class="pre">x</span> <span class="pre">#features</span></code>. The values in <code class="docutils literal notranslate"><span class="pre">.X</span></code> can either be uploaded or directly computed from <code class="docutils literal notranslate"><span class="pre">.images</span></code> and <code class="docutils literal notranslate"><span class="pre">.masks</span></code>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">.spl</span></code>: A <a class="reference external" href="https://pandas.pydata.org/">pandas</a> dataframe containing sample-level annotations (e.g., patient clinical data) of shape: <code class="docutils literal notranslate"><span class="pre">#samples</span> <span class="pre">x</span> <span class="pre">#annotations</span></code>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">.obs</span></code>: A Python dictionary (length: <code class="docutils literal notranslate"><span class="pre">#samples</span></code>) containing single-cell-level annotations (e.g., cluster id, cell type, morphological fatures), where each sample is mapped to a <a class="reference external" href="https://pandas.pydata.org/">pandas</a> dataframe of shape: <code class="docutils literal notranslate"><span class="pre">#single_cells</span> <span class="pre">x</span> <span class="pre">#annotations</span></code>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">.var</span></code>: A Python dictionary (length: <code class="docutils literal notranslate"><span class="pre">#samples</span></code>) containing feature-level annotations (e.g., name of protein/transcript), where each sample is mapped to a <a class="reference external" href="https://pandas.pydata.org/">pandas</a> dataframe of shape: <code class="docutils literal notranslate"><span class="pre">#features</span> <span class="pre">x</span> <span class="pre">#annotations</span></code>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">.uns</span></code>: A Python dictionary containing unstructed data, e.g. various colormaps, experiment properties etc.</p></li>
+</ol>
+</div>
+<div class="section" id="athena">
+<h3><code class="docutils literal notranslate"><span class="pre">Athena</span></code><a class="headerlink" href="#athena" title="Permalink to this headline">¶</a></h3>
+<p><code class="docutils literal notranslate"><span class="pre">Athena</span></code> implements all visualization, processing and analysis steps integral to its functionalities. <code class="docutils literal notranslate"><span class="pre">Athena</span></code> consists in the following 5 submodules, each one performing different tasks as outlined below:
+<img alt="spatialHeterogeneity" src="../_images/spatialHeterogeneity.png" /></p>
+<p><code class="docutils literal notranslate"><span class="pre">Athena</span></code> is tightly interwoven with <code class="docutils literal notranslate"><span class="pre">SpatialOmics</span></code> (see figure below), in the sense that the submodules of <code class="docutils literal notranslate"><span class="pre">Athena</span></code> take as input various aspects of the data as stored in <code class="docutils literal notranslate"><span class="pre">SpatialOmics</span></code> (green arrows) and, at the same time, store computed outputs back into different attributes of <code class="docutils literal notranslate"><span class="pre">SpatialOmics</span></code> (purple arrows).</p>
+<p><img alt="interoperability" src="../_images/interoperability.png" /></p>
+<ol class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">.pp</span></code> works with <code class="docutils literal notranslate"><span class="pre">.images</span></code> and .<code class="docutils literal notranslate"><span class="pre">masks</span></code> and facilitates image pre-processing functions, such as extraction of cell centroids. ATHENA requires segmentation masks to be provided by the user. For ideas on how to do that, see Further Resources.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">.pl</span></code> supports plotting all aspects of the data, including raw images, masks, graphs and visualizes different annotations as well as results of computed heterogeneity scores. The plots can be either static or interactive, by exploiting the Python image viewer <a class="reference external" href="https://napari.org/">napari</a>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">.graph</span></code> construct cell-cell graphs from the cell masks using three different graph builders: <code class="docutils literal notranslate"><span class="pre">kNN</span></code> (connects each cell with its <em>k</em> closest neighbors), <code class="docutils literal notranslate"><span class="pre">radius</span></code> (connects each cell to all other cells within a radius <span class="math notranslate nohighlight">\(r\)</span>), and <code class="docutils literal notranslate"><span class="pre">contact</span></code> (connects cells that physically “touch” by first enlarging each mask by dilation and then connecting it to all other masks if there is overlap). The resulting graphs are saved back in the <code class="docutils literal notranslate"><span class="pre">.G</span></code> attribute of <code class="docutils literal notranslate"><span class="pre">SpatialOmics</span></code>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">.metrics</span></code> uses the cell-cell graphs, the single-cell values (in <code class="docutils literal notranslate"><span class="pre">.X</span></code>) and cell annotations (in <code class="docutils literal notranslate"><span class="pre">.obs</span></code>) to compute a number of diversity scores, including sample richness (number of distinct cell subpopulations/clusters/clones) and abundance (relative proportions of species), and information theoretic scores, (namely Shannon, Simpson, quadratic, or Renyi entropy, Hill numbers), either at a global, sample level (saved in <code class="docutils literal notranslate"><span class="pre">.spl</span></code>), or at a local, single-cell-level (saved in <code class="docutils literal notranslate"><span class="pre">.obs</span></code>) that incorporates the spatial information.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">.neigh</span></code> implements a number of neighborhood or spatial statistics methods, namely infiltration score, Ripley’s <span class="math notranslate nohighlight">\(k\)</span> and neighborhood analysis scores. Results are saved in <code class="docutils literal notranslate"><span class="pre">.spl</span></code> and <code class="docutils literal notranslate"><span class="pre">.uns</span></code>.</p></li>
+</ol>
+</div>
+</div>
+<div class="section" id="further-resources">
+<h2>Further Resources<a class="headerlink" href="#further-resources" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p><a class="reference external" href="https://squidpy.readthedocs.io/en/stable/">Squidpy</a></p></li>
+<li><p>Jackson, H. W. et al. The single-cell pathology landscape of breast cancer. Nature 578, 615–620 (2020).</p></li>
+</ul>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+        <a href="methodology.html" class="btn btn-neutral float-right" title="Methodology" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="installation.html" class="btn btn-neutral float-left" title="Install ATHENA" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright IBM Corp. 2021.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

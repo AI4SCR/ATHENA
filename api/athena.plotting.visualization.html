@@ -1,0 +1,456 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>athena.plotting.visualization module &mdash; athena  documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> athena
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">General</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../source/installation.html">Installation</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Gallery</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../source/overview.html">Overview of ATHENA</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../source/methodology.html">Methodology</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../source/quickstart.html">Quickstart</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../source/tutorial.html">Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../source/introduction-spatialOmics.html">SpatialOmics Tutorial</a></li>
+</ul>
+<p class="caption"><span class="caption-text">API</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../api_overview.html">API Overview</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">athena</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+      <li>athena.plotting.visualization module</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="../_sources/api/athena.plotting.visualization.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="module-athena.plotting.visualization">
+<span id="athena-plotting-visualization-module"></span><h1>athena.plotting.visualization module<a class="headerlink" href="#module-athena.plotting.visualization" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="summary">
+<h2>Summary<a class="headerlink" href="#summary" title="Permalink to this headline">¶</a></h2>
+<p>Functions:</p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#athena.plotting.visualization.get_cmap" title="athena.plotting.visualization.get_cmap"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_cmap</span></code></a></p></td>
+<td><p>Return the cmap and cmap labels for a given attribute if available, else a default</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#athena.plotting.visualization.infiltration" title="athena.plotting.visualization.infiltration"><code class="xref py py-obj docutils literal notranslate"><span class="pre">infiltration</span></code></a></p></td>
+<td><p>Visualises a heatmap of the featuer intensity.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#athena.plotting.visualization.interactions" title="athena.plotting.visualization.interactions"><code class="xref py py-obj docutils literal notranslate"><span class="pre">interactions</span></code></a></p></td>
+<td><p>Visualise results from <code class="xref py py-func docutils literal notranslate"><span class="pre">interactions()</span></code> results.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#athena.plotting.visualization.napari_viewer" title="athena.plotting.visualization.napari_viewer"><code class="xref py py-obj docutils literal notranslate"><span class="pre">napari_viewer</span></code></a></p></td>
+<td><p>Starts interactive Napari viewer to visualise raw images and explore samples.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#athena.plotting.visualization.ripleysK" title="athena.plotting.visualization.ripleysK"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ripleysK</span></code></a></p></td>
+<td><p>Visualise results from <code class="xref py py-func docutils literal notranslate"><span class="pre">ripleysK()</span></code> results.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#athena.plotting.visualization.spatial" title="athena.plotting.visualization.spatial"><code class="xref py py-obj docutils literal notranslate"><span class="pre">spatial</span></code></a></p></td>
+<td><p>Various functionalities to visualise samples.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="reference">
+<h2>Reference<a class="headerlink" href="#reference" title="Permalink to this headline">¶</a></h2>
+<dl class="py function">
+<dt id="athena.plotting.visualization.spatial">
+<code class="sig-name descname"><span class="pre">spatial</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">so</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">spl</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">attr</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'scatter'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">node_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">4</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">coordinate_keys</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">['x',</span> <span class="pre">'y']</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mask_key</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'cellmasks'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">graph_key</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'knn'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">edges</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">edge_width</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">edge_color</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'black'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">edge_zorder</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">background_color</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'white'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">norm</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">set_title</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cmap</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cmap_labels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cbar</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cbar_title</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tight_layout</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/athena/plotting/visualization.html#spatial"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#athena.plotting.visualization.spatial" title="Permalink to this definition">¶</a></dt>
+<dd><p>Various functionalities to visualise samples.
+Allows to visualise the samples and color observations according to features in either so.X or so.obs by setting the <code class="docutils literal notranslate"><span class="pre">attr</span></code> parameter accordingly.
+Furthermore, observations (cells) within a sample can be quickly visualised using scatter plots (requires extraction of centroids with <a class="reference internal" href="athena.preprocessing.preprocess.html#athena.preprocessing.preprocess.extract_centroids" title="athena.preprocessing.preprocess.extract_centroids"><code class="xref py py-func docutils literal notranslate"><span class="pre">extract_centroids()</span></code></a>)
+or by their actual segmentatio mask by setting <code class="docutils literal notranslate"><span class="pre">mode</span></code> accordingly.
+Finally, the graph representation of the sample can be overlayed by setting <code class="docutils literal notranslate"><span class="pre">edges=True</span></code> and specifing the <code class="docutils literal notranslate"><span class="pre">graph_key</span></code> as in <code class="docutils literal notranslate"><span class="pre">so.G[spl][graph_key]</span></code>.</p>
+<p>For more examples on how to use this function have a look at the <a class="reference external" href="https://ai4scr.github.io/ATHENA/source/tutorial.html">tutorial</a> section.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>so</strong> – SpatialOmics instance</p></li>
+<li><p><strong>spl</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – sample to visualise</p></li>
+<li><p><strong>attr</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – feature to visualise</p></li>
+<li><p><strong>mode</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – {scatter, mask}. In <cite>scatter</cite> mode, observations are represented by their centroid, in <cite>mask</cite> mode by their actual segmentation mask</p></li>
+<li><p><strong>node_size</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>) – size of the node when plotting the graph representation</p></li>
+<li><p><strong>coordinate_keys</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code>) – column names in SpatialOmics.obs[spl] that indicates the x and y coordinates</p></li>
+<li><p><strong>mask_key</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – key for the segmentation masks when in <cite>mask</cite> mode</p></li>
+<li><p><strong>graph_key</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – which graph representation to use</p></li>
+<li><p><strong>edges</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – whether to plot the graph or not</p></li>
+<li><p><strong>edge_width</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>) – width of edges</p></li>
+<li><p><strong>edge_color</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – color of edges as string</p></li>
+<li><p><strong>edge_zorder</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – z-order of edges</p></li>
+<li><p><strong>background_color</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – background color of plot</p></li>
+<li><p><strong>ax</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">Axes</span></code>]) – axes object in which to plot</p></li>
+<li><p><strong>norm</strong> – normalisation instance to normalise the values of <cite>attr</cite></p></li>
+<li><p><strong>set_title</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – title of plot</p></li>
+<li><p><strong>cmap</strong> – colormap to use</p></li>
+<li><p><strong>cmap_labels</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code>]) – colormap labels to use</p></li>
+<li><p><strong>cbar</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – whether to plot a colorbar or not</p></li>
+<li><p><strong>cbar_title</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – whether to plot the <cite>attr</cite> name as title of the colorbar</p></li>
+<li><p><strong>show</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – whether to show the plot or not</p></li>
+<li><p><strong>save</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]) – path to the file in which the plot is saved</p></li>
+<li><p><strong>tight_layout</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – whether to apply tight_layout or not.</p></li>
+</ul>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">so</span> <span class="o">=</span> <span class="n">sh</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">imc</span><span class="p">()</span>
+<span class="n">sh</span><span class="o">.</span><span class="n">pl</span><span class="o">.</span><span class="n">spatial</span><span class="p">(</span><span class="n">so</span><span class="p">,</span> <span class="s1">&#39;slide_7_Cy2x2&#39;</span><span class="p">,</span> <span class="s1">&#39;meta_id&#39;</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;mask&#39;</span><span class="p">)</span>
+<span class="n">sh</span><span class="o">.</span><span class="n">pl</span><span class="o">.</span><span class="n">spatial</span><span class="p">(</span><span class="n">so</span><span class="p">,</span> <span class="s1">&#39;slide_7_Cy2x2&#39;</span><span class="p">,</span> <span class="s1">&#39;meta_id&#39;</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;scatter&#39;</span><span class="p">,</span> <span class="n">edges</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt id="athena.plotting.visualization.napari_viewer">
+<code class="sig-name descname"><span class="pre">napari_viewer</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">so</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">spl</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">attrs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">censor</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.95</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">add_masks</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'cellmasks'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">attrs_key</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'target'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">index_key</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'fullstack_index'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/athena/plotting/visualization.html#napari_viewer"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#athena.plotting.visualization.napari_viewer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Starts interactive Napari viewer to visualise raw images and explore samples.
+<code class="docutils literal notranslate"><span class="pre">attrs</span></code> are measured features in the high dimensional images in <code class="docutils literal notranslate"><span class="pre">so.images[spl]</span></code>.
+All specified <code class="docutils literal notranslate"><span class="pre">attrs</span></code> should be in <code class="docutils literal notranslate"><span class="pre">so.var[spl][attrs_key]</span></code> along with the index in the high dimensional images.
+The column with the index in the high dimensional image where the measurement of an attribute is stored.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>so</strong> – SpatialOmics instance</p></li>
+<li><p><strong>spl</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – sample to visualise</p></li>
+<li><p><strong>attrs</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code>) – list of attributes/features to add as channels to the viewer</p></li>
+<li><p><strong>censor</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>) – percentil to use to censore pixle values in the raw images</p></li>
+<li><p><strong>add_masks</strong> – segmentation masks to add as channels to the viewer</p></li>
+<li><p><strong>attrs_key</strong> – key in <code class="docutils literal notranslate"><span class="pre">so.var[spl]</span></code> that defines the <code class="docutils literal notranslate"><span class="pre">attrs</span></code> names</p></li>
+<li><p><strong>index_key</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – key in <code class="docutils literal notranslate"><span class="pre">so.var[spl]</span></code> that specifies the layer index in the high dimensional image in <code class="docutils literal notranslate"><span class="pre">so.images[spl]</span></code>.</p></li>
+</ul>
+</dd>
+</dl>
+<p>Examples:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">so</span> <span class="o">=</span> <span class="n">sh</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">imc</span><span class="p">()</span>
+<span class="n">spl</span> <span class="o">=</span> <span class="n">so</span><span class="o">.</span><span class="n">spl</span><span class="o">.</span><span class="n">index</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+<span class="c1"># add all measured features to the napari viewer</span>
+<span class="n">sh</span><span class="o">.</span><span class="n">pl</span><span class="o">.</span><span class="n">napari_viewer</span><span class="p">(</span><span class="n">so</span><span class="p">,</span> <span class="n">spl</span><span class="p">,</span> <span class="n">attrs</span><span class="o">=</span><span class="n">so</span><span class="o">.</span><span class="n">var</span><span class="p">[</span><span class="n">spl</span><span class="p">][</span><span class="s1">&#39;target&#39;</span><span class="p">],</span> <span class="n">add_masks</span><span class="o">=</span><span class="n">so</span><span class="o">.</span><span class="n">masks</span><span class="p">[</span><span class="n">spl</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+
+<span class="c1"># specify the column containing the ``attrs`` names</span>
+<span class="n">sh</span><span class="o">.</span><span class="n">pl</span><span class="o">.</span><span class="n">napari_viewer</span><span class="p">(</span><span class="n">so</span><span class="p">,</span> <span class="n">spl</span><span class="p">,</span> <span class="n">attrs</span><span class="o">=</span><span class="n">so</span><span class="o">.</span><span class="n">var</span><span class="p">[</span><span class="n">spl</span><span class="p">][</span><span class="s1">&#39;target&#39;</span><span class="p">],</span> <span class="n">attrs_key</span><span class="o">=</span><span class="s1">&#39;target&#39;</span><span class="p">)</span>
+
+<span class="c1"># specify the column containing the ``attrs`` names and the columns that specifies the layer index</span>
+<span class="n">sh</span><span class="o">.</span><span class="n">pl</span><span class="o">.</span><span class="n">napari_viewer</span><span class="p">(</span><span class="n">so</span><span class="p">,</span> <span class="n">spl</span><span class="p">,</span> <span class="n">attrs</span><span class="o">=</span><span class="n">so</span><span class="o">.</span><span class="n">var</span><span class="p">[</span><span class="n">spl</span><span class="p">][</span><span class="s1">&#39;target&#39;</span><span class="p">],</span> <span class="n">attrs_key</span><span class="o">=</span><span class="s1">&#39;target&#39;</span><span class="p">,</span> <span class="n">index_key</span><span class="o">=</span><span class="s1">&#39;fullstack_index&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt id="athena.plotting.visualization.interactions">
+<code class="sig-name descname"><span class="pre">interactions</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">so</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">spl</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">attr</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'proportion'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prediction_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'diff'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">graph_key</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'knn'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">linewidths</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cmap</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">norm</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cbar</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/athena/plotting/visualization.html#interactions"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#athena.plotting.visualization.interactions" title="Permalink to this definition">¶</a></dt>
+<dd><p>Visualise results from <code class="xref py py-func docutils literal notranslate"><span class="pre">interactions()</span></code> results.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>so</strong> – SpatialOmics instance</p></li>
+<li><p><strong>spl</strong> – Spl for which to compute the metric</p></li>
+<li><p><strong>attr</strong> – Categorical feature in SpatialOmics.obs to use for the grouping</p></li>
+<li><p><strong>mode</strong> – One of {classic, histoCAT, proportion}, see notes</p></li>
+<li><p><strong>prediction_type</strong> – prediction_type: One of {observation, pvalue, diff}</p></li>
+<li><p><strong>graph_key</strong> – Specifies the graph representation to use in so.G[spl]</p></li>
+<li><p><strong>linewidths</strong> – Space between tiles</p></li>
+<li><p><strong>cmap</strong> – colormap to use</p></li>
+<li><p><strong>norm</strong> – normalisation to use</p></li>
+<li><p><strong>ax</strong> – axes object to use</p></li>
+<li><p><strong>show</strong> – whether to show the plot</p></li>
+<li><p><strong>cbar</strong> – wheter to show the colorbar</p></li>
+</ul>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># compute Ripley&#39;s K</span>
+<span class="n">so</span> <span class="o">=</span> <span class="n">sh</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">imc</span><span class="p">()</span>
+<span class="n">spl</span> <span class="o">=</span> <span class="n">so</span><span class="o">.</span><span class="n">spl</span><span class="o">.</span><span class="n">index</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+<span class="c1"># build graph</span>
+<span class="n">sh</span><span class="o">.</span><span class="n">graph</span><span class="o">.</span><span class="n">build_graph</span><span class="p">(</span><span class="n">so</span><span class="p">,</span> <span class="n">spl</span><span class="p">,</span> <span class="n">builder_type</span><span class="o">=</span><span class="s1">&#39;knn&#39;</span><span class="p">,</span> <span class="n">mask_key</span><span class="o">=</span><span class="s1">&#39;cellmasks&#39;</span><span class="p">)</span>
+
+<span class="c1"># compute &amp; plot interactions</span>
+<span class="n">sh</span><span class="o">.</span><span class="n">neigh</span><span class="o">.</span><span class="n">interactions</span><span class="p">(</span><span class="n">so</span><span class="p">,</span> <span class="n">spl</span><span class="p">,</span> <span class="s1">&#39;meta_id&#39;</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;proportion&#39;</span><span class="p">,</span> <span class="n">prediction_type</span><span class="o">=</span><span class="s1">&#39;observation&#39;</span><span class="p">)</span>
+<span class="n">sh</span><span class="o">.</span><span class="n">pl</span><span class="o">.</span><span class="n">interactions</span><span class="p">(</span><span class="n">so</span><span class="p">,</span> <span class="n">spl</span><span class="p">,</span> <span class="s1">&#39;meta_id&#39;</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;proportion&#39;</span><span class="p">,</span> <span class="n">prediction_type</span><span class="o">=</span><span class="s1">&#39;observation&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt id="athena.plotting.visualization.get_cmap">
+<code class="sig-name descname"><span class="pre">get_cmap</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">so</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">attr</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/athena/plotting/visualization.html#get_cmap"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#athena.plotting.visualization.get_cmap" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the cmap and cmap labels for a given attribute if available, else a default</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>so</strong> (<em>IMCData</em>) – so object form which to fetch the data</p></li>
+<li><p><strong>spl</strong> (<em>str</em>) – spl for which to get data</p></li>
+<li><p><strong>attr</strong> (<em>str</em>) – attribute for which to get the cmap and cmap labels if available</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p></p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>cmap and cmap labels for attribute</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="athena.plotting.visualization.ripleysK">
+<code class="sig-name descname"><span class="pre">ripleysK</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">so</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">spl</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">attr</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ids</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'K'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">correction</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'ripley'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">key</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">legend</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'auto'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/athena/plotting/visualization.html#ripleysK"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#athena.plotting.visualization.ripleysK" title="Permalink to this definition">¶</a></dt>
+<dd><p>Visualise results from <code class="xref py py-func docutils literal notranslate"><span class="pre">ripleysK()</span></code> results.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>so</strong> – SpatialOmics instance</p></li>
+<li><p><strong>spl</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – Spl for which to compute the metric</p></li>
+<li><p><strong>attr</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – Categorical feature in SpatialOmics.obs to use for the grouping</p></li>
+<li><p><strong>ids</strong> – The category in the categorical feature <cite>attr</cite>, for which Ripley’s K should be plotted</p></li>
+<li><p><strong>mode</strong> – {K, csr-deviation}. If <cite>K</cite>, Ripley’s K is estimated, with <cite>csr-deviation</cite> the deviation from a poission process is computed.</p></li>
+<li><p><strong>correction</strong> – Correction method to use to correct for boarder effects, see [1].</p></li>
+<li><p><strong>key</strong> – key to use in so.uns[‘ripleysK’] for the plot, if None it is constructed from spl,attr,ids,mode and correction</p></li>
+<li><p><strong>ax</strong> – axes to use for the plot</p></li>
+</ul>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># compute Ripley&#39;s K</span>
+<span class="n">so</span> <span class="o">=</span> <span class="n">sh</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">imc</span><span class="p">()</span>
+<span class="n">sh</span><span class="o">.</span><span class="n">neigh</span><span class="o">.</span><span class="n">ripleysK</span><span class="p">(</span><span class="n">so</span><span class="p">,</span> <span class="n">so</span><span class="o">.</span><span class="n">spl</span><span class="o">.</span><span class="n">index</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="s1">&#39;meta_id&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;csr-deviation&#39;</span><span class="p">,</span> <span class="n">radii</span><span class="o">=</span><span class="n">radii</span><span class="p">)</span>
+<span class="n">sh</span><span class="o">.</span><span class="n">pl</span><span class="o">.</span><span class="n">ripleysK</span><span class="p">(</span><span class="n">so</span><span class="p">,</span> <span class="n">so</span><span class="o">.</span><span class="n">spl</span><span class="o">.</span><span class="n">index</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="s1">&#39;meta_id&#39;</span><span class="p">,</span> <span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;csr-deviation&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt id="athena.plotting.visualization.infiltration">
+<code class="sig-name descname"><span class="pre">infiltration</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">so</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">spl</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">attr</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'infiltration'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">step_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">interpolation</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'gaussian'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cmap</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'plasma'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">collision_strategy</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'mean'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/athena/plotting/visualization.html#infiltration"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#athena.plotting.visualization.infiltration" title="Permalink to this definition">¶</a></dt>
+<dd><p>Visualises a heatmap of the featuer intensity.</p>
+<p>Approximates the sample with a grid representation and colors each grid square according to the
+value of the attribute. If multiple observations map to the same grid square a the aggregation specified
+in <cite>collision_strategy</cite> is employed (any value accepted by pandas aggregate function, i.e. ‘mean’, ‘max’, …)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>so</strong> – SpatialOmics instance</p></li>
+<li><p><strong>spl</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – Spl for which to compute the metric</p></li>
+<li><p><strong>attr</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – feature in SpatialOmics.obs to plot</p></li>
+<li><p><strong>step_size</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – grid step size</p></li>
+<li><p><strong>interpolation</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – interpolation method to use between grid values, see [1]</p></li>
+<li><p><strong>cmap</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – colormap to use</p></li>
+<li><p><strong>collision_strategy</strong> – aggragation strategy to use if multiple obseravtion values map to the same grid value</p></li>
+<li><p><strong>ax</strong> – axes to use for the plot</p></li>
+<li><p><strong>show</strong> – whether to show the plot or not. Will be set to False if axes is provided.</p></li>
+</ul>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">so</span> <span class="o">=</span> <span class="n">sh</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">imc</span><span class="p">()</span>
+<span class="n">spl</span> <span class="o">=</span> <span class="n">so</span><span class="o">.</span><span class="n">spl</span><span class="o">.</span><span class="n">index</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+<span class="c1"># build graph</span>
+<span class="n">sh</span><span class="o">.</span><span class="n">graph</span><span class="o">.</span><span class="n">build_graph</span><span class="p">(</span><span class="n">so</span><span class="p">,</span> <span class="n">spl</span><span class="p">,</span> <span class="n">builder_type</span><span class="o">=</span><span class="s1">&#39;knn&#39;</span><span class="p">,</span> <span class="n">mask_key</span><span class="o">=</span><span class="s1">&#39;cellmasks&#39;</span><span class="p">)</span>
+
+<span class="n">sh</span><span class="o">.</span><span class="n">neigh</span><span class="o">.</span><span class="n">infiltration</span><span class="p">(</span><span class="n">so</span><span class="p">,</span> <span class="n">spl</span><span class="p">,</span> <span class="s1">&#39;meta_id&#39;</span><span class="p">,</span> <span class="n">graph_key</span><span class="o">=</span><span class="s1">&#39;knn&#39;</span><span class="p">)</span>
+<span class="n">sh</span><span class="o">.</span><span class="n">pl</span><span class="o">.</span><span class="n">infiltration</span><span class="p">(</span><span class="n">so</span><span class="p">,</span> <span class="n">spl</span><span class="p">,</span> <span class="n">step_size</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+</pre></div>
+</div>
+<p class="rubric">Notes</p>
+<dl class="footnote brackets">
+<dt class="label" id="id1"><span class="brackets">1</span></dt>
+<dd><p><a class="reference external" href="https://matplotlib.org/stable/gallery/images_contours_and_fields/interpolation_methods.html">https://matplotlib.org/stable/gallery/images_contours_and_fields/interpolation_methods.html</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright IBM Corp. 2021.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

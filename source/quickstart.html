@@ -1,0 +1,828 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>Quickstart &mdash; athena  documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Tutorial on Imaging Mass Cytometry data" href="tutorial.html" />
+    <link rel="prev" title="Methodology" href="methodology.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> athena
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">General</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Gallery</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="overview.html">Overview of ATHENA</a></li>
+<li class="toctree-l1"><a class="reference internal" href="methodology.html">Methodology</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Quickstart</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#important"><strong><em>Important</em></strong></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#requirements">Requirements</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#further-resources">Further Resources</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#load-example-data">Load Example Data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#how-to-create-a-spatialomics-instance-with-dummy-data">How to Create a SpatialOmics Instance with Dummy Data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#minimal-working-example">Minimal Working Example</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#sample-level-meta-data">Sample-level Meta Data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#observation-level-meta-data">Observation-level Meta Data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#observation-level-omics-profiles">Observation-level Omics Profiles</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#compute-graphs">Compute Graphs</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#from-segmentation-masks">From Segmentation Masks</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#from-coordinates">From Coordinates</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#visualise-the-data">Visualise the Data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#compute-metrics">Compute Metrics</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#note-on-phenotype-encodings">Note On Phenotype Encodings</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#note-on-segmentation-masks">Note On Segmentation Masks</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="tutorial.html">Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="introduction-spatialOmics.html">SpatialOmics Tutorial</a></li>
+</ul>
+<p class="caption"><span class="caption-text">API</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../api_overview.html">API Overview</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">athena</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+      <li>Quickstart</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="../_sources/source/quickstart.md.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="quickstart">
+<h1>Quickstart<a class="headerlink" href="#quickstart" title="Permalink to this headline">¶</a></h1>
+<p>ATHENA is an open-source computational framework written in Python that facilitates the visualization, processing and analysis of (spatial) heterogeneity from spatial omics data. ATHENA supports any spatially resolved dataset that contains spatial transcriptomic or proteomic measurements, including Imaging Mass Cytometry (IMC), Multiplexed Ion Beam Imaging (MIBI), multiplexed Immunohistochemisty (mIHC) or Immunofluorescence (mIF), seqFISH, MERFISH, Visium.</p>
+<div class="section" id="important">
+<h2><strong><em>Important</em></strong><a class="headerlink" href="#important" title="Permalink to this headline">¶</a></h2>
+<p>You are strongly advised to read the sections:</p>
+<ul class="simple">
+<li><p>Note on Phenotype Encodings</p></li>
+<li><p>Note on Segmentation Masks</p></li>
+</ul>
+<p>at the end of this document.</p>
+</div>
+<div class="section" id="requirements">
+<h2>Requirements<a class="headerlink" href="#requirements" title="Permalink to this headline">¶</a></h2>
+<p>To use all the capabilities of ATHENA one needs the (cell-) segmenation masks for a sample and the omics-profiles of the observations in the sample (as extracted from the high-dimensional images produced by different omics-technologies).</p>
+<p>However, it is also possible to use ATHENA (with some limitations) without segmentation masks and the omics-profiles and just the single-observation coordinates and a classification of those observations (phenotypes).</p>
+</div>
+<div class="section" id="further-resources">
+<h2>Further Resources<a class="headerlink" href="#further-resources" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>A more comprehensive tutorial on IMC data can be found <a class="reference external" href="https://ai4scr.github.io/ATHENA/source/tutorial.html">here</a></p></li>
+<li><p>A tutorial on how to load your data can be found <a class="reference external" href="https://ai4scr.github.io/ATHENA/source/introduction-spatialOmics.html">here</a></p></li>
+</ul>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">athena</span> <span class="k">as</span> <span class="nn">ath</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">seaborn</span> <span class="k">as</span> <span class="nn">sns</span>
+<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+
+<span class="n">pd</span><span class="o">.</span><span class="n">set_option</span><span class="p">(</span><span class="s2">&quot;display.max_columns&quot;</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">ath</span><span class="o">.</span><span class="n">__version__</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;frozen importlib._bootstrap&gt;:219: RuntimeWarning: numpy.ndarray size changed, may indicate binary incompatibility. Expected 80 from C header, got 88 from PyObject
+
+
+0.1.2
+</pre></div>
+</div>
+</div>
+<div class="section" id="load-example-data">
+<h2>Load Example Data<a class="headerlink" href="#load-example-data" title="Permalink to this headline">¶</a></h2>
+<p>To use ATHENA you need to load the data in a SpatialOmics instance (see below, <a class="reference external" href="https://ai4scr.github.io/ATHENA/source/overview.html#spatialomics-data-structure">here</a> for a general description and <a class="reference external" href="https://ai4scr.github.io/ATHENA/source/introduction-spatialOmics.html">here</a> for a more detailed tutorial). The structure of the SpatialOmics instance is very similar to the AnnData.</p>
+<p>For this tutorial we provide a small example of a populated SpatialOmics instance. Meta data for each stored sample can be found in <code class="docutils literal notranslate"><span class="pre">so.spl</span></code>. You can access the data by indexing the different attributes by the sample name (<code class="docutils literal notranslate"><span class="pre">so.X[spl]</span></code>, <code class="docutils literal notranslate"><span class="pre">so.obs[spl</span></code>, …).</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">so</span> <span class="o">=</span> <span class="n">ath</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">imc_quickstart</span><span class="p">()</span>
+<span class="n">so</span>
+</pre></div>
+</div>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>INFO:numexpr.utils:NumExpr defaulting to 8 threads.
+
+
+warning: to get the latest version of this dataset use `so = sh.dataset.imc(force_download=True)`
+
+
+
+
+
+
+SpatialOmics object with 5505 observations across 2 samples.
+    X: 2 samples,
+    spl: 2 samples,
+        columns: [&#39;pid&#39;, &#39;cell_count&#39;, &#39;immune_cell_count&#39;]
+    obs: 2 samples,
+        columns: [&#39;meta_label&#39;, &#39;id&#39;, &#39;core&#39;, &#39;cell_type&#39;, &#39;meta_id&#39;, &#39;CellId&#39;, &#39;x&#39;, &#39;cell_type_id&#39;, &#39;tumor_immune_id&#39;, &#39;tumor_immune&#39;, &#39;phenograph_cluster&#39;, &#39;y&#39;]
+    var: 2 samples,
+        columns: [&#39;target&#39;, &#39;fullstack_index&#39;, &#39;metal_tag&#39;, &#39;feature_type&#39;, &#39;channel&#39;, &#39;full_target_name&#39;]
+    G: 0 samples,
+        keys: []
+    masks: 2 samples
+        keys: [{&#39;cellmasks&#39;}]
+    images: 0 samples
+</pre></div>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">samples</span> <span class="o">=</span> <span class="n">so</span><span class="o">.</span><span class="n">spl</span><span class="o">.</span><span class="n">index</span>
+<span class="n">samples</span>
+</pre></div>
+</div>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>Index([&#39;SP43_75_X2Y5&#39;, &#39;SP41_239_X11Y3_165&#39;], dtype=&#39;object&#39;, name=&#39;core&#39;)
+</pre></div>
+</div>
+</div>
+<div class="section" id="how-to-create-a-spatialomics-instance-with-dummy-data">
+<h2>How to Create a SpatialOmics Instance with Dummy Data<a class="headerlink" href="#how-to-create-a-spatialomics-instance-with-dummy-data" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># create dummy data</span>
+
+<span class="n">n_obs</span> <span class="o">=</span> <span class="mi">100</span>  <span class="c1"># number of observations (cells)</span>
+<span class="n">n_var</span> <span class="o">=</span> <span class="mi">5</span>  <span class="c1"># number of features</span>
+<span class="n">samples</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;sample_&#39;</span><span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">5</span><span class="p">)]</span>  <span class="c1"># sample names</span>
+<span class="n">mask_dim</span> <span class="o">=</span> <span class="p">[</span><span class="mi">100</span><span class="p">,</span><span class="mi">100</span><span class="p">]</span>  <span class="c1"># dimension of segmentation masks</span>
+
+<span class="c1"># sample-level meta data</span>
+<span class="n">spl</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="s1">&#39;samples&#39;</span><span class="p">:</span> <span class="n">samples</span><span class="p">,</span> <span class="s1">&#39;age&#39;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">50</span><span class="p">,</span><span class="mi">80</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="n">samples</span><span class="p">))})</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="s1">&#39;samples&#39;</span><span class="p">)</span>
+
+<span class="c1"># observation-level meta data</span>
+<span class="n">obs</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span>
+    <span class="s1">&#39;phenotype&#39;</span><span class="p">:</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_obs</span><span class="p">),</span>
+    <span class="s1">&#39;x&#39;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">mask_dim</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">n_obs</span><span class="p">),</span>
+    <span class="s1">&#39;y&#39;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">mask_dim</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">n_obs</span><span class="p">)})</span>
+
+<span class="c1"># observation-level omics profiles</span>
+<span class="n">X</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="n">n_obs</span><span class="p">,</span> <span class="n">n_var</span><span class="p">),</span> <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;var_&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_var</span><span class="p">)])</span>
+<span class="c1"># high-dimensional images of samples, first dimension is the number of features, i.e. multiplexing</span>
+<span class="n">img</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="n">n_var</span><span class="p">,</span> <span class="o">*</span><span class="n">mask_dim</span><span class="p">)</span>
+<span class="c1"># segmentation masks of images</span>
+<span class="n">mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">mask_dim</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span>
+<span class="c1"># feature annotation</span>
+<span class="n">var</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="s1">&#39;target&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;var_&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_var</span><span class="p">)]})</span>
+</pre></div>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># create SpatialOmics instance</span>
+
+<span class="kn">from</span> <span class="nn">spatialOmics</span> <span class="kn">import</span> <span class="n">SpatialOmics</span>
+<span class="n">dummy</span> <span class="o">=</span> <span class="n">SpatialOmics</span><span class="p">()</span>
+
+<span class="n">dummy</span><span class="o">.</span><span class="n">spl</span> <span class="o">=</span> <span class="n">spl</span>
+<span class="k">for</span> <span class="n">spl</span> <span class="ow">in</span> <span class="n">samples</span><span class="p">:</span>
+    <span class="n">dummy</span><span class="o">.</span><span class="n">obs</span><span class="p">[</span><span class="n">spl</span><span class="p">]</span> <span class="o">=</span> <span class="n">obs</span>
+    <span class="n">dummy</span><span class="o">.</span><span class="n">X</span><span class="p">[</span><span class="n">spl</span><span class="p">]</span> <span class="o">=</span> <span class="n">X</span>
+    <span class="n">dummy</span><span class="o">.</span><span class="n">var</span><span class="p">[</span><span class="n">spl</span><span class="p">]</span> <span class="o">=</span> <span class="n">var</span>
+    <span class="n">dummy</span><span class="o">.</span><span class="n">images</span><span class="p">[</span><span class="n">spl</span><span class="p">]</span> <span class="o">=</span> <span class="n">img</span>
+    <span class="n">dummy</span><span class="o">.</span><span class="n">masks</span><span class="p">[</span><span class="n">spl</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;cellmasks&#39;</span><span class="p">:</span> <span class="n">mask</span><span class="p">}</span>
+    
+<span class="n">dummy</span>
+</pre></div>
+</div>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>SpatialOmics object with 500 observations across 5 samples.
+    X: 5 samples,
+    spl: 5 samples,
+        columns: [&#39;age&#39;]
+    obs: 5 samples,
+        columns: [&#39;y&#39;, &#39;phenotype&#39;, &#39;x&#39;]
+    var: 5 samples,
+        columns: [&#39;target&#39;]
+    G: 0 samples,
+        keys: []
+    masks: 5 samples
+        keys: [{&#39;cellmasks&#39;}]
+    images: 5 samples
+</pre></div>
+</div>
+</div>
+<div class="section" id="minimal-working-example">
+<h2>Minimal Working Example<a class="headerlink" href="#minimal-working-example" title="Permalink to this headline">¶</a></h2>
+<p>Depending on your use case you do not need to populate all attributes of the SpatialOmics instance.</p>
+<p>For a minimal working example you only need to populate the <code class="docutils literal notranslate"><span class="pre">.obs</span></code> attribute with the observation coordinates and a label.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">dummy_min</span> <span class="o">=</span> <span class="n">SpatialOmics</span><span class="p">()</span>
+<span class="n">dummy_min</span><span class="o">.</span><span class="n">obs</span><span class="p">[</span><span class="n">spl</span><span class="p">]</span> <span class="o">=</span> <span class="n">obs</span>
+<span class="n">dummy_min</span>
+</pre></div>
+</div>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>SpatialOmics object with 100 observations across 1 samples.
+    X: 0 samples,
+    spl: 0 samples,
+        columns: []
+    obs: 0 samples,
+        columns: [&#39;y&#39;, &#39;phenotype&#39;, &#39;x&#39;]
+    var: 0 samples,
+        columns: []
+    G: 0 samples,
+        keys: []
+    masks: 0 samples
+        keys: [set()]
+    images: 0 samples
+</pre></div>
+</div>
+</div>
+<div class="section" id="sample-level-meta-data">
+<h2>Sample-level Meta Data<a class="headerlink" href="#sample-level-meta-data" title="Permalink to this headline">¶</a></h2>
+<p>Sample-level meta data is stored in the <code class="docutils literal notranslate"><span class="pre">so.spl</span></code> attribute but not required to use ATHENA.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">so</span><span class="o">.</span><span class="n">spl</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span> 
+</pre></div>
+</div>
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>.dataframe tbody tr th {
+    vertical-align: top;
+}
+
+.dataframe thead th {
+    text-align: right;
+}
+</pre></div>
+</div>
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>pid</th>
+      <th>cell_count</th>
+      <th>immune_cell_count</th>
+    </tr>
+    <tr>
+      <th>core</th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>SP43_75_X2Y5</th>
+      <td>75</td>
+      <td>2771</td>
+      <td>940</td>
+    </tr>
+    <tr>
+      <th>SP41_239_X11Y3_165</th>
+      <td>239</td>
+      <td>2734</td>
+      <td>412</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+</div>
+<div class="section" id="observation-level-meta-data">
+<h2>Observation-level Meta Data<a class="headerlink" href="#observation-level-meta-data" title="Permalink to this headline">¶</a></h2>
+<p>Observation-level meta data is stored in the <code class="docutils literal notranslate"><span class="pre">so.obs</span></code> attribute and required to use ATHENA. At least the coordinates of the
+observations along with some classification of those (phenotypes) are required.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">spl</span> <span class="o">=</span> <span class="n">so</span><span class="o">.</span><span class="n">spl</span><span class="o">.</span><span class="n">index</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+<span class="n">so</span><span class="o">.</span><span class="n">obs</span><span class="p">[</span><span class="n">spl</span><span class="p">]</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+</pre></div>
+</div>
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>.dataframe tbody tr th {
+    vertical-align: top;
+}
+
+.dataframe thead th {
+    text-align: right;
+}
+</pre></div>
+</div>
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>core</th>
+      <th>meta_id</th>
+      <th>...</th>
+      <th>y</th>
+      <th>x</th>
+    </tr>
+    <tr>
+      <th>cell_id</th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>1</th>
+      <td>SP43_75_X2Y5</td>
+      <td>9</td>
+      <td>...</td>
+      <td>1.142857</td>
+      <td>33.107143</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>SP43_75_X2Y5</td>
+      <td>3</td>
+      <td>...</td>
+      <td>4.868613</td>
+      <td>43.693431</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>SP43_75_X2Y5</td>
+      <td>10</td>
+      <td>...</td>
+      <td>5.467391</td>
+      <td>61.326087</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>SP43_75_X2Y5</td>
+      <td>8</td>
+      <td>...</td>
+      <td>2.353659</td>
+      <td>79.987805</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>SP43_75_X2Y5</td>
+      <td>3</td>
+      <td>...</td>
+      <td>2.026316</td>
+      <td>128.302632</td>
+    </tr>
+  </tbody>
+</table>
+<p>5 rows × 12 columns</p>
+</div>
+</div>
+<div class="section" id="observation-level-omics-profiles">
+<h2>Observation-level Omics Profiles<a class="headerlink" href="#observation-level-omics-profiles" title="Permalink to this headline">¶</a></h2>
+<p>The omics-profiles of the obserations are stores in the <code class="docutils literal notranslate"><span class="pre">so.X</span></code> attribute. These are the gene / protein expression values of the observations (most likely single cells or patches). You only need to provide this information if you want to use <code class="docutils literal notranslate"><span class="pre">metrics.quadratic_entropy()</span></code>.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">so</span><span class="o">.</span><span class="n">X</span><span class="p">[</span><span class="n">spl</span><span class="p">]</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+</pre></div>
+</div>
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>.dataframe tbody tr th {
+    vertical-align: top;
+}
+
+.dataframe thead th {
+    text-align: right;
+}
+</pre></div>
+</div>
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th>target</th>
+      <th>H3</th>
+      <th>H3K28me3</th>
+      <th>...</th>
+      <th>PARP</th>
+      <th>DNA2</th>
+    </tr>
+    <tr>
+      <th>cell_id</th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>1</th>
+      <td>8.252318</td>
+      <td>0.442500</td>
+      <td>...</td>
+      <td>0.674024</td>
+      <td>9.002035</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>12.754854</td>
+      <td>1.436547</td>
+      <td>...</td>
+      <td>0.852686</td>
+      <td>19.567230</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>1.946717</td>
+      <td>0.470739</td>
+      <td>...</td>
+      <td>0.858645</td>
+      <td>2.316239</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>7.552009</td>
+      <td>0.562183</td>
+      <td>...</td>
+      <td>0.939330</td>
+      <td>8.991525</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>15.079700</td>
+      <td>0.492224</td>
+      <td>...</td>
+      <td>0.828238</td>
+      <td>12.647001</td>
+    </tr>
+  </tbody>
+</table>
+<p>5 rows × 34 columns</p>
+</div>
+</div>
+<div class="section" id="compute-graphs">
+<h2>Compute Graphs<a class="headerlink" href="#compute-graphs" title="Permalink to this headline">¶</a></h2>
+<p>ATHENA can construct <code class="docutils literal notranslate"><span class="pre">knn</span></code>, <code class="docutils literal notranslate"><span class="pre">radius</span></code> and <code class="docutils literal notranslate"><span class="pre">contact</span></code> graphs. By default, ATHENA tries to build the graphs from segmentation masks. Without segmentation masks, one can only use the <code class="docutils literal notranslate"><span class="pre">kNN</span></code> and <code class="docutils literal notranslate"><span class="pre">radius</span></code> graph functionality of ATHENA. For the <code class="docutils literal notranslate"><span class="pre">contact</span></code> graph the segmentation masks are required. See the <a class="reference external" href="https://ai4scr.github.io/ATHENA/source/tutorial.html">main tutorial</a> to see how the graph construction can be customized.</p>
+<div class="section" id="from-segmentation-masks">
+<h3>From Segmentation Masks<a class="headerlink" href="#from-segmentation-masks" title="Permalink to this headline">¶</a></h3>
+<p>Provide the <code class="docutils literal notranslate"><span class="pre">spatialOmics</span></code> instance and sample name for which the graph should be computed. Furthermore, <code class="docutils literal notranslate"><span class="pre">builder_type</span></code> defines the type of graph that is constructed and <code class="docutils literal notranslate"><span class="pre">mask_key</span></code> the segmentation masks that should be used (stored at <code class="docutils literal notranslate"><span class="pre">so.masks[spl][MASK_KEY]</span></code>)</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">ath</span><span class="o">.</span><span class="n">graph</span><span class="o">.</span><span class="n">build_graph</span><span class="p">(</span><span class="n">so</span><span class="p">,</span> <span class="n">spl</span><span class="p">,</span> <span class="n">builder_type</span><span class="o">=</span><span class="s1">&#39;knn&#39;</span><span class="p">,</span> <span class="n">mask_key</span><span class="o">=</span><span class="s1">&#39;cellmasks&#39;</span><span class="p">)</span>
+<span class="n">so</span><span class="o">.</span><span class="n">G</span><span class="p">[</span><span class="n">spl</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>  <span class="c1"># graphs are stored at so.G[spl]</span>
+</pre></div>
+</div>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>dict_keys([&#39;knn&#39;])
+</pre></div>
+</div>
+<p>One can build multiple graph-representations for each sample by simply calling <code class="docutils literal notranslate"><span class="pre">build_graph</span></code> again with another <code class="docutils literal notranslate"><span class="pre">builder_type</span></code></p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">ath</span><span class="o">.</span><span class="n">graph</span><span class="o">.</span><span class="n">build_graph</span><span class="p">(</span><span class="n">so</span><span class="p">,</span> <span class="n">spl</span><span class="p">,</span> <span class="n">builder_type</span><span class="o">=</span><span class="s1">&#39;radius&#39;</span><span class="p">,</span> <span class="n">mask_key</span><span class="o">=</span><span class="s1">&#39;cellmasks&#39;</span><span class="p">)</span>
+<span class="n">so</span><span class="o">.</span><span class="n">G</span><span class="p">[</span><span class="n">spl</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>  <span class="c1"># graphs are stored at so.G[spl]</span>
+</pre></div>
+</div>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>dict_keys([&#39;knn&#39;, &#39;radius&#39;])
+</pre></div>
+</div>
+</div>
+<div class="section" id="from-coordinates">
+<h3>From Coordinates<a class="headerlink" href="#from-coordinates" title="Permalink to this headline">¶</a></h3>
+<p>One can build the <code class="docutils literal notranslate"><span class="pre">knn</span></code> and <code class="docutils literal notranslate"><span class="pre">radius</span></code> graphs from coordinates only by setting <code class="docutils literal notranslate"><span class="pre">mask_key=None</span></code> and providing the column names of the coordinates with <code class="docutils literal notranslate"><span class="pre">coordinate_keys</span></code>.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">ath</span><span class="o">.</span><span class="n">graph</span><span class="o">.</span><span class="n">build_graph</span><span class="p">(</span><span class="n">so</span><span class="p">,</span> <span class="n">spl</span><span class="p">,</span> <span class="n">builder_type</span><span class="o">=</span><span class="s1">&#39;knn&#39;</span><span class="p">,</span> <span class="n">mask_key</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">coordinate_keys</span><span class="o">=</span><span class="p">(</span><span class="s1">&#39;x&#39;</span><span class="p">,</span> <span class="s1">&#39;y&#39;</span><span class="p">))</span>
+<span class="n">ath</span><span class="o">.</span><span class="n">graph</span><span class="o">.</span><span class="n">build_graph</span><span class="p">(</span><span class="n">so</span><span class="p">,</span> <span class="n">spl</span><span class="p">,</span> <span class="n">builder_type</span><span class="o">=</span><span class="s1">&#39;radius&#39;</span><span class="p">,</span> <span class="n">mask_key</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">coordinate_keys</span><span class="o">=</span><span class="p">(</span><span class="s1">&#39;x&#39;</span><span class="p">,</span> <span class="s1">&#39;y&#39;</span><span class="p">))</span>
+<span class="n">so</span><span class="o">.</span><span class="n">G</span><span class="p">[</span><span class="n">spl</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>  <span class="c1"># graphs are stored at so.G[spl]</span>
+</pre></div>
+</div>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>dict_keys([&#39;knn&#39;, &#39;radius&#39;])
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="visualise-the-data">
+<h2>Visualise the Data<a class="headerlink" href="#visualise-the-data" title="Permalink to this headline">¶</a></h2>
+<p>For some of the plotting functionalities ATHENA requires the x,y coordinates of each observation. They can be extracted from segmentation masks with</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">ath</span><span class="o">.</span><span class="n">pp</span><span class="o">.</span><span class="n">extract_centroids</span><span class="p">(</span><span class="n">so</span><span class="p">,</span> <span class="n">spl</span><span class="p">,</span> <span class="n">mask_key</span><span class="o">=</span><span class="s1">&#39;cellmasks&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The data can then be visualised with</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">ath</span><span class="o">.</span><span class="n">pl</span><span class="o">.</span><span class="n">spatial</span><span class="p">(</span><span class="n">so</span><span class="p">,</span> <span class="n">spl</span><span class="p">,</span> <span class="n">attr</span><span class="o">=</span><span class="s1">&#39;meta_id&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>/Users/art/Documents/projects/athena/athena/plotting/visualization.py:217: UserWarning: Matplotlib is currently using module://matplotlib_inline.backend_inline, which is a non-GUI backend, so cannot show the figure.
+  fig.show()
+</pre></div>
+</div>
+<p><img alt="png" src="../_images/quickstart_27_1.png" /></p>
+<p>or if one wants to use custom coordinates, one can provide coordinate keys that are stored in the <code class="docutils literal notranslate"><span class="pre">so.obs[spl]</span></code> dataframe ATHENA should use</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">ath</span><span class="o">.</span><span class="n">pl</span><span class="o">.</span><span class="n">spatial</span><span class="p">(</span><span class="n">so</span><span class="p">,</span> <span class="n">spl</span><span class="p">,</span> <span class="n">attr</span><span class="o">=</span><span class="s1">&#39;meta_id&#39;</span><span class="p">,</span> <span class="n">coordinate_keys</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;x&#39;</span><span class="p">,</span> <span class="s1">&#39;y&#39;</span><span class="p">])</span>
+</pre></div>
+</div>
+<p><img alt="png" src="../_images/quickstart_29_0.png" /></p>
+<p>See the <a class="reference external" href="https://ai4scr.github.io/ATHENA/source/tutorial.html">main tutorial</a> and the <a class="reference external" href="https://ai4scr.github.io/ATHENA/api/athena.plotting.visualization.html?highlight=spatial#athena.plotting.visualization.spatial">docs</a>  to see how the plotting can be customized.</p>
+</div>
+<div class="section" id="compute-metrics">
+<h2>Compute Metrics<a class="headerlink" href="#compute-metrics" title="Permalink to this headline">¶</a></h2>
+<p>Once the graphs are built we can use the quantifications methods from the <code class="docutils literal notranslate"><span class="pre">ath.metrics</span></code> and the <code class="docutils literal notranslate"><span class="pre">ath.neigh</span></code> module. Again, provide the <code class="docutils literal notranslate"><span class="pre">spatialOmics</span></code> instance and the sample name for which the metric should be computed. Furthermore, since ATHENA quantifies the phenotypic heterogeneity in the data, provide the column name that indicates the different phenotypes of each observation with <code class="docutils literal notranslate"><span class="pre">attr</span></code> and specify the graph topologie to use with <code class="docutils literal notranslate"><span class="pre">graph_key</span></code>.</p>
+<p>Most of the metrics can be computed either on a sample-level (i.e. 1 value per sample) or on a observation-level (i.e. 1 value per observation). This behaviour can be controlled by setting <code class="docutils literal notranslate"><span class="pre">local={True,False}</span></code>.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># compute shannon entropy for each observation, once for the radius graph and once for the knn graph</span>
+<span class="n">ath</span><span class="o">.</span><span class="n">metrics</span><span class="o">.</span><span class="n">shannon</span><span class="p">(</span><span class="n">so</span><span class="p">,</span> <span class="n">spl</span><span class="p">,</span> <span class="n">attr</span><span class="o">=</span><span class="s1">&#39;meta_id&#39;</span><span class="p">,</span><span class="n">graph_key</span><span class="o">=</span><span class="s1">&#39;radius&#39;</span><span class="p">)</span>
+<span class="n">ath</span><span class="o">.</span><span class="n">metrics</span><span class="o">.</span><span class="n">shannon</span><span class="p">(</span><span class="n">so</span><span class="p">,</span> <span class="n">spl</span><span class="p">,</span> <span class="n">attr</span><span class="o">=</span><span class="s1">&#39;meta_id&#39;</span><span class="p">,</span><span class="n">graph_key</span><span class="o">=</span><span class="s1">&#39;knn&#39;</span><span class="p">)</span>
+
+<span class="c1"># compute the shannon entropy for the whole sample</span>
+<span class="n">ath</span><span class="o">.</span><span class="n">metrics</span><span class="o">.</span><span class="n">shannon</span><span class="p">(</span><span class="n">so</span><span class="p">,</span> <span class="n">spl</span><span class="p">,</span> <span class="n">attr</span><span class="o">=</span><span class="s1">&#39;meta_id&#39;</span><span class="p">,</span> <span class="n">local</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The results for <code class="docutils literal notranslate"><span class="pre">local=True</span></code> (default) are stores in <code class="docutils literal notranslate"><span class="pre">so.obs</span></code> as <code class="docutils literal notranslate"><span class="pre">{method}_{attr}_{graph_key}</span></code>.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">so</span><span class="o">.</span><span class="n">obs</span><span class="p">[</span><span class="n">spl</span><span class="p">]</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+</pre></div>
+</div>
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>.dataframe tbody tr th {
+    vertical-align: top;
+}
+
+.dataframe thead th {
+    text-align: right;
+}
+</pre></div>
+</div>
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>core</th>
+      <th>meta_id</th>
+      <th>...</th>
+      <th>shannon_meta_id_radius</th>
+      <th>shannon_meta_id_knn</th>
+    </tr>
+    <tr>
+      <th>cell_id</th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>1</th>
+      <td>SP43_75_X2Y5</td>
+      <td>9</td>
+      <td>...</td>
+      <td>1.921928</td>
+      <td>1.918296</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>SP43_75_X2Y5</td>
+      <td>3</td>
+      <td>...</td>
+      <td>1.918296</td>
+      <td>1.918296</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>SP43_75_X2Y5</td>
+      <td>10</td>
+      <td>...</td>
+      <td>2.446439</td>
+      <td>2.521641</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>SP43_75_X2Y5</td>
+      <td>8</td>
+      <td>...</td>
+      <td>2.419382</td>
+      <td>2.128085</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>SP43_75_X2Y5</td>
+      <td>3</td>
+      <td>...</td>
+      <td>1.870254</td>
+      <td>1.459148</td>
+    </tr>
+  </tbody>
+</table>
+<p>5 rows × 14 columns</p>
+</div>
+<p>The results for <code class="docutils literal notranslate"><span class="pre">local=False</span></code> are stored in <code class="docutils literal notranslate"><span class="pre">so.spl</span></code></p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">so</span><span class="o">.</span><span class="n">spl</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">spl</span><span class="p">]</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+</pre></div>
+</div>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>pid                    75.000000
+cell_count           2771.000000
+immune_cell_count     940.000000
+shannon_meta_id         3.311329
+Name: SP43_75_X2Y5, dtype: float64
+</pre></div>
+</div>
+</div>
+<div class="section" id="note-on-phenotype-encodings">
+<h2>Note On Phenotype Encodings<a class="headerlink" href="#note-on-phenotype-encodings" title="Permalink to this headline">¶</a></h2>
+<p>We advise the users to use <em>numeric</em> phenotype encodings when computing metrics. If one has label names stored in a <code class="docutils literal notranslate"><span class="pre">pd.DataFrame</span></code> as <code class="docutils literal notranslate"><span class="pre">label_names</span></code> one can easily create numeric labels by</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="s1">&#39;label_names&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;A&#39;</span><span class="p">,</span> <span class="s1">&#39;B&#39;</span><span class="p">,</span> <span class="s1">&#39;B&#39;</span><span class="p">,</span> <span class="s1">&#39;C&#39;</span><span class="p">]})</span>
+<span class="n">df</span><span class="p">[</span><span class="s1">&#39;labels_names_id&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s1">&#39;label_names&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">ngroup</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>Furthermore, some functions require a strict <code class="docutils literal notranslate"><span class="pre">categorical</span></code> encoding. Thus the columns <code class="docutils literal notranslate"><span class="pre">dtype</span></code> should be set to <code class="docutils literal notranslate"><span class="pre">categorical</span></code> and include all categories across the samples. This can be achived by running the following snippet for all <code class="docutils literal notranslate"><span class="pre">categorical</span></code> columns in <code class="docutils literal notranslate"><span class="pre">so.obs[spl]</span></code></p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># collect all occurences in the dataset</span>
+<span class="n">i</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+<span class="k">for</span> <span class="n">spl</span> <span class="ow">in</span> <span class="n">so</span><span class="o">.</span><span class="n">spl</span><span class="o">.</span><span class="n">index</span><span class="p">:</span>
+    <span class="n">i</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">so</span><span class="o">.</span><span class="n">obs</span><span class="p">[</span><span class="n">spl</span><span class="p">][</span><span class="s1">&#39;meta_id&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">)</span>
+
+<span class="c1"># define categorical dtype</span>
+<span class="n">dtype</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">CategoricalDtype</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">spl</span> <span class="ow">in</span> <span class="n">so</span><span class="o">.</span><span class="n">spl</span><span class="o">.</span><span class="n">index</span><span class="p">:</span>
+    <span class="n">so</span><span class="o">.</span><span class="n">obs</span><span class="p">[</span><span class="n">spl</span><span class="p">]</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span><span class="s1">&#39;meta_id&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">so</span><span class="o">.</span><span class="n">obs</span><span class="p">[</span><span class="n">spl</span><span class="p">][</span><span class="s1">&#39;meta_id&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">dtype</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="note-on-segmentation-masks">
+<h2>Note On Segmentation Masks<a class="headerlink" href="#note-on-segmentation-masks" title="Permalink to this headline">¶</a></h2>
+<p>Segmentation masks should be stored as <code class="docutils literal notranslate"><span class="pre">np.ndarray</span></code> and have <code class="docutils literal notranslate"><span class="pre">int</span></code> encodings with 0 being background. The labels do not need to be sequential but aligned with the index in <code class="docutils literal notranslate"><span class="pre">so.obs[spl]</span></code>, i.e. the label of the segmentation mask should be the same as in the index of the <code class="docutils literal notranslate"><span class="pre">so.obs</span></code> dataframe for a given observation. One can test that the labels overlap</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">ids</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">so</span><span class="o">.</span><span class="n">masks</span><span class="p">[</span><span class="n">spl</span><span class="p">][</span><span class="s1">&#39;cellmasks&#39;</span><span class="p">])</span>
+<span class="n">ids</span> <span class="o">=</span> <span class="n">ids</span><span class="p">[</span><span class="n">ids</span><span class="o">!=</span><span class="mi">0</span><span class="p">]</span>  <span class="c1"># remove background label</span>
+<span class="n">s_mask</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">ids</span><span class="p">)</span>
+<span class="n">s_obs</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">so</span><span class="o">.</span><span class="n">obs</span><span class="p">[</span><span class="n">spl</span><span class="p">]</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">values</span><span class="p">)</span>
+<span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">s_obs</span> <span class="o">-</span> <span class="n">s_mask</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span>
+<span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">s_mask</span> <span class="o">-</span> <span class="n">s_obs</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span>
+</pre></div>
+</div>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+        <a href="tutorial.html" class="btn btn-neutral float-right" title="Tutorial on Imaging Mass Cytometry data" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="methodology.html" class="btn btn-neutral float-left" title="Methodology" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright IBM Corp. 2021.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

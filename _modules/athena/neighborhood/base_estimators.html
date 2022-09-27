@@ -1,0 +1,547 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>athena.neighborhood.base_estimators &mdash; athena  documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../index.html" class="icon icon-home"> athena
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">General</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../source/installation.html">Installation</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Gallery</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../source/overview.html">Overview of ATHENA</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../source/methodology.html">Methodology</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../source/quickstart.html">Quickstart</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../source/tutorial.html">Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../source/introduction-spatialOmics.html">SpatialOmics Tutorial</a></li>
+</ul>
+<p class="caption"><span class="caption-text">API</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../api_overview.html">API Overview</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">athena</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+        
+      <li>athena.neighborhood.base_estimators</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for athena.neighborhood.base_estimators</h1><div class="highlight"><pre>
+<span></span><span class="c1"># %%</span>
+<span class="kn">import</span> <span class="nn">networkx</span> <span class="k">as</span> <span class="nn">nx</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">from</span> <span class="nn">pandas.api.types</span> <span class="kn">import</span> <span class="n">CategoricalDtype</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">networkx</span> <span class="kn">import</span> <span class="n">Graph</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">time</span>
+<span class="kn">from</span> <span class="nn">astropy.stats</span> <span class="kn">import</span> <span class="n">RipleysKEstimator</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+
+<span class="n">logging</span><span class="o">.</span><span class="n">basicConfig</span><span class="p">(</span><span class="n">level</span><span class="o">=</span><span class="n">logging</span><span class="o">.</span><span class="n">INFO</span><span class="p">)</span>
+
+<span class="kn">from</span> <span class="nn">..utils.general</span> <span class="kn">import</span> <span class="n">make_iterable</span>
+<span class="kn">from</span> <span class="nn">.utils</span> <span class="kn">import</span> <span class="n">get_node_interactions</span><span class="p">,</span> <span class="n">get_interaction_score</span><span class="p">,</span> <span class="n">permute_labels</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">Counter</span>
+
+
+<span class="c1"># %%</span>
+
+<span class="k">def</span> <span class="nf">_infiltration_local_deprecated</span><span class="p">(</span><span class="n">G</span><span class="p">:</span> <span class="n">Graph</span><span class="p">,</span>
+                        <span class="n">interaction1</span><span class="o">=</span><span class="p">(</span><span class="s1">&#39;tumor&#39;</span><span class="p">,</span> <span class="s1">&#39;immune&#39;</span><span class="p">),</span>
+                        <span class="n">interaction2</span><span class="o">=</span><span class="p">(</span><span class="s1">&#39;immune&#39;</span><span class="p">,</span> <span class="s1">&#39;immune&#39;</span><span class="p">)):</span>
+
+    <span class="n">ids</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">interaction1</span><span class="p">,</span> <span class="n">interaction2</span><span class="p">)</span>
+    <span class="n">nodes_inter1</span> <span class="o">=</span> <span class="p">[</span><span class="n">node</span> <span class="k">for</span> <span class="n">node</span> <span class="ow">in</span> <span class="n">G</span><span class="o">.</span><span class="n">nodes</span> <span class="k">if</span> <span class="n">G</span><span class="o">.</span><span class="n">nodes</span><span class="p">[</span><span class="n">node</span><span class="p">][</span><span class="s1">&#39;attr&#39;</span><span class="p">]</span> <span class="ow">in</span> <span class="n">ids</span><span class="p">]</span>
+    <span class="n">nodes_inter1</span> <span class="o">=</span> <span class="p">[</span><span class="n">node</span> <span class="k">for</span> <span class="n">node</span> <span class="ow">in</span> <span class="n">G</span><span class="o">.</span><span class="n">nodes</span> <span class="k">if</span> <span class="n">G</span><span class="o">.</span><span class="n">nodes</span><span class="p">[</span><span class="n">node</span><span class="p">][</span><span class="s1">&#39;attr&#39;</span><span class="p">]</span> <span class="ow">in</span> <span class="n">interaction1</span><span class="p">]</span>
+    <span class="n">nodes_inter2</span> <span class="o">=</span> <span class="p">[</span><span class="n">node</span> <span class="k">for</span> <span class="n">node</span> <span class="ow">in</span> <span class="n">G</span><span class="o">.</span><span class="n">nodes</span> <span class="k">if</span> <span class="n">G</span><span class="o">.</span><span class="n">nodes</span><span class="p">[</span><span class="n">node</span><span class="p">][</span><span class="s1">&#39;attr&#39;</span><span class="p">]</span> <span class="ow">in</span> <span class="n">interaction2</span><span class="p">]</span>
+
+    <span class="k">for</span> <span class="n">node</span> <span class="ow">in</span> <span class="n">ids</span><span class="p">:</span>
+        <span class="n">neigh</span> <span class="o">=</span> <span class="n">G</span><span class="p">[</span><span class="n">node</span><span class="p">]</span>
+        <span class="n">counts</span> <span class="o">=</span> <span class="n">Counter</span><span class="p">([</span><span class="n">G</span><span class="o">.</span><span class="n">nodes</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="s1">&#39;attr&#39;</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">neigh</span><span class="p">])</span>
+
+<span class="k">def</span> <span class="nf">_infiltration_local</span><span class="p">(</span><span class="n">G</span><span class="p">:</span> <span class="n">Graph</span><span class="p">,</span>
+                        <span class="n">interaction1</span><span class="o">=</span><span class="p">(</span><span class="s1">&#39;tumor&#39;</span><span class="p">,</span> <span class="s1">&#39;immune&#39;</span><span class="p">),</span>
+                        <span class="n">interaction2</span><span class="o">=</span><span class="p">(</span><span class="s1">&#39;immune&#39;</span><span class="p">,</span> <span class="s1">&#39;immune&#39;</span><span class="p">)):</span>
+
+    <span class="n">ids</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">interaction1</span><span class="p">,</span> <span class="n">interaction2</span><span class="p">)</span>
+    <span class="n">nodes</span> <span class="o">=</span> <span class="p">[</span><span class="n">node</span> <span class="k">for</span> <span class="n">node</span> <span class="ow">in</span> <span class="n">G</span><span class="o">.</span><span class="n">nodes</span> <span class="k">if</span> <span class="n">G</span><span class="o">.</span><span class="n">nodes</span><span class="p">[</span><span class="n">node</span><span class="p">][</span><span class="s1">&#39;attr&#39;</span><span class="p">]</span> <span class="ow">in</span> <span class="n">ids</span><span class="p">]</span>
+    <span class="k">for</span> <span class="n">node</span> <span class="ow">in</span> <span class="n">nodes</span><span class="p">:</span>
+        <span class="n">neigh</span> <span class="o">=</span> <span class="n">G</span><span class="p">[</span><span class="n">node</span><span class="p">]</span>
+        <span class="n">subG</span> <span class="o">=</span> <span class="n">G</span><span class="o">.</span><span class="n">subgraph</span><span class="p">()</span>
+
+    <span class="k">pass</span>
+
+<span class="k">def</span> <span class="nf">_infiltration</span><span class="p">(</span><span class="n">node_interactions</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">interaction1</span><span class="o">=</span><span class="p">(</span><span class="s1">&#39;tumor&#39;</span><span class="p">,</span> <span class="s1">&#39;immune&#39;</span><span class="p">),</span>
+                  <span class="n">interaction2</span><span class="o">=</span><span class="p">(</span><span class="s1">&#39;immune&#39;</span><span class="p">,</span> <span class="s1">&#39;immune&#39;</span><span class="p">))</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Compute infiltration score between two species.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        node_interactions: Dataframe with columns `source_label` and `target_label` that specifies interactions.</span>
+<span class="sd">        interaction1: labels of enumerator interaction</span>
+<span class="sd">        interaction2: labels of denominator interaction</span>
+
+<span class="sd">    Notes:</span>
+<span class="sd">        The infiltration score is computed as #interactions1 / #interactions2.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        Interaction score</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">nint</span> <span class="o">=</span> <span class="n">node_interactions</span>  <span class="c1"># verbose</span>
+
+    <span class="p">(</span><span class="n">a1</span><span class="p">,</span> <span class="n">a2</span><span class="p">),</span> <span class="p">(</span><span class="n">b1</span><span class="p">,</span> <span class="n">b2</span><span class="p">)</span> <span class="o">=</span> <span class="n">interaction1</span><span class="p">,</span> <span class="n">interaction2</span>
+    <span class="n">num</span> <span class="o">=</span> <span class="n">nint</span><span class="p">[(</span><span class="n">nint</span><span class="o">.</span><span class="n">source_label</span> <span class="o">==</span> <span class="n">a1</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">nint</span><span class="o">.</span><span class="n">target_label</span> <span class="o">==</span> <span class="n">a2</span><span class="p">)]</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">denom</span> <span class="o">=</span> <span class="n">nint</span><span class="p">[(</span><span class="n">nint</span><span class="o">.</span><span class="n">source_label</span> <span class="o">==</span> <span class="n">b1</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">nint</span><span class="o">.</span><span class="n">target_label</span> <span class="o">==</span> <span class="n">b2</span><span class="p">)]</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+    <span class="k">return</span> <span class="n">num</span> <span class="o">/</span> <span class="n">denom</span> <span class="k">if</span> <span class="n">denom</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="k">else</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>  <span class="c1"># TODO: np.inf or np.nan</span>
+
+
+<div class="viewcode-block" id="Interactions"><a class="viewcode-back" href="../../../api/athena.neighborhood.base_estimators.html#athena.neighborhood.base_estimators.Interactions">[docs]</a><span class="k">class</span> <span class="nc">Interactions</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Estimator to quantify interaction strength between different species in the sample.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">VALID_MODES</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;classic&#39;</span><span class="p">,</span> <span class="s1">&#39;histoCAT&#39;</span><span class="p">,</span> <span class="s1">&#39;proportion&#39;</span><span class="p">]</span>
+    <span class="n">VALID_PREDICTION_TYPES</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;pvalue&#39;</span><span class="p">,</span> <span class="s1">&#39;observation&#39;</span><span class="p">,</span> <span class="s1">&#39;diff&#39;</span><span class="p">]</span>
+
+<div class="viewcode-block" id="Interactions.__init__"><a class="viewcode-back" href="../../../api/athena.neighborhood.base_estimators.html#athena.neighborhood.base_estimators.Interactions.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">so</span><span class="p">,</span> <span class="n">spl</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">attr</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;meta_id&#39;</span><span class="p">,</span> <span class="n">mode</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;classic&#39;</span><span class="p">,</span> <span class="n">n_permutations</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">500</span><span class="p">,</span>
+                 <span class="n">random_seed</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">alpha</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">.01</span><span class="p">,</span> <span class="n">graph_key</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;knn&#39;</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Estimator to quantify interaction strength between different species in the sample.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            so: SpatialOmics</span>
+<span class="sd">            spl: Sample for which to compute the interaction strength</span>
+<span class="sd">            attr: Categorical feature in SpatialOmics.obs to use for the grouping</span>
+<span class="sd">            mode: One of {classic, histoCAT, proportion}, see notes</span>
+<span class="sd">            n_permutations: Number of permutations to compute p-values and the interactions strength score (mode diff)</span>
+<span class="sd">            random_seed: Random seed for permutations</span>
+<span class="sd">            alpha: Threshold for significance</span>
+<span class="sd">            graph_key: Specifies the graph representation to use in so.G[spl] if `local=True`.</span>
+
+<span class="sd">        Notes:</span>
+<span class="sd">            classic and histoCAT are python implementations of the corresponding methods pubished by the Bodenmiller lab at UZH.</span>
+<span class="sd">            The proportion method is similar to the classic method but normalises the score by the number of edges and is thus bound [0,1].</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">so</span> <span class="o">=</span> <span class="n">so</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">spl</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">spl</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">graph_key</span> <span class="o">=</span> <span class="n">graph_key</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">g</span><span class="p">:</span> <span class="n">Graph</span> <span class="o">=</span> <span class="n">so</span><span class="o">.</span><span class="n">G</span><span class="p">[</span><span class="n">spl</span><span class="p">][</span><span class="n">graph_key</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">attr</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">attr</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span> <span class="o">=</span> <span class="n">so</span><span class="o">.</span><span class="n">obs</span><span class="p">[</span><span class="n">spl</span><span class="p">][</span><span class="n">attr</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mode</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">mode</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">n_perm</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">n_permutations</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">random_seed</span> <span class="o">=</span> <span class="n">random_seed</span> <span class="k">if</span> <span class="n">random_seed</span> <span class="k">else</span> <span class="n">so</span><span class="o">.</span><span class="n">random_seed</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">rng</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">default_rng</span><span class="p">(</span><span class="n">random_seed</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">alpha</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">alpha</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fitted</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+
+        <span class="c1"># set dtype categories of data to attributes that are in the data</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">CategoricalDtype</span><span class="p">(</span><span class="n">categories</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">unique</span><span class="p">(),</span> <span class="n">ordered</span><span class="o">=</span><span class="kc">False</span><span class="p">))</span>
+
+        <span class="c1"># path where h0 models would be</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">expanduser</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;~/.cache/spatialHeterogeneity/h0-models/&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">h0_file</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">spl</span><span class="si">}</span><span class="s1">_</span><span class="si">{</span><span class="n">attr</span><span class="si">}</span><span class="s1">_</span><span class="si">{</span><span class="n">graph_key</span><span class="si">}</span><span class="s1">_</span><span class="si">{</span><span class="n">mode</span><span class="si">}</span><span class="s1">.pkl&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">h0</span> <span class="o">=</span> <span class="kc">None</span></div>
+
+<div class="viewcode-block" id="Interactions.fit"><a class="viewcode-back" href="../../../api/athena.neighborhood.base_estimators.html#athena.neighborhood.base_estimators.Interactions.fit">[docs]</a>    <span class="k">def</span> <span class="nf">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">prediction_type</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;observation&#39;</span><span class="p">,</span> <span class="n">try_load</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Compute the interactions scores for the sample.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            prediction_type: One of {observation, pvalue, diff}, see Notes</span>
+<span class="sd">            try_load: load pre-computed permutation results if available</span>
+
+<span class="sd">        Returns:</span>
+
+<span class="sd">        Notes:</span>
+<span class="sd">            `observation`: computes the observed interaction strength in the sample</span>
+
+<span class="sd">            `pvalue`: computes the P-value of a two-sided t-test for the interactions strength based on the random permutations</span>
+
+<span class="sd">            `diff`: computes the difference between observed and average interaction strength (across permutations)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">prediction_type</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">VALID_PREDICTION_TYPES</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s1">&#39;invalid `prediction_type` </span><span class="si">{</span><span class="n">prediction_type</span><span class="si">}</span><span class="s1">. Available modes are </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">VALID_PREDICTION_TYPES</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">prediction_type</span> <span class="o">=</span> <span class="n">prediction_type</span>
+
+        <span class="c1"># extract observed interactions</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">mode</span> <span class="o">==</span> <span class="s1">&#39;classic&#39;</span><span class="p">:</span>
+            <span class="n">relative_freq</span><span class="p">,</span> <span class="n">observed</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="kc">False</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">mode</span> <span class="o">==</span> <span class="s1">&#39;histoCAT&#39;</span><span class="p">:</span>
+            <span class="n">relative_freq</span><span class="p">,</span> <span class="n">observed</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="kc">True</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">mode</span> <span class="o">==</span> <span class="s1">&#39;proportion&#39;</span><span class="p">:</span>
+            <span class="n">relative_freq</span><span class="p">,</span> <span class="n">observed</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="kc">False</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;invalid mode </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">mode</span><span class="si">}</span><span class="s1">. Available modes are </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">VALID_MODES</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+
+        <span class="n">node_interactions</span> <span class="o">=</span> <span class="n">get_node_interactions</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">g</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">)</span>
+        <span class="n">obs_interaction</span> <span class="o">=</span> <span class="n">get_interaction_score</span><span class="p">(</span><span class="n">node_interactions</span><span class="p">,</span> <span class="n">relative_freq</span><span class="o">=</span><span class="n">relative_freq</span><span class="p">,</span> <span class="n">observed</span><span class="o">=</span><span class="n">observed</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">obs_interaction</span> <span class="o">=</span> <span class="n">obs_interaction</span><span class="o">.</span><span class="n">set_index</span><span class="p">([</span><span class="s1">&#39;source_label&#39;</span><span class="p">,</span> <span class="s1">&#39;target_label&#39;</span><span class="p">])</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">prediction_type</span> <span class="o">==</span> <span class="s1">&#39;observation&#39;</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">try_load</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">)</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">h0_file</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">):</span>
+                    <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+                        <span class="sa">f</span><span class="s1">&#39;loading h0 for </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">spl</span><span class="si">}</span><span class="s1">, graph type </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">graph_key</span><span class="si">}</span><span class="s1"> and mode </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">mode</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">h0</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_pickle</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">h0_file</span><span class="p">))</span>
+            <span class="c1"># if try_load was not successful</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">h0</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s1">&#39;generate h0 for </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">spl</span><span class="si">}</span><span class="s1">, graph type </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">graph_key</span><span class="si">}</span><span class="s1"> and mode </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">mode</span><span class="si">}</span><span class="s1"> and attribute </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">attr</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">generate_h0</span><span class="p">(</span><span class="n">relative_freq</span><span class="o">=</span><span class="n">relative_freq</span><span class="p">,</span> <span class="n">observed</span><span class="o">=</span><span class="n">observed</span><span class="p">,</span> <span class="n">save</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">fitted</span> <span class="o">=</span> <span class="kc">True</span></div>
+
+<div class="viewcode-block" id="Interactions.predict"><a class="viewcode-back" href="../../../api/athena.neighborhood.base_estimators.html#athena.neighborhood.base_estimators.Interactions.predict">[docs]</a>    <span class="k">def</span> <span class="nf">predict</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Predict interactions strengths of observations.</span>
+
+<span class="sd">        Returns: A dataframe with the interaction results.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">prediction_type</span> <span class="o">==</span> <span class="s1">&#39;observation&#39;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">obs_interaction</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">prediction_type</span> <span class="o">==</span> <span class="s1">&#39;pvalue&#39;</span><span class="p">:</span>
+            <span class="c1"># TODO: Check p-value computation</span>
+            <span class="n">data_perm</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">obs_interaction</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">h0</span><span class="p">),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+            <span class="n">data_perm</span><span class="o">.</span><span class="n">fillna</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="n">data_pval</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">index</span><span class="o">=</span><span class="n">data_perm</span><span class="o">.</span><span class="n">index</span><span class="p">)</span>
+
+            <span class="c1"># see h0_models_analysis.py for alterantive p-value computation</span>
+            <span class="n">data_pval</span><span class="p">[</span><span class="s1">&#39;score&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">obs_interaction</span><span class="o">.</span><span class="n">score</span>
+            <span class="n">data_pval</span><span class="p">[</span><span class="s1">&#39;perm_mean&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">data_perm</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">:]),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">raw</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="n">data_pval</span><span class="p">[</span><span class="s1">&#39;perm_std&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">data_perm</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">:]),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">raw</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="n">data_pval</span><span class="p">[</span><span class="s1">&#39;perm_median&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">data_perm</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">median</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">:]),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">raw</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+            <span class="n">data_pval</span><span class="p">[</span><span class="s1">&#39;p_gt&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">data_perm</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span> <span class="o">&gt;=</span> <span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_perm</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">raw</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="n">data_pval</span><span class="p">[</span><span class="s1">&#39;p_lt&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">data_perm</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span> <span class="o">&lt;=</span> <span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_perm</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">raw</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="n">data_pval</span><span class="p">[</span><span class="s1">&#39;perm_n&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">data_perm</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_perm</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">raw</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+            <span class="n">data_pval</span><span class="p">[</span><span class="s1">&#39;p&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">data_pval</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">p_gt</span> <span class="k">if</span> <span class="n">x</span><span class="o">.</span><span class="n">p_gt</span> <span class="o">&lt;=</span> <span class="n">x</span><span class="o">.</span><span class="n">p_lt</span> <span class="k">else</span> <span class="n">x</span><span class="o">.</span><span class="n">p_lt</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+            <span class="n">data_pval</span><span class="p">[</span><span class="s1">&#39;sig&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">data_pval</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">p</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">alpha</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+            <span class="n">data_pval</span><span class="p">[</span><span class="s1">&#39;attraction&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">data_pval</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">p_gt</span> <span class="o">&lt;=</span> <span class="n">x</span><span class="o">.</span><span class="n">p_lt</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+            <span class="n">data_pval</span><span class="p">[</span><span class="s1">&#39;sigval&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">data_pval</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">sign</span><span class="p">((</span><span class="n">x</span><span class="o">.</span><span class="n">attraction</span> <span class="o">-</span> <span class="mf">.5</span><span class="p">)</span> <span class="o">*</span> <span class="n">x</span><span class="o">.</span><span class="n">sig</span><span class="p">),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">data_pval</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">prediction_type</span> <span class="o">==</span> <span class="s1">&#39;diff&#39;</span><span class="p">:</span>
+            <span class="n">data_perm</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">obs_interaction</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">h0</span><span class="p">),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+            <span class="n">data_perm</span><span class="o">.</span><span class="n">fillna</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="n">data_pval</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">index</span><span class="o">=</span><span class="n">data_perm</span><span class="o">.</span><span class="n">index</span><span class="p">)</span>
+
+            <span class="c1"># see h0_models_analysis.py for alterantive p-value computation</span>
+            <span class="n">data_pval</span><span class="p">[</span><span class="s1">&#39;score&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">obs_interaction</span><span class="o">.</span><span class="n">score</span>
+            <span class="n">data_pval</span><span class="p">[</span><span class="s1">&#39;perm_mean&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">data_perm</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">:]),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">raw</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="n">data_pval</span><span class="p">[</span><span class="s1">&#39;perm_std&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">data_perm</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">:]),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">raw</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="n">data_pval</span><span class="p">[</span><span class="s1">&#39;perm_median&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">data_perm</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">median</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">:]),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">raw</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+            <span class="n">data_pval</span><span class="p">[</span><span class="s1">&#39;diff&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">data_pval</span><span class="p">[</span><span class="s1">&#39;score&#39;</span><span class="p">]</span> <span class="o">-</span> <span class="n">data_pval</span><span class="p">[</span><span class="s1">&#39;perm_mean&#39;</span><span class="p">])</span>
+            <span class="k">return</span> <span class="n">data_pval</span>
+
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s1">&#39;invalid `prediction_type` </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">prediction_type</span><span class="si">}</span><span class="s1">. Available modes are </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">VALID_PREDICTION_TYPES</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Interactions.generate_h0"><a class="viewcode-back" href="../../../api/athena.neighborhood.base_estimators.html#athena.neighborhood.base_estimators.Interactions.generate_h0">[docs]</a>    <span class="k">def</span> <span class="nf">generate_h0</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">relative_freq</span><span class="p">,</span> <span class="n">observed</span><span class="p">,</span> <span class="n">save</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="n">connectivity</span> <span class="o">=</span> <span class="n">get_node_interactions</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">g</span><span class="p">)</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+        <span class="n">res_perm</span><span class="p">,</span> <span class="n">durations</span> <span class="o">=</span> <span class="p">[],</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n_perm</span><span class="p">):</span>
+            <span class="n">tic</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+
+            <span class="n">data</span> <span class="o">=</span> <span class="n">permute_labels</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">rng</span><span class="p">)</span>
+            <span class="n">source_label</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">connectivity</span><span class="o">.</span><span class="n">source</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span>
+            <span class="n">target_label</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">connectivity</span><span class="o">.</span><span class="n">target</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span>
+
+            <span class="c1"># create pd.Series and node_interaction pd.DataFrame</span>
+            <span class="n">source_label</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="n">source_label</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;source_label&#39;</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
+            <span class="n">target_label</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="n">target_label</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;target_label&#39;</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
+            <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">((</span><span class="n">connectivity</span><span class="p">,</span> <span class="n">source_label</span><span class="p">,</span> <span class="n">target_label</span><span class="p">),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+            <span class="c1"># get interaction count</span>
+            <span class="n">perm</span> <span class="o">=</span> <span class="n">get_interaction_score</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">relative_freq</span><span class="o">=</span><span class="n">relative_freq</span><span class="p">,</span> <span class="n">observed</span><span class="o">=</span><span class="n">observed</span><span class="p">)</span>
+            <span class="n">perm</span><span class="p">[</span><span class="s1">&#39;permutation_id&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">i</span>
+
+            <span class="c1"># save result</span>
+            <span class="n">res_perm</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">perm</span><span class="p">)</span>
+
+            <span class="c1"># stats</span>
+            <span class="n">toc</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+            <span class="n">durations</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">toc</span> <span class="o">-</span> <span class="n">tic</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="p">(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">%</span> <span class="mi">10</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">time</span><span class="o">.</span><span class="n">asctime</span><span class="p">()</span><span class="si">}</span><span class="s1">: </span><span class="si">{</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="si">}</span><span class="s1">/</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">n_perm</span><span class="si">}</span><span class="s1">, duration: </span><span class="si">{</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">durations</span><span class="p">)</span><span class="si">:</span><span class="s1">.2f</span><span class="si">}</span><span class="s1">) sec&#39;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">time</span><span class="o">.</span><span class="n">asctime</span><span class="p">()</span><span class="si">}</span><span class="s1">: Finished, duration: </span><span class="si">{</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">durations</span><span class="p">)</span> <span class="o">/</span> <span class="mi">60</span><span class="si">:</span><span class="s1">.2f</span><span class="si">}</span><span class="s1"> min (</span><span class="si">{</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">durations</span><span class="p">)</span><span class="si">:</span><span class="s1">.2f</span><span class="si">}</span><span class="s1">sec/it)&#39;</span><span class="p">)</span>
+
+        <span class="n">h0</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span><span class="n">res_perm</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">h0</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">pivot</span><span class="p">(</span><span class="n">h0</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;source_label&#39;</span><span class="p">,</span> <span class="s1">&#39;target_label&#39;</span><span class="p">],</span> <span class="n">columns</span><span class="o">=</span><span class="s1">&#39;permutation_id&#39;</span><span class="p">,</span> <span class="n">values</span><span class="o">=</span><span class="s1">&#39;score&#39;</span><span class="p">)</span>
+
+        <span class="c1"># create folders</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">):</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">h0</span><span class="o">.</span><span class="n">to_pickle</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">h0_file</span><span class="p">))</span></div></div>
+
+
+<div class="viewcode-block" id="RipleysK"><a class="viewcode-back" href="../../../api/athena.neighborhood.base_estimators.html#athena.neighborhood.base_estimators.RipleysK">[docs]</a><span class="k">class</span> <span class="nc">RipleysK</span><span class="p">():</span>
+<div class="viewcode-block" id="RipleysK.__init__"><a class="viewcode-back" href="../../../api/athena.neighborhood.base_estimators.html#athena.neighborhood.base_estimators.RipleysK.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">so</span><span class="p">,</span> <span class="n">spl</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="nb">id</span><span class="p">,</span> <span class="n">attr</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Compute Ripley&#39;s K for a given sample and group.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            so: SpatialOmics</span>
+<span class="sd">            spl: Sample for which to compute the interaction strength</span>
+<span class="sd">            id: The category in the categorical feature `attr`, for which Ripley&#39;s K should be computed</span>
+<span class="sd">            attr: Categorical feature in SpatialOmics.obs to use for the grouping</span>
+<span class="sd">            graph_key: Specifies the graph representation to use in so.G[spl] if `local=True`.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">id</span> <span class="o">=</span> <span class="nb">id</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">area</span> <span class="o">=</span> <span class="n">so</span><span class="o">.</span><span class="n">spl</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">spl</span><span class="p">]</span><span class="o">.</span><span class="n">area</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">width</span> <span class="o">=</span> <span class="n">so</span><span class="o">.</span><span class="n">spl</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">spl</span><span class="p">]</span><span class="o">.</span><span class="n">width</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">height</span> <span class="o">=</span> <span class="n">so</span><span class="o">.</span><span class="n">spl</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">spl</span><span class="p">]</span><span class="o">.</span><span class="n">height</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">rkE</span> <span class="o">=</span> <span class="n">RipleysKEstimator</span><span class="p">(</span><span class="n">area</span><span class="o">=</span><span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">area</span><span class="p">),</span>
+                                     <span class="c1"># we need to cast since the implementation checks for type int/float and does not recognise np.int64</span>
+                                     <span class="n">x_max</span><span class="o">=</span><span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">width</span><span class="p">),</span> <span class="n">x_min</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+                                     <span class="n">y_max</span><span class="o">=</span><span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">height</span><span class="p">),</span> <span class="n">y_min</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="n">so</span><span class="o">.</span><span class="n">obs</span><span class="p">[</span><span class="n">spl</span><span class="p">][[</span><span class="s1">&#39;x&#39;</span><span class="p">,</span> <span class="s1">&#39;y&#39;</span><span class="p">,</span> <span class="n">attr</span><span class="p">]]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">df</span><span class="p">[</span><span class="n">attr</span><span class="p">]</span> <span class="o">==</span> <span class="nb">id</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="RipleysK.fit"><a class="viewcode-back" href="../../../api/athena.neighborhood.base_estimators.html#athena.neighborhood.base_estimators.RipleysK.fit">[docs]</a>    <span class="k">def</span> <span class="nf">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">pass</span></div>
+
+<div class="viewcode-block" id="RipleysK.predict"><a class="viewcode-back" href="../../../api/athena.neighborhood.base_estimators.html#athena.neighborhood.base_estimators.RipleysK.predict">[docs]</a>    <span class="k">def</span> <span class="nf">predict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">radii</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span> <span class="n">correction</span><span class="p">:</span> <span class="nb">str</span><span class="o">=</span><span class="s1">&#39;ripley&#39;</span><span class="p">,</span> <span class="n">mode</span><span class="p">:</span> <span class="nb">str</span><span class="o">=</span><span class="s1">&#39;K&#39;</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Estimate Ripley&#39;s K</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            radii: List of radiis for which Ripley&#39;s K is computed</span>
+<span class="sd">            correction: Correction method to use to correct for boarder effects, see [1].</span>
+<span class="sd">            mode: {K, csr-deviation}. If `K`, Ripley&#39;s K is estimated, with `csr-deviation` the deviation from a poission process is computed.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Ripley&#39;s K estimates</span>
+
+<span class="sd">        Notes:</span>
+<span class="sd">            .. [1] https://docs.astropy.org/en/stable/stats/ripley.html</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="n">radii</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">radii</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">min</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">height</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">width</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span>
+        <span class="n">radii</span> <span class="o">=</span> <span class="n">make_iterable</span><span class="p">(</span><span class="n">radii</span><span class="p">)</span>
+
+        <span class="c1"># if we have no observations of the given id, K is zero</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">df</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">K</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">rkE</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">df</span><span class="p">[[</span><span class="s1">&#39;x&#39;</span><span class="p">,</span> <span class="s1">&#39;y&#39;</span><span class="p">]],</span> <span class="n">radii</span><span class="o">=</span><span class="n">radii</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="n">correction</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">K</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">radii</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">mode</span> <span class="o">==</span> <span class="s1">&#39;K&#39;</span><span class="p">:</span>
+            <span class="n">res</span> <span class="o">=</span> <span class="n">K</span>
+        <span class="k">elif</span> <span class="n">mode</span> <span class="o">==</span> <span class="s1">&#39;csr-deviation&#39;</span><span class="p">:</span>
+            <span class="n">L</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">K</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">)</span>  <span class="c1"># transform, to stabilise variance</span>
+            <span class="n">res</span> <span class="o">=</span> <span class="n">L</span> <span class="o">-</span> <span class="n">radii</span>
+
+        <span class="n">res</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="n">res</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="n">radii</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">res</span></div>
+
+<div class="viewcode-block" id="RipleysK.csr_deviation"><a class="viewcode-back" href="../../../api/athena.neighborhood.base_estimators.html#athena.neighborhood.base_estimators.RipleysK.csr_deviation">[docs]</a>    <span class="k">def</span> <span class="nf">csr_deviation</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">radii</span><span class="p">,</span> <span class="n">correction</span><span class="o">=</span><span class="s1">&#39;ripley&#39;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Compute deviation from random poisson process.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            radii: List of radiis for which Ripley&#39;s K is computed</span>
+<span class="sd">            correction: Correction method to use to correct for boarder effects, see [1].</span>
+
+<span class="sd">        Returns:</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># http://doi.wiley.com/10.1002/9781118445112.stat07751</span>
+        <span class="n">radii</span> <span class="o">=</span> <span class="n">make_iterable</span><span class="p">(</span><span class="n">radii</span><span class="p">)</span>
+        <span class="n">K</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">rkE</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">df</span><span class="p">[[</span><span class="s1">&#39;x&#39;</span><span class="p">,</span> <span class="s1">&#39;y&#39;</span><span class="p">]],</span> <span class="n">radii</span><span class="o">=</span><span class="n">radii</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="n">correction</span><span class="p">)</span>
+        <span class="n">L</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">K</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">)</span>  <span class="c1"># transform, to stabilise variance</span>
+        <span class="n">dev</span> <span class="o">=</span> <span class="n">L</span> <span class="o">-</span> <span class="n">radii</span>
+
+        <span class="k">return</span> <span class="n">dev</span></div></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright IBM Corp. 2021.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

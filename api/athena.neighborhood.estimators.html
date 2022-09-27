@@ -1,0 +1,346 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>athena.neighborhood.estimators module &mdash; athena  documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["\\(", "\\)"]], "displayMath": [["\\[", "\\]"]], "processRefs": false, "processEnvironments": false}})</script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> athena
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">General</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../source/installation.html">Installation</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Gallery</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../source/overview.html">Overview of ATHENA</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../source/methodology.html">Methodology</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../source/quickstart.html">Quickstart</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../source/tutorial.html">Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../source/introduction-spatialOmics.html">SpatialOmics Tutorial</a></li>
+</ul>
+<p class="caption"><span class="caption-text">API</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../api_overview.html">API Overview</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">athena</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+      <li>athena.neighborhood.estimators module</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="../_sources/api/athena.neighborhood.estimators.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="module-athena.neighborhood.estimators">
+<span id="athena-neighborhood-estimators-module"></span><h1>athena.neighborhood.estimators module<a class="headerlink" href="#module-athena.neighborhood.estimators" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="summary">
+<h2>Summary<a class="headerlink" href="#summary" title="Permalink to this headline">¶</a></h2>
+<p>Functions:</p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#athena.neighborhood.estimators.add2uns" title="athena.neighborhood.estimators.add2uns"><code class="xref py py-obj docutils literal notranslate"><span class="pre">add2uns</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#athena.neighborhood.estimators.infiltration" title="athena.neighborhood.estimators.infiltration"><code class="xref py py-obj docutils literal notranslate"><span class="pre">infiltration</span></code></a></p></td>
+<td><p>Compute infiltration score.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#athena.neighborhood.estimators.interactions" title="athena.neighborhood.estimators.interactions"><code class="xref py py-obj docutils literal notranslate"><span class="pre">interactions</span></code></a></p></td>
+<td><p>Compute interaction strength between species. This is done by counting the number of interactions (edges in the graph)</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#athena.neighborhood.estimators.ripleysK" title="athena.neighborhood.estimators.ripleysK"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ripleysK</span></code></a></p></td>
+<td><p>Compute Ripley’s K as implemented by <a class="reference external" href="https://docs.astropy.org/en/stable/stats/ripley.html">[1]</a>.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="reference">
+<h2>Reference<a class="headerlink" href="#reference" title="Permalink to this headline">¶</a></h2>
+<dl class="py function">
+<dt id="athena.neighborhood.estimators.interactions">
+<code class="sig-name descname"><span class="pre">interactions</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">so</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">spl</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">attr</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'classic'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prediction_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'observation'</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_permutations</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">random_seed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alpha</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.01</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">try_load</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">key_added</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">graph_key</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'knn'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">inplace</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/athena/neighborhood/estimators.html#interactions"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#athena.neighborhood.estimators.interactions" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt>Compute interaction strength between species. This is done by counting the number of interactions (edges in the graph)</dt><dd><p>between pair-wise observation types as encdoded by <cite>attr</cite>. See notes for more information or the
+<a class="reference external" href="https://ai4scr.github.io/ATHENA/source/methodology.html">methodology</a> section in the docs.</p>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>so</strong> – SpatialOmics instance</p></li>
+<li><p><strong>spl</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – Spl for which to compute the metric</p></li>
+<li><p><strong>attr</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – Categorical feature in SpatialOmics.obs to use for the grouping</p></li>
+<li><p><strong>mode</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – One of {classic, histoCAT, proportion}, see notes</p></li>
+<li><p><strong>n_permutations</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – Number of permutations to compute p-values and the interactions strength score (mode diff)</p></li>
+<li><p><strong>random_seed</strong> – Random seed for permutations</p></li>
+<li><p><strong>alpha</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>) – Threshold for significance</p></li>
+<li><p><strong>prediction_type</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – One of {observation, pvalue, diff}, see Notes</p></li>
+<li><p><strong>try_load</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – load pre-computed permutation results if available</p></li>
+<li><p><strong>key_added</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]) – Key added to SpatialOmics.uns[spl][metric][key_added]</p></li>
+<li><p><strong>graph_key</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – Specifies the graph representation to use in so.G[spl] if <cite>local=True</cite>.</p></li>
+<li><p><strong>inplace</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – Whether to add the metric to the current SpatialOmics instance or to return a new one.</p></li>
+</ul>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p><cite>classic</cite> and <cite>histoCAT</cite> are python implementations of the corresponding methods pubished by the Bodenmiller lab at UZH.
+The <cite>proportion</cite> method is similar to the <cite>classic</cite> method but normalises the score by the number of edges and is thus bound [0,1].</p>
+<p>Returns:</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="athena.neighborhood.estimators.infiltration">
+<code class="sig-name descname"><span class="pre">infiltration</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">so</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">spl</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">attr</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">interaction1</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">('tumor',</span> <span class="pre">'immune')</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">interaction2</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">('immune',</span> <span class="pre">'immune')</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">add_key</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'infiltration'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">inplace</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">graph_key</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'knn'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">local</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/athena/neighborhood/estimators.html#infiltration"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#athena.neighborhood.estimators.infiltration" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute infiltration score. Generalises the infiltration score presented in
+<a class="reference external" href="https://pubmed.ncbi.nlm.nih.gov/30193111/">A Structured Tumor-Immune Microenvironment in Triple Negative Breast Cancer Revealed by Multiplexed Ion Beam Imaging</a>
+The score comptes a ratio between the number of interactions observed between the observation types specified in <cite>interactions1</cite>
+and <cite>interaction2</cite> as <span class="math notranslate nohighlight">\(\frac{\texttt{number of interactions 1}}{\texttt{number of interactions 2}}\)</span>. This ratio can
+be undefined. See notes for more information.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>so</strong> – SpatialOmics instance</p></li>
+<li><p><strong>spl</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – Spl for which to compute the metric</p></li>
+<li><p><strong>attr</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – Categorical feature in SpatialOmics.obs to use for the grouping</p></li>
+<li><p><strong>interaction1</strong> – labels in <cite>attr</cite> of enumerator interaction</p></li>
+<li><p><strong>interaction2</strong> – labels in <cite>attr</cite> of denominator interaction</p></li>
+<li><p><strong>key_added</strong> – Key added to SpatialOmics.uns[spl][metric][key_added]</p></li>
+<li><p><strong>inplace</strong> – Whether to add the metric to the current SpatialOmics instance or to return a new one.</p></li>
+<li><p><strong>graph_key</strong> – Specifies the graph representation to use in so.G[spl] if <cite>local=True</cite>.</p></li>
+</ul>
+</dd>
+</dl>
+<p>Returns:</p>
+<p class="rubric">Notes</p>
+<p>The default arguments are replicating the <a class="reference external" href="https://pubmed.ncbi.nlm.nih.gov/30193111/">immune infiltration score</a>. However, you
+can compute any kind of “infiltration” between observation types. The <cite>attr</cite> argument specifies the column
+in the <cite>obs</cite> dataframe which encodes different observation types. <cite>interaction{1,2}</cite> argument defines between
+which types the score should be computed.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="athena.neighborhood.estimators.ripleysK">
+<code class="sig-name descname"><span class="pre">ripleysK</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">so</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">spl</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">attr</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">id</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'K'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">radii</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">correction</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'ripley'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">inplace</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">key_added</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/athena/neighborhood/estimators.html#ripleysK"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#athena.neighborhood.estimators.ripleysK" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute Ripley’s K as implemented by <a class="reference external" href="https://docs.astropy.org/en/stable/stats/ripley.html">[1]</a>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>so</strong> – SpatialOmics instance</p></li>
+<li><p><strong>spl</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – Spl for which to compute the metric</p></li>
+<li><p><strong>attr</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – Categorical feature in SpatialOmics.obs to use for the grouping</p></li>
+<li><p><strong>id</strong> – The category in the categorical feature <cite>attr</cite>, for which Ripley’s K should be computed</p></li>
+<li><p><strong>mode</strong> – {K, csr-deviation}. If <cite>K</cite>, Ripley’s K is estimated, with <cite>csr-deviation</cite> the deviation from a poission process is computed.</p></li>
+<li><p><strong>radii</strong> – List of radiis for which Ripley’s K is computed</p></li>
+<li><p><strong>correction</strong> – Correction method to use to correct for boarder effects, see [1].</p></li>
+<li><p><strong>inplace</strong> – Whether to add the metric to the current SpatialOmics instance or to return a new one.</p></li>
+<li><p><strong>key_added</strong> – Key added to SpatialOmics.uns[spl][metric][key_added]</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Ripley’s K estimates</p>
+</dd>
+</dl>
+<p class="rubric">References</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="athena.neighborhood.estimators.add2uns">
+<code class="sig-name descname"><span class="pre">add2uns</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">so</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">res</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">spl</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">parent_key</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">key_added</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/athena/neighborhood/estimators.html#add2uns"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#athena.neighborhood.estimators.add2uns" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright IBM Corp. 2021.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

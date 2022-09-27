@@ -1,0 +1,266 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>athena.graph_builder.graphBuilder &mdash; athena  documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../index.html" class="icon icon-home"> athena
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">General</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../source/installation.html">Installation</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Gallery</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../source/overview.html">Overview of ATHENA</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../source/methodology.html">Methodology</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../source/quickstart.html">Quickstart</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../source/tutorial.html">Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../source/introduction-spatialOmics.html">SpatialOmics Tutorial</a></li>
+</ul>
+<p class="caption"><span class="caption-text">API</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../api_overview.html">API Overview</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">athena</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+        
+      <li>athena.graph_builder.graphBuilder</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for athena.graph_builder.graphBuilder</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">.constants</span> <span class="kn">import</span> <span class="n">GRAPH_BUILDER_DEFAULT_PARAMS</span>
+<span class="kn">from</span> <span class="nn">.mappings</span> <span class="kn">import</span> <span class="n">GRAPH_BUILDERS</span>
+
+
+<div class="viewcode-block" id="build_graph"><a class="viewcode-back" href="../../../api/athena.graph_builder.graphBuilder.html#athena.graph_builder.graphBuilder.build_graph">[docs]</a><span class="k">def</span> <span class="nf">build_graph</span><span class="p">(</span><span class="n">so</span><span class="p">,</span> <span class="n">spl</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">builder_type</span><span class="o">=</span><span class="s1">&#39;knn&#39;</span><span class="p">,</span> <span class="n">mask_key</span><span class="o">=</span><span class="s1">&#39;cellmasks&#39;</span><span class="p">,</span> <span class="n">key_added</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">config</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                <span class="n">coordinate_keys</span><span class="o">=</span><span class="p">(</span><span class="s1">&#39;x&#39;</span><span class="p">,</span> <span class="s1">&#39;y&#39;</span><span class="p">)):</span>
+    <span class="sd">&quot;&quot;&quot;Build graph representation for a sample. A graph is constructed based on the provided segmentation masks</span>
+<span class="sd">    for the sample. For the `knn` and `radius` graph representation the centroid of each mask is used. For the `contact`</span>
+<span class="sd">    graph representation the segmentation masks are dilation_ is performed. The segmentation masks that overlap after</span>
+<span class="sd">    dilation are considered to be in physical contact and connected in the `contact` graph.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        so: SpatialOmics object</span>
+<span class="sd">        spl: sample name in so.spl.index</span>
+<span class="sd">        builder_type: graph type to construct {knn, radius, contact}</span>
+<span class="sd">        mask_key: key in so.masks[spl] to use as segmentation masks from which the observation coordinates are extracted, if</span>
+<span class="sd">            `None` `coordinate_keys` from `obs` attribute are used</span>
+<span class="sd">        key_added: key added in so.G[spl][key_add] to store the graph.</span>
+<span class="sd">        config: dict containing a dict &#39;builder_params&#39; that specifies the graph construction parameters</span>
+<span class="sd">        inplace: whether to return a new SpatialOmics instance</span>
+<span class="sd">        coordinate_keys: column names of the x and y coordinates of a observation</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        None or SpatialOmics if inplace = False</span>
+
+<span class="sd">    .. _dilation: https://scikit-image.org/docs/stable/api/skimage.morphology.html#skimage.morphology.binary_dilation</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">builder_type</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">GRAPH_BUILDERS</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;invalid type </span><span class="si">{</span><span class="n">builder_type</span><span class="si">}</span><span class="s1">. Available types are </span><span class="si">{</span><span class="n">GRAPH_BUILDERS</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">config</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">config</span> <span class="o">=</span> <span class="n">GRAPH_BUILDER_DEFAULT_PARAMS</span><span class="p">[</span><span class="n">builder_type</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">key_added</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">key_added</span> <span class="o">=</span> <span class="n">builder_type</span>
+
+    <span class="k">if</span> <span class="n">mask_key</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">builder_type</span> <span class="o">==</span> <span class="s1">&#39;contact&#39;</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s1">&#39;Contact-graph requires segmentations masks. To compute a contact graph please specify `the mask_key` to use in so.masks[spl]&#39;</span><span class="p">)</span>
+        <span class="n">ndat</span> <span class="o">=</span> <span class="n">so</span><span class="o">.</span><span class="n">obs</span><span class="p">[</span><span class="n">spl</span><span class="p">][[</span><span class="n">coordinate_keys</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">coordinate_keys</span><span class="p">[</span><span class="mi">1</span><span class="p">]]]</span>
+        <span class="n">builder</span> <span class="o">=</span> <span class="n">GRAPH_BUILDERS</span><span class="p">[</span><span class="n">builder_type</span><span class="p">](</span><span class="n">config</span><span class="p">)</span>
+        <span class="n">g</span> <span class="o">=</span> <span class="n">builder</span><span class="p">(</span><span class="n">ndata</span><span class="o">=</span><span class="n">ndat</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">mask</span> <span class="o">=</span> <span class="n">so</span><span class="o">.</span><span class="n">get_mask</span><span class="p">(</span><span class="n">spl</span><span class="p">,</span> <span class="n">mask_key</span><span class="p">)</span>
+        <span class="n">g</span> <span class="o">=</span> <span class="n">GRAPH_BUILDERS</span><span class="p">[</span><span class="n">builder_type</span><span class="p">]</span><span class="o">.</span><span class="n">from_mask</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">mask</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="s1">&#39;include_self&#39;</span> <span class="ow">in</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;builder_params&#39;</span><span class="p">]</span> <span class="ow">and</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;builder_params&#39;</span><span class="p">][</span>
+        <span class="s1">&#39;include_self&#39;</span><span class="p">]</span> <span class="ow">and</span> <span class="n">builder_type</span> <span class="o">==</span> <span class="s1">&#39;contact&#39;</span><span class="p">:</span>
+        <span class="n">edge_list</span> <span class="o">=</span> <span class="p">[(</span><span class="n">i</span><span class="p">,</span> <span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">g</span><span class="o">.</span><span class="n">nodes</span><span class="p">]</span>
+        <span class="n">g</span><span class="o">.</span><span class="n">add_edges_from</span><span class="p">(</span><span class="n">edge_list</span><span class="p">)</span>
+
+    <span class="n">so</span> <span class="o">=</span> <span class="n">so</span> <span class="k">if</span> <span class="n">inplace</span> <span class="k">else</span> <span class="n">so</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">spl</span> <span class="ow">in</span> <span class="n">so</span><span class="o">.</span><span class="n">G</span><span class="p">:</span>
+        <span class="n">so</span><span class="o">.</span><span class="n">G</span><span class="p">[</span><span class="n">spl</span><span class="p">]</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="n">key_added</span><span class="p">:</span> <span class="n">g</span><span class="p">})</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">so</span><span class="o">.</span><span class="n">G</span><span class="p">[</span><span class="n">spl</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="n">key_added</span><span class="p">:</span> <span class="n">g</span><span class="p">}</span></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright IBM Corp. 2021.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

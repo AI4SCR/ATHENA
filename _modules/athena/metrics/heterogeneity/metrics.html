@@ -1,0 +1,568 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>athena.metrics.heterogeneity.metrics &mdash; athena  documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../../" src="../../../../_static/documentation_options.js"></script>
+        <script src="../../../../_static/jquery.js"></script>
+        <script src="../../../../_static/underscore.js"></script>
+        <script src="../../../../_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="../../../../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../../index.html" class="icon icon-home"> athena
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">General</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../source/installation.html">Installation</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Gallery</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../source/overview.html">Overview of ATHENA</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../source/methodology.html">Methodology</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../source/quickstart.html">Quickstart</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../source/tutorial.html">Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../source/introduction-spatialOmics.html">SpatialOmics Tutorial</a></li>
+</ul>
+<p class="caption"><span class="caption-text">API</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../api_overview.html">API Overview</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">athena</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="../../../index.html">Module code</a> &raquo;</li>
+        
+      <li>athena.metrics.heterogeneity.metrics</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for athena.metrics.heterogeneity.metrics</h1><div class="highlight"><pre>
+<span></span><span class="c1"># %%</span>
+<span class="kn">from</span> <span class="nn">.base_metrics</span> <span class="kn">import</span> <span class="n">_shannon</span><span class="p">,</span> <span class="n">_richness</span><span class="p">,</span> <span class="n">_simpson</span><span class="p">,</span> <span class="n">_shannon_evenness</span><span class="p">,</span> <span class="n">_hill_number</span><span class="p">,</span> \
+    <span class="n">_simpson_evenness</span><span class="p">,</span> <span class="n">_gini_simpson</span><span class="p">,</span> <span class="n">_renyi</span><span class="p">,</span> <span class="n">_abundance</span><span class="p">,</span> <span class="n">_quadratic_entropy</span>
+
+<span class="kn">from</span> <span class="nn">...utils.general</span> <span class="kn">import</span> <span class="n">is_categorical</span><span class="p">,</span> <span class="n">make_iterable</span><span class="p">,</span> <span class="n">is_numeric</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">Counter</span>
+
+<span class="kn">from</span> <span class="nn">sklearn.preprocessing</span> <span class="kn">import</span> <span class="n">StandardScaler</span>
+
+
+<span class="c1"># %%</span>
+
+<div class="viewcode-block" id="richness"><a class="viewcode-back" href="../../../../api/athena.metrics.heterogeneity.metrics.html#athena.metrics.heterogeneity.metrics.richness">[docs]</a><span class="k">def</span> <span class="nf">richness</span><span class="p">(</span><span class="n">so</span><span class="p">,</span> <span class="n">spl</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">attr</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">local</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">key_added</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">graph_key</span><span class="o">=</span><span class="s1">&#39;knn&#39;</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Computes the richness on the observation or the sample level</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        so: SpatialOmics instance</span>
+<span class="sd">        spl: Spl for which to compute the metric</span>
+<span class="sd">        attr: Categorical feature in SpatialOmics.obs to use for the grouping</span>
+<span class="sd">        local: Whether to compute the metric on the observation or the sample level</span>
+<span class="sd">        key_added: Key added to either obs or spl depending on the choice of `local`</span>
+<span class="sd">        graph_key: Specifies the graph representation to use in so.G[spl] if `local=True`.</span>
+<span class="sd">        inplace: Whether to add the metric to the current SpatialOmics instance or to return a new one.</span>
+
+<span class="sd">    Examples:</span>
+
+<span class="sd">        .. code-block:: python</span>
+
+<span class="sd">            so = sh.dataset.imc()</span>
+<span class="sd">            spl = so.spl.index[0]</span>
+
+<span class="sd">            sh.metrics.richness(so, spl, &#39;meta_id&#39;, local=False)</span>
+<span class="sd">            sh.metrics.richness(so, spl, &#39;meta_id&#39;, local=True)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">if</span> <span class="n">key_added</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">key_added</span> <span class="o">=</span> <span class="s1">&#39;richness&#39;</span>
+        <span class="n">key_added</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">key_added</span><span class="si">}</span><span class="s1">_</span><span class="si">{</span><span class="n">attr</span><span class="si">}</span><span class="s1">&#39;</span>
+        <span class="k">if</span> <span class="n">local</span><span class="p">:</span>
+            <span class="n">key_added</span> <span class="o">+=</span> <span class="sa">f</span><span class="s1">&#39;_</span><span class="si">{</span><span class="n">graph_key</span><span class="si">}</span><span class="s1">&#39;</span>
+
+    <span class="n">metric</span> <span class="o">=</span> <span class="n">_richness</span>
+    <span class="n">kwargs_metric</span> <span class="o">=</span> <span class="p">{}</span>
+
+    <span class="k">return</span> <span class="n">_compute_metric</span><span class="p">(</span><span class="n">so</span><span class="o">=</span><span class="n">so</span><span class="p">,</span> <span class="n">spl</span><span class="o">=</span><span class="n">spl</span><span class="p">,</span> <span class="n">attr</span><span class="o">=</span><span class="n">attr</span><span class="p">,</span> <span class="n">key_added</span><span class="o">=</span><span class="n">key_added</span><span class="p">,</span> <span class="n">graph_key</span><span class="o">=</span><span class="n">graph_key</span><span class="p">,</span> <span class="n">metric</span><span class="o">=</span><span class="n">metric</span><span class="p">,</span>
+                           <span class="n">kwargs_metric</span><span class="o">=</span><span class="n">kwargs_metric</span><span class="p">,</span>
+                           <span class="n">local</span><span class="o">=</span><span class="n">local</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="n">inplace</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="shannon"><a class="viewcode-back" href="../../../../api/athena.metrics.heterogeneity.metrics.html#athena.metrics.heterogeneity.metrics.shannon">[docs]</a><span class="k">def</span> <span class="nf">shannon</span><span class="p">(</span><span class="n">so</span><span class="p">,</span> <span class="n">spl</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">attr</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">local</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">key_added</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">graph_key</span><span class="o">=</span><span class="s1">&#39;knn&#39;</span><span class="p">,</span> <span class="n">base</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Computes the Shannon Index on the observation or the sample level</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        so: SpatialOmics instance</span>
+<span class="sd">        spl: Spl for which to compute the metric</span>
+<span class="sd">        attr: Categorical feature in SpatialOmics.obs to use for the grouping</span>
+<span class="sd">        local: Whether to compute the metric on the observation or the sample level</span>
+<span class="sd">        key_added: Key added to either obs or spl depending on the choice of `local`</span>
+<span class="sd">        graph_key: Specifies the graph representation to use in so.G[spl] if `local=True`.</span>
+<span class="sd">        inplace: Whether to add the metric to the current SpatialOmics instance or to return a new one.</span>
+
+<span class="sd">    Examples:</span>
+
+<span class="sd">        .. code-block:: python</span>
+
+<span class="sd">            so = sh.dataset.imc()</span>
+<span class="sd">            spl = so.spl.index[0]</span>
+
+<span class="sd">            sh.metrics.shannon(so, spl, &#39;meta_id&#39;, local=False)</span>
+<span class="sd">            sh.metrics.shannon(so, spl, &#39;meta_id&#39;, local=True)</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">key_added</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">key_added</span> <span class="o">=</span> <span class="s1">&#39;shannon&#39;</span>
+        <span class="n">key_added</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">key_added</span><span class="si">}</span><span class="s1">_</span><span class="si">{</span><span class="n">attr</span><span class="si">}</span><span class="s1">&#39;</span>
+        <span class="k">if</span> <span class="n">local</span><span class="p">:</span>
+            <span class="n">key_added</span> <span class="o">+=</span> <span class="sa">f</span><span class="s1">&#39;_</span><span class="si">{</span><span class="n">graph_key</span><span class="si">}</span><span class="s1">&#39;</span>
+
+    <span class="n">metric</span> <span class="o">=</span> <span class="n">_shannon</span>
+    <span class="n">kwargs_metric</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;base&#39;</span><span class="p">:</span> <span class="n">base</span><span class="p">}</span>
+
+    <span class="k">return</span> <span class="n">_compute_metric</span><span class="p">(</span><span class="n">so</span><span class="o">=</span><span class="n">so</span><span class="p">,</span> <span class="n">spl</span><span class="o">=</span><span class="n">spl</span><span class="p">,</span> <span class="n">attr</span><span class="o">=</span><span class="n">attr</span><span class="p">,</span> <span class="n">key_added</span><span class="o">=</span><span class="n">key_added</span><span class="p">,</span> <span class="n">graph_key</span><span class="o">=</span><span class="n">graph_key</span><span class="p">,</span> <span class="n">metric</span><span class="o">=</span><span class="n">metric</span><span class="p">,</span>
+                           <span class="n">kwargs_metric</span><span class="o">=</span><span class="n">kwargs_metric</span><span class="p">,</span>
+                           <span class="n">local</span><span class="o">=</span><span class="n">local</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="n">inplace</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="simpson"><a class="viewcode-back" href="../../../../api/athena.metrics.heterogeneity.metrics.html#athena.metrics.heterogeneity.metrics.simpson">[docs]</a><span class="k">def</span> <span class="nf">simpson</span><span class="p">(</span><span class="n">so</span><span class="p">,</span> <span class="n">spl</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">attr</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">local</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">key_added</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">graph_key</span><span class="o">=</span><span class="s1">&#39;knn&#39;</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Computes the Simpson Index on the observation or the sample level</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        so: SpatialOmics instance</span>
+<span class="sd">        spl: Spl for which to compute the metric</span>
+<span class="sd">        attr: Categorical feature in SpatialOmics.obs to use for the grouping</span>
+<span class="sd">        local: Whether to compute the metric on the observation or the sample level</span>
+<span class="sd">        key_added: Key added to either obs or spl depending on the choice of `local`</span>
+<span class="sd">        graph_key: Specifies the graph representation to use in so.G[spl] if `local=True`.</span>
+<span class="sd">        inplace: Whether to add the metric to the current SpatialOmics instance or to return a new one.</span>
+
+<span class="sd">    Examples:</span>
+
+<span class="sd">        .. code-block:: python</span>
+
+<span class="sd">            so = sh.dataset.imc()</span>
+<span class="sd">            spl = so.spl.index[0]</span>
+
+<span class="sd">            sh.metrics.simpson(so, spl, &#39;meta_id&#39;, local=False)</span>
+<span class="sd">            sh.metrics.simpson(so, spl, &#39;meta_id&#39;, local=True)</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">key_added</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">key_added</span> <span class="o">=</span> <span class="s1">&#39;simpson&#39;</span>
+        <span class="n">key_added</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">key_added</span><span class="si">}</span><span class="s1">_</span><span class="si">{</span><span class="n">attr</span><span class="si">}</span><span class="s1">&#39;</span>
+        <span class="k">if</span> <span class="n">local</span><span class="p">:</span>
+            <span class="n">key_added</span> <span class="o">+=</span> <span class="sa">f</span><span class="s1">&#39;_</span><span class="si">{</span><span class="n">graph_key</span><span class="si">}</span><span class="s1">&#39;</span>
+
+    <span class="n">metric</span> <span class="o">=</span> <span class="n">_simpson</span>
+    <span class="n">kwargs_metric</span> <span class="o">=</span> <span class="p">{}</span>
+
+    <span class="k">return</span> <span class="n">_compute_metric</span><span class="p">(</span><span class="n">so</span><span class="o">=</span><span class="n">so</span><span class="p">,</span> <span class="n">spl</span><span class="o">=</span><span class="n">spl</span><span class="p">,</span> <span class="n">attr</span><span class="o">=</span><span class="n">attr</span><span class="p">,</span> <span class="n">key_added</span><span class="o">=</span><span class="n">key_added</span><span class="p">,</span> <span class="n">graph_key</span><span class="o">=</span><span class="n">graph_key</span><span class="p">,</span> <span class="n">metric</span><span class="o">=</span><span class="n">metric</span><span class="p">,</span>
+                           <span class="n">kwargs_metric</span><span class="o">=</span><span class="n">kwargs_metric</span><span class="p">,</span>
+                           <span class="n">local</span><span class="o">=</span><span class="n">local</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="n">inplace</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="hill_number"><a class="viewcode-back" href="../../../../api/athena.metrics.heterogeneity.metrics.html#athena.metrics.heterogeneity.metrics.hill_number">[docs]</a><span class="k">def</span> <span class="nf">hill_number</span><span class="p">(</span><span class="n">so</span><span class="p">,</span> <span class="n">spl</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">attr</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">q</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">local</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">key_added</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">graph_key</span><span class="o">=</span><span class="s1">&#39;knn&#39;</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Computes the Hill Numbers on the observation or the sample level</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        so: SpatialOmics instance</span>
+<span class="sd">        spl: Spl for which to compute the metric</span>
+<span class="sd">        attr: Categorical feature in SpatialOmics.obs to use for the grouping</span>
+<span class="sd">        q: The hill coefficient as defined here_.</span>
+<span class="sd">        local: Whether to compute the metric on the observation or the sample level</span>
+<span class="sd">        key_added: Key added to either obs or spl depending on the choice of `local`</span>
+<span class="sd">        graph_key: Specifies the graph representation to use in so.G[spl] if `local=True`.</span>
+<span class="sd">        inplace: Whether to add the metric to the current SpatialOmics instance or to return a new one.</span>
+
+<span class="sd">    Examples:</span>
+
+<span class="sd">        .. code-block:: python</span>
+
+<span class="sd">            so = sh.dataset.imc()</span>
+<span class="sd">            spl = so.spl.index[0]</span>
+
+<span class="sd">            sh.metrics.hill_number(so, spl, &#39;meta_id&#39;, q=2, local=False)</span>
+<span class="sd">            sh.metrics.hill_number(so, spl, &#39;meta_id&#39;, q=2, local=True)</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">key_added</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">key_added</span> <span class="o">=</span> <span class="s1">&#39;hill_number&#39;</span>
+        <span class="n">key_added</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">key_added</span><span class="si">}</span><span class="s1">_</span><span class="si">{</span><span class="n">attr</span><span class="si">}</span><span class="s1">_q</span><span class="si">{</span><span class="n">q</span><span class="si">}</span><span class="s1">&#39;</span>
+        <span class="k">if</span> <span class="n">local</span><span class="p">:</span>
+            <span class="n">key_added</span> <span class="o">+=</span> <span class="sa">f</span><span class="s1">&#39;_</span><span class="si">{</span><span class="n">graph_key</span><span class="si">}</span><span class="s1">&#39;</span>
+
+    <span class="n">metric</span> <span class="o">=</span> <span class="n">_hill_number</span>
+    <span class="n">kwargs_metric</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;q&#39;</span><span class="p">:</span> <span class="n">q</span><span class="p">}</span>
+
+    <span class="k">return</span> <span class="n">_compute_metric</span><span class="p">(</span><span class="n">so</span><span class="o">=</span><span class="n">so</span><span class="p">,</span> <span class="n">spl</span><span class="o">=</span><span class="n">spl</span><span class="p">,</span> <span class="n">attr</span><span class="o">=</span><span class="n">attr</span><span class="p">,</span> <span class="n">key_added</span><span class="o">=</span><span class="n">key_added</span><span class="p">,</span> <span class="n">graph_key</span><span class="o">=</span><span class="n">graph_key</span><span class="p">,</span> <span class="n">metric</span><span class="o">=</span><span class="n">metric</span><span class="p">,</span>
+                           <span class="n">kwargs_metric</span><span class="o">=</span><span class="n">kwargs_metric</span><span class="p">,</span>
+                           <span class="n">local</span><span class="o">=</span><span class="n">local</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="n">inplace</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="renyi_entropy"><a class="viewcode-back" href="../../../../api/athena.metrics.heterogeneity.metrics.html#athena.metrics.heterogeneity.metrics.renyi_entropy">[docs]</a><span class="k">def</span> <span class="nf">renyi_entropy</span><span class="p">(</span><span class="n">so</span><span class="p">,</span> <span class="n">spl</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">attr</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">q</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">local</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">key_added</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">graph_key</span><span class="o">=</span><span class="s1">&#39;knn&#39;</span><span class="p">,</span> <span class="n">base</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+                  <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Computes the Renyi-Entropy.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        so: SpatialOmics instance</span>
+<span class="sd">        spl: Spl for which to compute the metric</span>
+<span class="sd">        attr: Categorical feature in SpatialOmics.obs to use for the grouping</span>
+<span class="sd">        q: The renyi coefficient as defined here_</span>
+<span class="sd">        local: Whether to compute the metric on the observation or the sample level</span>
+<span class="sd">        key_added: Key added to either obs or spl depending on the choice of `local`</span>
+<span class="sd">        graph_key: Specifies the graph representation to use in so.G[spl] if `local=True`.</span>
+<span class="sd">        inplace: Whether to add the metric to the current SpatialOmics instance or to return a new one.</span>
+
+<span class="sd">    Examples:</span>
+
+<span class="sd">        .. code-block:: python</span>
+
+<span class="sd">            so = sh.dataset.imc()</span>
+<span class="sd">            spl = so.spl.index[0]</span>
+
+<span class="sd">            sh.metrics.renyi_entropy(so, spl, &#39;meta_id&#39;, q=2, local=False)</span>
+<span class="sd">            sh.metrics.renyi_entropy(so, spl, &#39;meta_id&#39;, q=2, local=True)</span>
+
+<span class="sd">    .. _here: https://ai4scr.github.io/ATHENA/source/methodology.html</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">key_added</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">key_added</span> <span class="o">=</span> <span class="s1">&#39;renyi&#39;</span>
+        <span class="n">key_added</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">key_added</span><span class="si">}</span><span class="s1">_</span><span class="si">{</span><span class="n">attr</span><span class="si">}</span><span class="s1">_q</span><span class="si">{</span><span class="n">q</span><span class="si">}</span><span class="s1">&#39;</span>
+        <span class="k">if</span> <span class="n">local</span><span class="p">:</span>
+            <span class="n">key_added</span> <span class="o">+=</span> <span class="sa">f</span><span class="s1">&#39;_</span><span class="si">{</span><span class="n">graph_key</span><span class="si">}</span><span class="s1">&#39;</span>
+
+    <span class="n">metric</span> <span class="o">=</span> <span class="n">_renyi</span>
+    <span class="n">kwargs_metric</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;q&#39;</span><span class="p">:</span> <span class="n">q</span><span class="p">,</span>
+                     <span class="s1">&#39;base&#39;</span><span class="p">:</span> <span class="n">base</span><span class="p">}</span>
+
+    <span class="k">return</span> <span class="n">_compute_metric</span><span class="p">(</span><span class="n">so</span><span class="o">=</span><span class="n">so</span><span class="p">,</span> <span class="n">spl</span><span class="o">=</span><span class="n">spl</span><span class="p">,</span> <span class="n">attr</span><span class="o">=</span><span class="n">attr</span><span class="p">,</span> <span class="n">key_added</span><span class="o">=</span><span class="n">key_added</span><span class="p">,</span> <span class="n">graph_key</span><span class="o">=</span><span class="n">graph_key</span><span class="p">,</span> <span class="n">metric</span><span class="o">=</span><span class="n">metric</span><span class="p">,</span>
+                           <span class="n">kwargs_metric</span><span class="o">=</span><span class="n">kwargs_metric</span><span class="p">,</span>
+                           <span class="n">local</span><span class="o">=</span><span class="n">local</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="n">inplace</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="quadratic_entropy"><a class="viewcode-back" href="../../../../api/athena.metrics.heterogeneity.metrics.html#athena.metrics.heterogeneity.metrics.quadratic_entropy">[docs]</a><span class="k">def</span> <span class="nf">quadratic_entropy</span><span class="p">(</span><span class="n">so</span><span class="p">,</span> <span class="n">spl</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">attr</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">metric</span><span class="o">=</span><span class="s1">&#39;minkowski&#39;</span><span class="p">,</span> <span class="n">metric_kwargs</span><span class="o">=</span><span class="p">{},</span> <span class="n">scale</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+                      <span class="n">local</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">key_added</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">graph_key</span><span class="o">=</span><span class="s1">&#39;knn&#39;</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Computes the quadratic entropy, taking relative abundance and similarity between observations into account.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        so: SpatialOmics instance</span>
+<span class="sd">        spl: Spl for which to compute the metric</span>
+<span class="sd">        attr: Categorical feature in SpatialOmics.obs to use for the grouping</span>
+<span class="sd">        metric: metric used to compute distance of observations in the features space so.X[spl]</span>
+<span class="sd">        metric_kwargs: key word arguments for metric</span>
+<span class="sd">        scale: whether to scale features of observations to unit variance and 0 mean</span>
+<span class="sd">        local: whether to compute the metric on the observation or the sample level</span>
+<span class="sd">        key_added: Key added to either obs or spl depending on the choice of `local`</span>
+<span class="sd">        graph_key: Specifies the graph representation to use in so.G[spl] if `local=True`.</span>
+<span class="sd">        inplace: Whether to add the metric to the current SpatialOmics instance or to return a new one.</span>
+
+<span class="sd">    Notes:</span>
+<span class="sd">        The implementation computes an average feature vector for each group in attr based on all observations in the</span>
+<span class="sd">        sample. Thus, if staining biases across samples exists this will directly distort this metric.</span>
+
+<span class="sd">    Examples:</span>
+
+<span class="sd">        .. code-block:: python</span>
+
+<span class="sd">            so = sh.dataset.imc()</span>
+<span class="sd">            spl = so.spl.index[0]</span>
+
+<span class="sd">            sh.metrics.quadratic_entropy(so, spl, &#39;meta_id&#39;, local=False)</span>
+<span class="sd">            sh.metrics.quadratic_entropy(so, spl, &#39;meta_id&#39;, local=True)</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">key_added</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">key_added</span> <span class="o">=</span> <span class="s1">&#39;quadratic&#39;</span>
+        <span class="n">key_added</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">key_added</span><span class="si">}</span><span class="s1">_</span><span class="si">{</span><span class="n">attr</span><span class="si">}</span><span class="s1">&#39;</span>
+        <span class="k">if</span> <span class="n">local</span><span class="p">:</span>
+            <span class="n">key_added</span> <span class="o">+=</span> <span class="sa">f</span><span class="s1">&#39;_</span><span class="si">{</span><span class="n">graph_key</span><span class="si">}</span><span class="s1">&#39;</span>
+
+    <span class="c1"># collect feature vectors of all observations and add attr grouping</span>
+    <span class="n">features</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span> <span class="o">=</span> <span class="n">so</span><span class="o">.</span><span class="n">X</span><span class="p">[</span><span class="n">spl</span><span class="p">]</span>
+    <span class="n">features</span> <span class="o">=</span> <span class="n">features</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="n">so</span><span class="o">.</span><span class="n">obs</span><span class="p">[</span><span class="n">spl</span><span class="p">][</span><span class="n">attr</span><span class="p">],</span> <span class="n">right_index</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">left_index</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">features</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">so</span><span class="o">.</span><span class="n">X</span><span class="p">[</span><span class="n">spl</span><span class="p">]),</span> <span class="s1">&#39;inner merge resulted in dropped index ids&#39;</span>
+
+    <span class="c1"># compute average feature vector for each attr group and standardise</span>
+    <span class="n">features</span> <span class="o">=</span> <span class="n">features</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="n">attr</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">scale</span><span class="p">:</span>
+        <span class="n">tmp</span> <span class="o">=</span> <span class="n">StandardScaler</span><span class="p">()</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">features</span><span class="p">)</span>
+        <span class="n">features</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">tmp</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="n">features</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="n">features</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span>
+
+    <span class="n">base_metric</span> <span class="o">=</span> <span class="n">_quadratic_entropy</span>
+    <span class="n">kwargs_metric</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;features&#39;</span><span class="p">:</span> <span class="n">features</span><span class="p">,</span>
+                     <span class="s1">&#39;metric&#39;</span><span class="p">:</span> <span class="n">metric</span><span class="p">,</span>
+                     <span class="s1">&#39;metric_kwargs&#39;</span><span class="p">:</span> <span class="n">metric_kwargs</span><span class="p">,</span>
+                     <span class="s1">&#39;scale&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">}</span>  <span class="c1"># we scaled already</span>
+
+    <span class="k">return</span> <span class="n">_compute_metric</span><span class="p">(</span><span class="n">so</span><span class="o">=</span><span class="n">so</span><span class="p">,</span> <span class="n">spl</span><span class="o">=</span><span class="n">spl</span><span class="p">,</span> <span class="n">attr</span><span class="o">=</span><span class="n">attr</span><span class="p">,</span> <span class="n">key_added</span><span class="o">=</span><span class="n">key_added</span><span class="p">,</span> <span class="n">graph_key</span><span class="o">=</span><span class="n">graph_key</span><span class="p">,</span> <span class="n">metric</span><span class="o">=</span><span class="n">base_metric</span><span class="p">,</span>
+                           <span class="n">kwargs_metric</span><span class="o">=</span><span class="n">kwargs_metric</span><span class="p">,</span>
+                           <span class="n">local</span><span class="o">=</span><span class="n">local</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="n">inplace</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="abundance"><a class="viewcode-back" href="../../../../api/athena.metrics.heterogeneity.metrics.html#athena.metrics.heterogeneity.metrics.abundance">[docs]</a><span class="k">def</span> <span class="nf">abundance</span><span class="p">(</span><span class="n">so</span><span class="p">,</span> <span class="n">spl</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">attr</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;proportion&#39;</span><span class="p">,</span> <span class="n">key_added</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">graph_key</span><span class="o">=</span><span class="s1">&#39;knn&#39;</span><span class="p">,</span>
+              <span class="n">local</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">inplace</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Computes the abundance of species on the observation or the sample level.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        so: SpatialOmics instance</span>
+<span class="sd">        spl: Spl for which to compute the metric</span>
+<span class="sd">        attr: Categorical feature in SpatialOmics.obs to use for the grouping</span>
+<span class="sd">        local: Whether to compute the metric on the observation or the sample level</span>
+<span class="sd">        key_added: Key added to either uns[spl] or obs depending on the choice of `local`</span>
+<span class="sd">        graph_key: Specifies the graph representation to use in so.G[spl] if `local=True`.</span>
+<span class="sd">        inplace: Whether to add the metric to the current SpatialOmics instance or to return a new one.</span>
+
+<span class="sd">    Examples:</span>
+
+<span class="sd">        .. code-block:: python</span>
+
+<span class="sd">            so = sh.dataset.imc()</span>
+<span class="sd">            spl = so.spl.index[0]</span>
+
+<span class="sd">            sh.metrics.abundance(so, spl, &#39;meta_id&#39;, local=False)</span>
+<span class="sd">            sh.metrics.abundance(so, spl, &#39;meta_id&#39;, local=True)</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">if</span> <span class="n">key_added</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">key_added</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">mode</span><span class="si">}</span><span class="s1">&#39;</span>
+        <span class="k">if</span> <span class="n">local</span><span class="p">:</span>
+            <span class="n">key_added</span> <span class="o">+=</span> <span class="sa">f</span><span class="s1">&#39;_</span><span class="si">{</span><span class="n">graph_key</span><span class="si">}</span><span class="s1">&#39;</span>
+
+    <span class="n">event_space</span> <span class="o">=</span> <span class="n">so</span><span class="o">.</span><span class="n">obs</span><span class="p">[</span><span class="n">spl</span><span class="p">][</span><span class="n">attr</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">is_categorical</span><span class="p">(</span><span class="n">event_space</span><span class="p">):</span>
+        <span class="n">event_space</span> <span class="o">=</span> <span class="n">event_space</span><span class="o">.</span><span class="n">dtypes</span><span class="o">.</span><span class="n">categories</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">attr</span><span class="si">}</span><span class="s1"> is not categorical&#39;</span><span class="p">)</span>
+
+    <span class="n">metric</span> <span class="o">=</span> <span class="n">_abundance</span>
+    <span class="n">kwargs_metric</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;event_space&#39;</span><span class="p">:</span> <span class="n">event_space</span><span class="p">,</span>
+                     <span class="s1">&#39;mode&#39;</span><span class="p">:</span> <span class="n">mode</span><span class="p">}</span>
+
+    <span class="k">return</span> <span class="n">_compute_metric</span><span class="p">(</span><span class="n">so</span><span class="o">=</span><span class="n">so</span><span class="p">,</span> <span class="n">spl</span><span class="o">=</span><span class="n">spl</span><span class="p">,</span> <span class="n">attr</span><span class="o">=</span><span class="n">attr</span><span class="p">,</span> <span class="n">key_added</span><span class="o">=</span><span class="n">key_added</span><span class="p">,</span> <span class="n">metric</span><span class="o">=</span><span class="n">metric</span><span class="p">,</span> <span class="n">graph_key</span><span class="o">=</span><span class="n">graph_key</span><span class="p">,</span>
+                           <span class="n">kwargs_metric</span><span class="o">=</span><span class="n">kwargs_metric</span><span class="p">,</span> <span class="n">local</span><span class="o">=</span><span class="n">local</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="n">inplace</span><span class="p">)</span></div>
+
+
+<span class="k">def</span> <span class="nf">_compute_metric</span><span class="p">(</span><span class="n">so</span><span class="p">,</span> <span class="n">spl</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">attr</span><span class="p">,</span> <span class="n">key_added</span><span class="p">,</span> <span class="n">graph_key</span><span class="p">,</span> <span class="n">metric</span><span class="p">,</span> <span class="n">kwargs_metric</span><span class="p">,</span> <span class="n">local</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Computes the given metric for each observation or the sample</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># generate a copy if necessary</span>
+    <span class="n">so</span> <span class="o">=</span> <span class="n">so</span> <span class="k">if</span> <span class="n">inplace</span> <span class="k">else</span> <span class="n">so</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+
+    <span class="c1"># extract relevant categorisation</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="n">so</span><span class="o">.</span><span class="n">obs</span><span class="p">[</span><span class="n">spl</span><span class="p">][</span><span class="n">attr</span><span class="p">]</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">is_categorical</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;`attr` needs to be categorical&#39;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">local</span><span class="p">:</span>
+        <span class="c1"># get graph</span>
+        <span class="n">g</span> <span class="o">=</span> <span class="n">so</span><span class="o">.</span><span class="n">G</span><span class="p">[</span><span class="n">spl</span><span class="p">][</span><span class="n">graph_key</span><span class="p">]</span>
+
+        <span class="c1"># compute metric for each observation</span>
+        <span class="n">res</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">observation_ids</span> <span class="o">=</span> <span class="n">so</span><span class="o">.</span><span class="n">obs</span><span class="p">[</span><span class="n">spl</span><span class="p">]</span><span class="o">.</span><span class="n">index</span>
+        <span class="k">for</span> <span class="n">observation_id</span> <span class="ow">in</span> <span class="n">observation_ids</span><span class="p">:</span>
+            <span class="n">n</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">g</span><span class="o">.</span><span class="n">neighbors</span><span class="p">(</span><span class="n">observation_id</span><span class="p">))</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">n</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">res</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+                <span class="k">continue</span>
+            <span class="n">counts</span> <span class="o">=</span> <span class="n">Counter</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">n</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">)</span>
+            <span class="n">res</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">metric</span><span class="p">(</span><span class="n">counts</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs_metric</span><span class="p">))</span>
+
+        <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">ndim</span><span class="p">(</span><span class="n">res</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">res</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">res</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="n">observation_ids</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">spl</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">so</span><span class="o">.</span><span class="n">obsm</span><span class="p">:</span>
+                <span class="n">so</span><span class="o">.</span><span class="n">obsm</span><span class="p">[</span><span class="n">spl</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="n">so</span><span class="o">.</span><span class="n">obsm</span><span class="p">[</span><span class="n">spl</span><span class="p">][</span><span class="n">key_added</span><span class="p">]</span> <span class="o">=</span> <span class="n">res</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">res</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="n">key_added</span><span class="p">:</span> <span class="n">res</span><span class="p">},</span> <span class="n">index</span><span class="o">=</span><span class="n">observation_ids</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">key_added</span> <span class="ow">in</span> <span class="n">so</span><span class="o">.</span><span class="n">obs</span><span class="p">[</span><span class="n">spl</span><span class="p">]:</span>  <span class="c1"># drop previous computation of metric</span>
+                <span class="n">so</span><span class="o">.</span><span class="n">obs</span><span class="p">[</span><span class="n">spl</span><span class="p">]</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="n">key_added</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="n">so</span><span class="o">.</span><span class="n">obs</span><span class="p">[</span><span class="n">spl</span><span class="p">]</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">((</span><span class="n">so</span><span class="o">.</span><span class="n">obs</span><span class="p">[</span><span class="n">spl</span><span class="p">],</span> <span class="n">res</span><span class="p">),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">res</span> <span class="o">=</span> <span class="n">metric</span><span class="p">(</span><span class="n">Counter</span><span class="p">(</span><span class="n">data</span><span class="p">),</span> <span class="o">**</span><span class="n">kwargs_metric</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">ndim</span><span class="p">(</span><span class="n">res</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">spl</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">so</span><span class="o">.</span><span class="n">uns</span><span class="p">:</span>
+                <span class="n">so</span><span class="o">.</span><span class="n">uns</span><span class="p">[</span><span class="n">spl</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="n">so</span><span class="o">.</span><span class="n">uns</span><span class="p">[</span><span class="n">spl</span><span class="p">][</span><span class="n">key_added</span><span class="p">]</span> <span class="o">=</span> <span class="n">res</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">so</span><span class="o">.</span><span class="n">spl</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">spl</span><span class="p">,</span> <span class="n">key_added</span><span class="p">]</span> <span class="o">=</span> <span class="n">res</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">inplace</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">so</span>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright IBM Corp. 2021.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>
