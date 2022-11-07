@@ -61,7 +61,7 @@ def build_graph(so, spl: str, builder_type='knn', mask_key='cellmasks', key_adde
         edge_list = [(i, i) for i in g.nodes]
         g.add_edges_from(edge_list)
 
-    # I would just rewrite: if not inplace: so.copy()
+    # Copys so if inplace == Ture. I would just rewrite: if not inplace: so.copy()
     # TODO: imporve readability here. 
     so = so if inplace else so.copy()
 
