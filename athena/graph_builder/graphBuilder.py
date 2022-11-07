@@ -39,7 +39,7 @@ def build_graph(so, spl: str, builder_type='knn', mask_key='cellmasks', key_adde
     if key_added is None:
         key_added = builder_type
 
-    # If no masks are provided check that builder_type != 'contact'. Then build
+    # If no masks are provided build graph with centroids.
     if mask_key is None:
         # Raise error if no masks were provided and the builder_type is contact
         if builder_type == 'contact':
