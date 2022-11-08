@@ -31,12 +31,16 @@ class BaseGraphBuilder(ABC):
         Returns:
             nx.Graph
         """
+        
+        # Write input parameters to instance varaibles
         self.ndata = ndata
         self.edata = edata
 
+        # Add nodes and node attributes to graph
         self._add_nodes()
         self._add_nodes_attr()
 
+        # If `edata` is given add edges and edge attributes to graph. Else build graph
         if edata is None:
             self._build_topology(topo_data=topo_data)
         else:
