@@ -55,28 +55,39 @@ class ContactGraphBuilder(BaseGraphBuilder):
 
         # type hints
         self.graph: nx.Graph
-
+        
+        # Instance variable to in function variable
         params = self.config['builder_params']
 
+        # Function param to function variable
         mask = topo_data['mask']
 
+        # If dilation_kernel instantiate kernel object, else raise error
         if params['dilation_kernel'] in DILATION_KERNELS:
             kernel = DILATION_KERNELS[params['dilation_kernel']](params['radius'])
         else:
             raise ValueError(
                 f'Specified dilate kernel not available. Please use one of {{{", ".join(DILATION_KERNELS)}}}.')
 
+        # Context: Each pixel that belongs to cell i, was value i in the mask. 
         # get object ids, 0 is background.
         objs = np.unique(mask)
         objs = objs[objs != 0]
 
-        # compute neighbours
+        # compute neighbours (object = the mask of a single cell)
         edges = []
         for obj in tqdm(objs):
+            # This creates the augemnted object mask in a bool array from
             dilated_img = binary_dilation(mask == obj, kernel)
-            cells = np.unique(mask[dilated_img])
+
+            cells = np.unique(mask[dilated_img]) # This identifies the intersecting objects
             cells = cells[cells != obj]  # remove object itself
             cells = cells[cells != 0]  # remove background
+
+            # Appends a list of the edges found at this iteration
             edges.extend([(obj, cell, {EDGE_WEIGHT: 1}) for cell in cells])
 
+        # Adds edges to instance variable graph object
         self.graph.add_edges_from(edges)
+
+# %%
