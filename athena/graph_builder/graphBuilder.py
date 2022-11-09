@@ -10,7 +10,8 @@ def build_graph(so,
                 config=None, 
                 inplace=True,
                 coordinate_keys=('x', 'y'),
-                cell_types=None):
+                col_name=None, 
+                types=None):
     """Build graph representation for a sample. A graph is constructed based on the provided segmentation masks
     for the sample. For the `knn` and `radius` graph representation the centroid of each mask is used. For the `contact`
     graph representation the segmentation masks are dilation_ is performed. The segmentation masks that overlap after
@@ -20,15 +21,17 @@ def build_graph(so,
         so: SpatialOmics object
         spl: sample name in so.spl.index
         builder_type: graph type to construct {knn, radius, contact}
-        mask_key: key in so.masks[spl] to use as segmentation masks from which the observation coordinates are extracted, if
-            `None` `coordinate_keys` from `obs` attribute are used
+        mask_key: key in so.masks[spl] to use as segmentation masks from which the observation
+                coordinates are extracted, if `None` `coordinate_keys` from `obs` attribute are used
         key_added: key added in so.G[spl][key_add] to store the graph.
         config: dict containing a dict 'builder_params' that specifies the graph construction parameters
         inplace: whether to return a new SpatialOmics instance
         coordinate_keys: column names of the x and y coordinates of a observation
-        cell_types: list of cell types (strings) to be included in the graph. 
-                    These strings should match those listed so.obs[spl]['cell_type'].
-                    If no list is provided the graph is built using all the cells/cell types. 
+        col_name: string of the column in so.obs[spl][col_name] which has the labels on which you want 
+                to subset the cells.
+        types: list of cell-types (strings) to be included in the graph. 
+                These strings should match those listed so.obs[spl][col_name].
+                If no list is provided the graph is built using all the cells/cell types. 
 
     Returns:
         None or SpatialOmics if inplace = False
@@ -56,19 +59,25 @@ def build_graph(so,
             raise ValueError(
                 'Contact-graph requires segmentations masks. To compute a contact graph please specify `the mask_key` to use in so.masks[spl]')
         
-        # Get coordinates for every cell in the sample and build graph
-        ndat = so.obs[spl][[coordinate_keys[0], coordinate_keys[1]]]
+        # If types is specified, get rid of coordinates that are in the out-set. 
+        # Else get all coordinates.
+        if types is not None:
+            ndat = so.obs[spl].query("`{0}` in @types".format(col_name))[coordinate_keys[0], coordinate_keys[1]]
+        else:
+            ndat = so.obs[spl][[coordinate_keys[0], coordinate_keys[1]]]
+
+        # Build graph
         builder = GRAPH_BUILDERS[builder_type](config)
         g = builder(ndata=ndat)
     else:
         # Get masks
         mask = so.get_mask(spl, mask_key)
 
-        # If cell_types are specified then simplify the mask
-        if cell_types is not None:
-            # Get cell_ids of the cells that are in `cell_types`
-            cell_ids = so.obs[spl].query("cell_type in @cell_types").index.values
-            # Simplify masks filling it with 0s for cellsa that are not in `cell_types`
+        # If types are specified then simplify the mask
+        if types is not None:
+            # Get cell_ids of the cells that are in `types`
+            cell_ids = so.obs[spl].query("`{0}` in @types".format(col_name)).index.values
+            # Simplify masks filling it with 0s for cellsa that are not in `types`
             mask = np.where(np.isin(mask, cell_ids), mask, 0)
 
         # Build graph
