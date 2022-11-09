@@ -66,7 +66,6 @@ def build_graph(so, spl: str, builder_type='knn', mask_key='cellmasks', key_adde
     so = so if inplace else so.copy()
 
     # If there already is a graph from spl then add or update the so object with graph at key_added
-    # TODO: here maybe the if/else is not needed. 
     if spl in so.G:
         so.G[spl].update({key_added: g})
     else:

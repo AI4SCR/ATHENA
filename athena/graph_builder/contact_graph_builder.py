@@ -62,6 +62,9 @@ class ContactGraphBuilder(BaseGraphBuilder):
         # Function param to function variable
         mask = topo_data['mask']
 
+        # TODO: change masks such that only the masks from the desired cell types persist in the local variable mask
+        
+
         # If dilation_kernel instantiate kernel object, else raise error
         if params['dilation_kernel'] in DILATION_KERNELS:
             kernel = DILATION_KERNELS[params['dilation_kernel']](params['radius'])
