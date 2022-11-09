@@ -40,7 +40,9 @@ class BaseGraphBuilder(ABC):
         self._add_nodes()
         self._add_nodes_attr()
 
-        # If `edata` is given add edges and edge attributes to graph. Else build graph
+        # If `edata` is given add edges and edge attributes to graph. Else build graph.
+        # TODO: discuss the utility of edata. Since the function is only called internally 
+        # and internally edata is never sepcified why is it here?
         if edata is None:
             self._build_topology(topo_data=topo_data)
         else:
@@ -117,14 +119,19 @@ class BaseGraphBuilder(ABC):
             raise ImportError(
                 'Please install the skimage: `conda install -c anaconda scikit-image`.')
 
+        # This creates a new instance of the `BaseGraphBuilder` class
         instance = cls(config)
 
         # extract location
+        # Compute centroid and return them as a pandas-compatible table.
+        # The table is a dictionary mapping column names to value arrays.
         ndata = regionprops_table(mask, properties=['label', 'centroid'])
 
+        # The cell_id is the number that identifies a cell in the mask and is set to be the index of ndata
         ndata = pd.DataFrame.from_dict(ndata)
         ndata.columns = ['cell_id', 'y', 'x']  # NOTE: axis 0 is y and axis 1 is x
         ndata.set_index('cell_id', inplace=True)
         ndata.sort_index(axis=0, ascending=True, inplace=True)
 
+        # Here we use the `__call__` method on our new instance with the ndata included
         return instance(ndata, topo_data={'mask': mask})
