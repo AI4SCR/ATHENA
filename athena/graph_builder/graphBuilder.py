@@ -1,9 +1,16 @@
 from .constants import GRAPH_BUILDER_DEFAULT_PARAMS
 from .mappings import GRAPH_BUILDERS
+import numpy as np
 
-
-def build_graph(so, spl: str, builder_type='knn', mask_key='cellmasks', key_added=None, config=None, inplace=True,
-                coordinate_keys=('x', 'y')):
+def build_graph(so, 
+                spl: str, 
+                builder_type='knn', 
+                mask_key='cellmasks', 
+                key_added=None, 
+                config=None, 
+                inplace=True,
+                coordinate_keys=('x', 'y'),
+                cell_types=None):
     """Build graph representation for a sample. A graph is constructed based on the provided segmentation masks
     for the sample. For the `knn` and `radius` graph representation the centroid of each mask is used. For the `contact`
     graph representation the segmentation masks are dilation_ is performed. The segmentation masks that overlap after
@@ -19,6 +26,9 @@ def build_graph(so, spl: str, builder_type='knn', mask_key='cellmasks', key_adde
         config: dict containing a dict 'builder_params' that specifies the graph construction parameters
         inplace: whether to return a new SpatialOmics instance
         coordinate_keys: column names of the x and y coordinates of a observation
+        cell_types: list of cell types (strings) to be included in the graph. 
+                    These strings should match those listed so.obs[spl]['cell_type'].
+                    If no list is provided the graph is built using all the cells/cell types. 
 
     Returns:
         None or SpatialOmics if inplace = False
@@ -51,8 +61,17 @@ def build_graph(so, spl: str, builder_type='knn', mask_key='cellmasks', key_adde
         builder = GRAPH_BUILDERS[builder_type](config)
         g = builder(ndata=ndat)
     else:
-        # Get masks and build graph
+        # Get masks
         mask = so.get_mask(spl, mask_key)
+
+        # If cell_types are specified then simplify the mask
+        if cell_types is not None:
+            # Get cell_ids of the cells that are in `cell_types`
+            cell_ids = so.obs[spl].query("cell_type in @cell_types").index.values
+            # Simplify masks filling it with 0s for cellsa that are not in `cell_types`
+            mask = np.where(np.isin(mask, cell_ids), mask, 0)
+
+        # Build graph
         g = GRAPH_BUILDERS[builder_type].from_mask(config, mask)
 
     # If include self is specified and true and the graph built is a contact graph, add self edges in graph. 

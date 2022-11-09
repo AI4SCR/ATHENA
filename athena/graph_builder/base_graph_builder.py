@@ -122,8 +122,8 @@ class BaseGraphBuilder(ABC):
         # This creates a new instance of the `BaseGraphBuilder` class
         instance = cls(config)
 
-        # extract location
-        # Compute centroid and return them as a pandas-compatible table.
+        # Extract location:
+        # Compute centroid from image of labels (mask) and return them as a pandas-compatible table.
         # The table is a dictionary mapping column names to value arrays.
         ndata = regionprops_table(mask, properties=['label', 'centroid'])
 
