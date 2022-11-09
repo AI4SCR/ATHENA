@@ -29,11 +29,13 @@ class RadiusGraphBuilder(BaseGraphBuilder):
         Build topology using a radius algorithm based on the distance between the centroid of the nodes.
         '''
 
-        # compute adjacency matrix
+        # compute adjacency matrix, put into df with cell_id for index and columns and ad to graph
         adj = radius_neighbors_graph(self.ndata.to_numpy(), **self.config['builder_params'])
         df = pd.DataFrame(adj.A, index=self.ndata.index, columns=self.ndata.index)
         self.graph = nx.from_pandas_adjacency(df)  # this does not add the nodes in the same sequence as the index, column
 
+        # Puts node attribute (usually just coordinates) into dictionary 
+        # and then as node attributes in the graph. Set edge wheight to 1. 
         attrs = df2node_attr(self.ndata)
         nx.set_node_attributes(self.graph, attrs)
         nx.set_edge_attributes(self.graph, 1, EDGE_WEIGHT)
