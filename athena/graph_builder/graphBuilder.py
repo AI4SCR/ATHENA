@@ -62,7 +62,7 @@ def build_graph(so,
         # If types is specified, get rid of coordinates that are in the out-set. 
         # Else get all coordinates.
         if types is not None:
-            ndat = so.obs[spl].query("`{0}` in @types".format(col_name))[coordinate_keys[0], coordinate_keys[1]]
+            ndat = so.obs[spl].query(f'{col_name} in @types')[coordinate_keys[0], coordinate_keys[1]]
         else:
             ndat = so.obs[spl][[coordinate_keys[0], coordinate_keys[1]]]
 
@@ -76,7 +76,7 @@ def build_graph(so,
         # If types are specified then simplify the mask
         if types is not None:
             # Get cell_ids of the cells that are in `types`
-            cell_ids = so.obs[spl].query("`{0}` in @types".format(col_name)).index.values
+            cell_ids = so.obs[spl].query(f'{col_name} in @types').index.values
             # Simplify masks filling it with 0s for cellsa that are not in `types`
             mask = np.where(np.isin(mask, cell_ids), mask, 0)
 
