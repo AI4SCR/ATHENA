@@ -1,7 +1,8 @@
+import numpy as np
+import pandas as pd
 import pytest
 from spatialOmics import SpatialOmics
-import pandas as pd
-import numpy as np
+
 
 @pytest.fixture(scope="module")
 def so_object():
@@ -16,7 +17,8 @@ def so_object():
     # Populate so.obs
     data = {'cell_id': [1, 2, 3, 4, 5],
             'y': [8, 13, 10, 80, 50], 
-            'x': [8, 8, 15, 80, 60]}
+            'x': [8, 8, 15, 80, 60],
+            'cell_type': ['tumor', 'tumor', 'tumor', 'epithilial', 'stromal']}
     ndata = pd.DataFrame(data)
     ndata.set_index('cell_id', inplace=True)
     ndata.sort_index(axis=0, ascending=True, inplace=True)
