@@ -1,7 +1,7 @@
-from spatialHeterogeneity.graph_builder.knn_graph_builder import KNNGraphBuilder
-from spatialHeterogeneity.graph_builder.radius_graph_builder import RadiusGraphBuilder
-from spatialHeterogeneity.graph_builder.contact_graph_builder import ContactGraphBuilder
-from spatialHeterogeneity.graph_builder.constants import GRAPH_BUILDER_DEFAULT_PARAMS
+from athena.graph_builder.knn_graph_builder import KNNGraphBuilder
+from athena.graph_builder.radius_graph_builder import RadiusGraphBuilder
+from athena.graph_builder.contact_graph_builder import ContactGraphBuilder
+from athena.graph_builder.constants import GRAPH_BUILDER_DEFAULT_PARAMS
 import pandas as pd
 import numpy as np
 import pytest
@@ -26,11 +26,11 @@ def masks():
 
 def test_knn_graph_builder(ndata):
     config = GRAPH_BUILDER_DEFAULT_PARAMS['knn']
-    config['n_neighbors'] = 5
+    config['builder_params']['n_neighbors'] = 5
     builder = KNNGraphBuilder(config)
     g = builder(ndata)
     assert len(g.nodes) == len(ndata)
-    assert len(g.edges) == 21
+    assert len(g.edges) == 15
 
 def test_radius_graph_bulder(ndata):
     config = GRAPH_BUILDER_DEFAULT_PARAMS['radius']
