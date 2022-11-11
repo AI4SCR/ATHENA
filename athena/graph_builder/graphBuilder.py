@@ -1,6 +1,7 @@
+import numpy as np
 from .constants import GRAPH_BUILDER_DEFAULT_PARAMS
 from .mappings import GRAPH_BUILDERS
-import numpy as np
+
 
 def build_graph(so, 
                 spl: str, 
@@ -69,19 +70,10 @@ def build_graph(so,
         
         # If types is specified, get rid of coordinates that are in the out-set. 
         if types is not None:
-            # Raise error if `col_name` is not found in 
-            if col_name not in so.obs[spl].columns:
-                raise NameError(f'{col_name} is not in so.obs[spl].columns')
-            
-            # Raise error if `types` is an empty list
-            if types == []:
-                raise NameError(f'types varaibel is empty. You need to give a non-empty list')
+            # Check weather the graph subset is well specified
+            raise_misspecification_error(so, spl, col_name, types)
 
-            # Raise error if not all `types` have a match in `so.obs[spl][col_name].cat.categories.values`
-            if not np.all(np.isin(types, so.obs[spl][col_name].cat.categories.values)):
-                raise NameError(f'Not all elements provided in variable types are in so.obs[spl][col_name]')
-
-            # Finally, get coordinates
+            # If no error was raised get coordinates
             ndat = so.obs[spl].query(f'{col_name} in @types')[coordinate_keys[0], coordinate_keys[1]]
         # Else get all coordinates.
         else:
@@ -119,3 +111,16 @@ def build_graph(so,
     else:
         # otherwise initialize new dictionary object at key `spl`
         so.G[spl] = {key_added: g}
+
+def raise_misspecification_error(so, spl, col_name, types):
+    # Raise error if `col_name` is not found in 
+    if col_name not in so.obs[spl].columns:
+        raise NameError(f'{col_name} is not in so.obs[spl].columns')
+            
+    # Raise error if `types` is an empty list
+    if types == []:
+        raise NameError(f'types varaibel is empty. You need to give a non-empty list')
+
+    # Raise error if not all `types` have a match in `so.obs[spl][col_name].cat.categories.values`
+    if not np.all(np.isin(types, so.obs[spl][col_name].cat.categories.values)):
+        raise NameError(f'Not all elements provided in variable types are in so.obs[spl][col_name]')
