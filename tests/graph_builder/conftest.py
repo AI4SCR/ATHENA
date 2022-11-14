@@ -35,6 +35,8 @@ def so_object():
 
     so.masks['a'] = {'cellmasks' : array.astype(int)}
 
+    return so
+
 def make_mask(a, b, r, n):
     y,x = np.ogrid[-a:n-a, -b:n-b]
     mask = x*x + y*y <= r*r
