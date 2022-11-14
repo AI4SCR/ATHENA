@@ -123,5 +123,5 @@ def raise_misspecification_error(so, spl, col_name, types):
         raise NameError(f'types varaibel is empty. You need to give a non-empty list')
 
     # Raise error if not all `types` have a match in `so.obs[spl][col_name].cat.categories.values`
-    if not np.all(np.isin(types, so.obs[spl][col_name].cat.categories.values)):
+    if not np.all(np.isin(types, so.obs[spl][col_name].values)):
         raise NameError(f'Not all elements provided in variable types are in so.obs[spl][col_name]')
