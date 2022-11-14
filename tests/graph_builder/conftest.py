@@ -28,19 +28,14 @@ def so_object():
     n = 100
     r = 2
     array = np.zeros((n, n))
-    y, x = so.obs['a'].loc[1][['y', 'x']]
-    array[make_mask(y, x, r)] = 1
-    y, x = so.obs['a'].loc[2][['y', 'x']]
-    array[make_mask(y, x, r)] = 2
-    y, x = so.obs['a'].loc[3][['y', 'x']]
-    array[make_mask(y, x, r)] = 3
-    y, x = so.obs['a'].loc[4][['y', 'x']]
-    array[make_mask(y, x, r)] = 4
-    y, x = so.obs['a'].loc[5][['y', 'x']]
-    array[make_mask(y, x, r)] = 5
+
+    for i in range(1, 4):
+        y, x = so.obs['a'].loc[i][['y', 'x']]
+        array[make_mask(y, x, r, n)] = i
+
     so.masks['a'] = {'cellmasks' : array.astype(int)}
 
-def make_mask(a, b, r):
+def make_mask(a, b, r, n):
     y,x = np.ogrid[-a:n-a, -b:n-b]
     mask = x*x + y*y <= r*r
     return mask
