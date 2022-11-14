@@ -23,22 +23,22 @@ def so_object():
     ndata.set_index('cell_id', inplace=True)
     ndata.sort_index(axis=0, ascending=True, inplace=True)
     so.obs['a'] = ndata
-
+    
     # Populate so.masks
     n = 100
     r = 2
     array = np.zeros((n, n))
-    y, x = so.obs['a'].loc[1]
+    y, x = so.obs['a'].loc[1][['y', 'x']]
     array[make_mask(y, x, r)] = 1
-    y, x = so.obs['a'].loc[2]
+    y, x = so.obs['a'].loc[2][['y', 'x']]
     array[make_mask(y, x, r)] = 2
-    y, x = so.obs['a'].loc[3]
+    y, x = so.obs['a'].loc[3][['y', 'x']]
     array[make_mask(y, x, r)] = 3
-    y, x = so.obs['a'].loc[4]
+    y, x = so.obs['a'].loc[4][['y', 'x']]
     array[make_mask(y, x, r)] = 4
-    y, x = so.obs['a'].loc[5]
+    y, x = so.obs['a'].loc[5][['y', 'x']]
     array[make_mask(y, x, r)] = 5
-    so.masks['a'] = {'cell_masks' : array}
+    so.masks['a'] = {'cellmasks' : array.astype(int)}
 
 def make_mask(a, b, r):
     y,x = np.ogrid[-a:n-a, -b:n-b]
