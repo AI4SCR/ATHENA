@@ -49,6 +49,10 @@ def build_graph(so,
     if (col_name is None) ^ (types is None):
         raise NameError(f'failed to specify either `col_name` or `types`')
 
+    if types is not None:
+        # Check weather the graph subset is well specified
+        raise_misspecification_error(so, spl, col_name, types)
+
     # Get default bulding parameters if non are specified    
     if config is None:
         config = GRAPH_BUILDER_DEFAULT_PARAMS[builder_type].copy()
@@ -70,10 +74,7 @@ def build_graph(so,
         
         # If types is specified, get rid of coordinates that are in the out-set. 
         if types is not None:
-            # Check weather the graph subset is well specified
-            raise_misspecification_error(so, spl, col_name, types)
-
-            # If no error was raised get coordinates
+            # Get coordinates
             ndat = so.obs[spl].query(f'{col_name} in @types')[coordinate_keys[0], coordinate_keys[1]]
         # Else get all coordinates.
         else:
