@@ -1,7 +1,5 @@
 from athena.graph_builder.constants import GRAPH_BUILDER_DEFAULT_PARAMS
 from athena.graph_builder import build_graph
-import pandas as pd
-import numpy as np
 import pytest
 
 def test_empty_types(so_object):
@@ -69,14 +67,15 @@ def test_knn(so_object):
     build_graph(so_object, 
                 spl='a', 
                 builder_type='knn', 
-                mask_key='cellmasks', 
+                mask_key='cellmasks',
+                key_added='knn',
                 config=config,
                 inplace=True,
                 coordinate_keys=('x', 'y'),
                 col_name='cell_type', 
                 types=['tumor'])
-    assert len(g.nodes) == 3
-    assert len(g.edges) == 6
+    assert len(so_object.G['a']['knn'].nodes) == 3
+    assert len(so_object.G['a']['knn'].edges) == 6
 
 def test_radius(so_object):
     config = GRAPH_BUILDER_DEFAULT_PARAMS['radius']
@@ -84,13 +83,14 @@ def test_radius(so_object):
                 spl='a', 
                 builder_type='radius', 
                 mask_key='cellmasks', 
+                key_added='radius',
                 config=config,
                 inplace=True,
                 coordinate_keys=('x', 'y'),
                 col_name='cell_type', 
                 types=['tumor'])
-    assert len(g.nodes) == 3
-    assert len(g.edges) == 6
+    assert len(so_object.G['a']['radius'].nodes) == 3
+    assert len(so_object.G['a']['radius'].edges) == 6
 
 def test_contact(so_object):
     config = GRAPH_BUILDER_DEFAULT_PARAMS['contact']
@@ -98,10 +98,25 @@ def test_contact(so_object):
                 spl='a', 
                 builder_type='contact', 
                 mask_key='cellmasks', 
+                key_added='contact',
                 config=config,
                 inplace=True,
                 coordinate_keys=('x', 'y'),
                 col_name='cell_type', 
                 types=['tumor'])
-    assert len(g.nodes) == 3
-    assert len(g.edges) == 6
+    assert len(so_object.G['a']['contact'].nodes) == 3
+    assert len(so_object.G['a']['contact'].edges) == 5
+
+def test_name(so_object):
+    # this testes whther the name gets assigned 
+    config = GRAPH_BUILDER_DEFAULT_PARAMS['contact']
+    build_graph(so_object, 
+                spl='a', 
+                builder_type='contact', 
+                mask_key='cellmasks',
+                config=config,
+                inplace=True,
+                coordinate_keys=('x', 'y'),
+                col_name='cell_type', 
+                types=['tumor'])
+    assert "contact > cell_type > ['tumor']" in so_object.G['a']
