@@ -41,8 +41,6 @@ class BaseGraphBuilder(ABC):
         self._add_nodes_attr()
 
         # If `edata` is given add edges and edge attributes to graph. Else build graph.
-        # TODO: discuss the utility of edata. Since the function is only called internally 
-        # and internally edata is never sepcified why is it here?
         if edata is None:
             self._build_topology(topo_data=topo_data)
         else:
