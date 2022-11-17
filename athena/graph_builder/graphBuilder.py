@@ -5,14 +5,10 @@ from .mappings import GRAPH_BUILDERS
 
 def build_graph(so, 
                 spl: str, 
-                builder_type: str='knn', 
-                mask_key: str='cellmasks', 
+                builder_type: str='knn',  
                 key_added: str=None, 
                 config: dict=None, 
-                inplace: bool=True,
-                coordinate_keys=('x', 'y'),
-                filter_col: str=None, 
-                labels: list=None):
+                inplace: bool=True):
     """Build graph representation for a sample. A graph is constructed based on the provided segmentation masks
     for the sample. For the `knn` and `radius` graph representation the centroid of each mask is used. For the `contact`
     graph representation the segmentation masks are dilation_ is performed. The segmentation masks that overlap after
@@ -22,13 +18,15 @@ def build_graph(so,
         so: SpatialOmics object
         spl: sample name in so.spl.index
         builder_type: graph type to construct {knn, radius, contact}
+        config: dict containing a dict 'builder_params' that specifies the graph construction parameters
+        inplace: whether to return a new SpatialOmics instance
+
+    Parameters in config:
         mask_key: key in so.masks[spl] to use as segmentation masks from which the observation
                 coordinates are extracted, if `None` `coordinate_keys` from `obs` attribute are used
         key_added: key added in so.G[spl][key_add] to store the graph. If not specified it defaluts to `builder_type`.
                 If the graph is being built on a subset of the nodes (e.g `filter_col` and `labels` are not None) 
                 then the key is `f'{builder_type} > {filter_col} > {labels}'`
-        config: dict containing a dict 'builder_params' that specifies the graph construction parameters
-        inplace: whether to return a new SpatialOmics instance
         coordinate_keys: column names of the x and y coordinates of a observation
         filter_col: string of the column in so.obs[spl][filter_col] which has the labels on which you want 
                 to subset the cells.
@@ -45,63 +43,15 @@ def build_graph(so,
     if builder_type not in GRAPH_BUILDERS:
         raise ValueError(f'invalid type {builder_type}. Available types are {GRAPH_BUILDERS.keys()}')
 
-    # Raise error if either `filter_col` `labels` is specified but not the other.
-    if (filter_col is None) ^ (labels is None):
-        raise NameError(f'failed to specify either `filter_col` or `labels`')
-
-    if labels is not None:
-        # Check weather the graph subset is well specified
-        raise_miss_specification_error(so, spl, filter_col, labels)
-
     # Get default bulding parameters if non are specified    
     if config is None:
         config = GRAPH_BUILDER_DEFAULT_PARAMS[builder_type].copy()
 
-    # If no title for the graph is provided use builder_type    
-    if key_added is None:
-        if labels is not None:
-            key_added = f'{builder_type} > {filter_col} > {labels}'
-        else:
-            key_added = builder_type
+    # Instantiate graph builder object
+    builder = GRAPH_BUILDERS[builder_type](config, key_added)
 
-    # If no masks are provided build graph with centroids.
-    if mask_key is None:
-        # Raise error if no masks were provided and the builder_type is contact
-        if builder_type == 'contact':
-            raise ValueError(
-                'Contact-graph requires segmentations masks. To compute a contact graph please specify `the mask_key` to use in so.masks[spl]')
-        
-        # If labels is specified, get rid of coordinates that are in the out-set. 
-        if labels is not None:
-            # Get coordinates
-            ndat = so.obs[spl].query(f'{filter_col} in @labels')[coordinate_keys[0], coordinate_keys[1]]
-        # Else get all coordinates.
-        else:
-            ndat = so.obs[spl][[coordinate_keys[0], coordinate_keys[1]]]
-
-        # Build graph
-        builder = GRAPH_BUILDERS[builder_type](config)
-        g = builder(ndata=ndat)
-
-    # Else build graph from masks
-    else:
-        # Get masks
-        mask = so.get_mask(spl, mask_key)
-
-        # If labels are specified then simplify the mask
-        if labels is not None:
-            # Get cell_ids of the cells that are in `labels`
-            cell_ids = so.obs[spl].query(f'{filter_col} in @labels').index.values
-            # Simplify masks filling it with 0s for cells that are not in `labels`
-            mask = np.where(np.isin(mask, cell_ids), mask, 0)
-
-        # Build graph
-        g = GRAPH_BUILDERS[builder_type].from_mask(config, mask)
-
-    # If include self is specified and true and the graph built is a contact graph, add self edges in graph. 
-    if 'include_self' in config['builder_params'] and config['builder_params']['include_self'] and builder_type == 'contact':
-        edge_list = [(i, i) for i in g.nodes]
-        g.add_edges_from(edge_list)
+    # Build graph and get key
+    g, key_added = builder(so, spl)
 
     # Copys `so` if inplace == Ture.
     so = so if inplace else so.copy()
@@ -112,16 +62,3 @@ def build_graph(so,
     else:
         # otherwise initialize new dictionary object at key `spl`
         so.G[spl] = {key_added: g}
-
-def raise_miss_specification_error(so, spl, filter_col, labels):
-    # Raise error if `filter_col` is not found in 
-    if filter_col not in so.obs[spl].columns:
-        raise NameError(f'{filter_col} is not in so.obs[spl].columns')
-            
-    # Raise error if `labels` is an empty list
-    if labels == []:
-        raise NameError(f'labels varaibel is empty. You need to give a non-empty list')
-
-    # Raise error if not all `labels` have a match in `so.obs[spl][filter_col].cat.categories.values`
-    if not np.all(np.isin(labels, so.obs[spl][filter_col].values)):
-        raise NameError(f'Not all elements provided in variable labels are in so.obs[spl][filter_col]')

@@ -18,7 +18,7 @@ def test_is_isomorphic():
     builder_type = 'radius'
     config = GRAPH_BUILDER_DEFAULT_PARAMS[builder_type]
     config['builder_params']['radius'] = 20 # set radius
-    ath.graph.build_graph(so, spl, builder_type=builder_type, mask_key='cellmasks', config=config)
+    ath.graph.build_graph(so, spl, builder_type=builder_type, config=config)
 
     # Buil concept graph with radius
     # Decide on subset
@@ -29,9 +29,9 @@ def test_is_isomorphic():
     # radius graph
     config = GRAPH_BUILDER_DEFAULT_PARAMS[builder_type]
     config['builder_params']['radius'] = 20 # set radius
-    ath.graph.build_graph(so, spl, builder_type='radius', mask_key='cellmasks', config=config,
-                        filter_col = filter_col,
-                        labels = labels)
+    config['concept_params']['filter_col'] = filter_col
+    config['concept_params']['labels'] = labels
+    ath.graph.build_graph(so, spl, builder_type='radius', config=config)
 
     A = so.G[spl][builder_type]  
     B = so.G[spl][f'{builder_type} > {filter_col} > {labels}'] 

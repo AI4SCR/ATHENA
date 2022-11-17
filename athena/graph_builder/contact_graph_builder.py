@@ -35,32 +35,58 @@ class ContactGraphBuilder(BaseGraphBuilder):
     Build contact graph based on pixel expansion of cell masks.
     '''
 
-    def __init__(self, config: dict):
+    def __init__(self, config: dict, key_added: str):
         """Base-Graph Builder constructor
 
         Args:
             config: Dictionary containing a dict called `builder_params` that provides function call arguments to the build_topology function
-        """
-        super().__init__(config)
+            key_added: string to use as key for the graph in the spatial omics object
 
-    def _build_topology(self, topo_data: dict, **kwargs) -> None:
+        Default config:
+            config = {'builder_params': 
+                    {'dilation_kernel': 'disk',
+                     'radius': 4, 
+                     'include_self':False},
+                'concept_params': 
+                    {'filter_col':None,
+                    'labels':None},
+                'coordinate_keys': ['x', 'y'],
+                'mask_key': 'cellmasks'}
+        """
+        self.builder_type = 'contact'
+        super().__init__(config, key_added)
+
+    def __call__(self, so, spl):
         """Build topology using pixel expansion of segmentation masks provided by topo_data['mask']. Masks that overlap after expansion are connected in the graph.
 
         Args:
-            topo_data: dict providing the segmentation mask under key 'mask'
+            so: spatial omic object
+            spl: sting identifying the sample in the spatial omics object
 
         Returns:
+            Graph and key to graph in the spatial omics object
 
         """
 
-        # type hints
-        self.graph: nx.Graph
-        
-        # Instance variable to in function variable
+        # Unpack parameters for building
+        filter_col = self.config['concept_params']['filter_col']
+        labels = self.config['concept_params']['labels']
+        mask_key = self.config['mask_key']
         params = self.config['builder_params']
 
-        # Function param to function variable
-        mask = topo_data['mask']
+        # Raise error if mask is not provided
+        if mask_key is None:
+            raise ValueError('Contact-graph requires segmentations masks. To compute a contact graph please specify `the mask_key` to use in so.masks[spl]')
+
+        # Check whether the graph subset is well specified. Method defined in the superclass.
+        if labels is not None or filter_col is not None:
+            self.look_for_miss_specification_error(so, spl, filter_col, labels)
+
+        # Set key. Depends on the config file. Method defined in the superclass.
+        self.add_key(filter_col, labels)
+
+        # Get masks
+        mask = so.get_mask(spl, mask_key)
 
         # If dilation_kernel instantiate kernel object, else raise error
         if params['dilation_kernel'] in DILATION_KERNELS:
@@ -89,5 +115,12 @@ class ContactGraphBuilder(BaseGraphBuilder):
 
         # Adds edges to instance variable graph object
         self.graph.add_edges_from(edges)
+
+        # Include self edges if desired 
+        if 'include_self' in self.config['builder_params'] and self.config['builder_params']['include_self'] and self.builder_type == 'contact':
+            edge_list = [(i, i) for i in g.nodes]
+            g.add_edges_from(edge_list)
+
+        return (self.graph, self.key_added)
 
 # %%
