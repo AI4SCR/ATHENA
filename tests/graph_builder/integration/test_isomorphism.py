@@ -1,5 +1,6 @@
 import networkx as nx
 import athena as ath
+import copy as cp
 from athena.graph_builder.constants import GRAPH_BUILDER_DEFAULT_PARAMS
 import pytest
 
@@ -16,7 +17,7 @@ def test_is_isomorphic():
 
     # Build full graph with radius
     builder_type = 'radius'
-    config = GRAPH_BUILDER_DEFAULT_PARAMS[builder_type]
+    config = cp.deepcopy(GRAPH_BUILDER_DEFAULT_PARAMS[builder_type])
     config['builder_params']['radius'] = 20 # set radius
     ath.graph.build_graph(so, spl, builder_type=builder_type, config=config)
 
@@ -27,11 +28,11 @@ def test_is_isomorphic():
 
     # Build subset graphs
     # radius graph
-    config = GRAPH_BUILDER_DEFAULT_PARAMS[builder_type]
+    config = cp.deepcopy(GRAPH_BUILDER_DEFAULT_PARAMS[builder_type])
     config['builder_params']['radius'] = 20 # set radius
     config['concept_params']['filter_col'] = filter_col
     config['concept_params']['labels'] = labels
-    ath.graph.build_graph(so, spl, builder_type='radius', config=config)
+    ath.graph.build_graph(so, spl, builder_type=builder_type, config=config)
 
     A = so.G[spl][builder_type]  
     B = so.G[spl][f'{builder_type} > {filter_col} > {labels}'] 

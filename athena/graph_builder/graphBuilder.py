@@ -1,6 +1,7 @@
 import numpy as np
 from .constants import GRAPH_BUILDER_DEFAULT_PARAMS
 from .mappings import GRAPH_BUILDERS
+import copy as cp
 
 
 def build_graph(so, 
@@ -45,7 +46,7 @@ def build_graph(so,
 
     # Get default bulding parameters if non are specified    
     if config is None:
-        config = GRAPH_BUILDER_DEFAULT_PARAMS[builder_type].copy()
+        config = cp.deepcopy(GRAPH_BUILDER_DEFAULT_PARAMS[builder_type])
 
     # Instantiate graph builder object
     builder = GRAPH_BUILDERS[builder_type](config, key_added)

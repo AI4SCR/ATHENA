@@ -31,7 +31,7 @@ class BaseGraphBuilder(ABC):
         """
         raise NotImplementedError('Implemented in subclasses.')
 
-    def extract_location(mask):
+    def extract_location(self, mask):
         '''Compute centroid from image of labels (mask) and return them as a pandas-compatible table.
         '''
         # The table is a dictionary mapping column names to value arrays.
@@ -46,7 +46,7 @@ class BaseGraphBuilder(ABC):
         return ndata
 
     
-    def look_for_miss_specification_error(so, spl, filter_col, labels):
+    def look_for_miss_specification_error(self, so, spl, filter_col, labels):
         ''' Looks for a miss especification error in the config
         '''
 

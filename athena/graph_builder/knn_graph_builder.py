@@ -2,7 +2,6 @@ from sklearn.neighbors import kneighbors_graph
 import networkx as nx
 import pandas as pd
 import numpy as np
-
 from ..utils.tools.graph import df2node_attr
 from .base_graph_builder import BaseGraphBuilder
 from .constants import EDGE_WEIGHT
@@ -63,6 +62,9 @@ class KNNGraphBuilder(BaseGraphBuilder):
         # Check weather the graph subset is well specified. Method defined in the superclass.
         if labels is not None or filter_col is not None:
             self.look_for_miss_specification_error(so, spl, filter_col, labels)
+            subset_specified = True
+        else:
+            subset_specified = False
 
         # Set key. Depends on the config file. Method defined in the superclass.
         self.add_key(filter_col, labels)
@@ -70,7 +72,7 @@ class KNNGraphBuilder(BaseGraphBuilder):
         # If no masks are provided build graph with centroids.
         if mask_key is None:
             # If labels is specified, get rid of coordinates that are in the out-set. # Else get all coordinates.
-            if labels is not None:
+            if subset_specified:
                 # Get coordinates
                 ndata = so.obs[spl].query(f'{filter_col} in @labels')[coordinate_keys[0], coordinate_keys[1]]
             else:
@@ -81,8 +83,8 @@ class KNNGraphBuilder(BaseGraphBuilder):
             # Get masks
             mask = so.get_mask(spl, mask_key)
 
-            # If labels are specified then simplify the mask
-            if labels is not None:
+            # If a cell subset is well are specified then simplify the mask
+            if subset_specified:
                 # Get cell_ids of the cells that are in `labels`
                 cell_ids = so.obs[spl].query(f'{filter_col} in @labels').index.values
                 # Simplify masks filling it with 0s for cells that are not in `labels`

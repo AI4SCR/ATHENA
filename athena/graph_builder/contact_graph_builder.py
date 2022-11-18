@@ -81,12 +81,22 @@ class ContactGraphBuilder(BaseGraphBuilder):
         # Check whether the graph subset is well specified. Method defined in the superclass.
         if labels is not None or filter_col is not None:
             self.look_for_miss_specification_error(so, spl, filter_col, labels)
+            subset_specified = True
+        else:
+            subset_specified = False
 
         # Set key. Depends on the config file. Method defined in the superclass.
         self.add_key(filter_col, labels)
 
         # Get masks
         mask = so.get_mask(spl, mask_key)
+
+        # If a cell subset is well are specified then simplify the mask
+        if subset_specified:
+            # Get cell_ids of the cells that are in `labels`
+            cell_ids = so.obs[spl].query(f'{filter_col} in @labels').index.values
+            # Simplify masks filling it with 0s for cells that are not in `labels`
+            mask = np.where(np.isin(mask, cell_ids), mask, 0)
 
         # If dilation_kernel instantiate kernel object, else raise error
         if params['dilation_kernel'] in DILATION_KERNELS:
@@ -99,6 +109,9 @@ class ContactGraphBuilder(BaseGraphBuilder):
         # get object ids, 0 is background.
         objs = np.unique(mask)
         objs = objs[objs != 0]
+
+        # Add nodes to graph
+        self.graph.add_nodes_from(objs)
 
         # compute neighbours (object = the mask of a single cell)
         edges = []
@@ -118,8 +131,8 @@ class ContactGraphBuilder(BaseGraphBuilder):
 
         # Include self edges if desired 
         if 'include_self' in self.config['builder_params'] and self.config['builder_params']['include_self'] and self.builder_type == 'contact':
-            edge_list = [(i, i) for i in g.nodes]
-            g.add_edges_from(edge_list)
+            edge_list = [(i, i) for i in self.graph.nodes]
+            self.graph.add_edges_from(edge_list)
 
         return (self.graph, self.key_added)
 

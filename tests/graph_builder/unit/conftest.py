@@ -29,7 +29,7 @@ def so_object():
     r = 2
     array = np.zeros((n, n))
 
-    for i in range(1, 4):
+    for i in range(1, 6):
         y, x = so.obs['a'].loc[i][['y', 'x']]
         array[make_mask(y, x, r, n)] = i
 
