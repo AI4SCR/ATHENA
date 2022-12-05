@@ -20,21 +20,6 @@ class RadiusGraphBuilder(BaseGraphBuilder):
         Args:
             config: dict specifying graph builder params
             key_added: string to use as key for the graph in the spatial omics object
-
-        Default config:
-            config = {'builder_params': 
-                    {'radius': 36, 
-                    'mode':'connectivity', 
-                    'metric':'minkowski', 
-                    'p':2, 
-                    'metric_params':None, 
-                    'include_self':False, 
-                    'n_jobs':-1},
-                'concept_params': 
-                    {'filter_col':None,
-                    'labels':None},
-                'coordinate_keys': ['x', 'y'],
-                'mask_key': 'cellmasks'}
         """
         self.builder_type = 'radius'
         super().__init__(config, key_added)

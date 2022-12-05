@@ -19,23 +19,8 @@ class KNNGraphBuilder(BaseGraphBuilder):
             config: Dictionary containing `builder_params`. Refer to [1] for possible parameters
             key_added: string to use as key for the graph in the spatial omics object
 
-        Default config:
-            config = {'builder_params': 
-                {'n_neighbors':6, 
-                'mode':'connectivity', 
-                'metric':'minkowski', 
-                'p':2, 
-                'metric_params':None, 
-                'include_self':False, 
-                'n_jobs':-1},
-            'concept_params': 
-                {'filter_col':None,
-                'labels':None},
-            'coordinate_keys': ['x', 'y'],
-            'mask_key': 'cellmasks'}
-
         Notes:
-            .. [1] https://scikit-learn.org/stable/modules/generated/sklearn.neighbors.kneighbors_graph.html
+            [1] https://scikit-learn.org/stable/modules/generated/sklearn.neighbors.kneighbors_graph.html
 
         """
         self.builder_type = 'knn'
