@@ -8,6 +8,23 @@ DILATION_KERNELS = {
 
 EDGE_WEIGHT = 'weight'
 
+GRAPH_ATTRIBUTER_DEFAULT_PARAMS = {
+    'so_feat': {'from_obs': True,
+                    'obs_cols': [],
+                    'from_X': True,
+                    'X_cols': []},
+    'deep_feat': {},
+    'random_feat': {}
+}
+
+OTHER_DEFAULT_PARAMS = {
+    'concept_params': 
+                {'filter_col':None,
+                'labels':None},
+    'coordinate_keys': ['x', 'y'],
+    'mask_key': 'cellmasks'
+}
+
 GRAPH_BUILDER_DEFAULT_PARAMS = {
     'knn': {'builder_params': 
                 {'n_neighbors':6, 
@@ -17,20 +34,14 @@ GRAPH_BUILDER_DEFAULT_PARAMS = {
                 'metric_params':None, 
                 'include_self':True, 
                 'n_jobs':-1},
-            'concept_params': 
-                {'filter_col':None,
-                'labels':None},
-            'coordinate_keys': ['x', 'y'],
-            'mask_key': 'cellmasks'},
+                **OTHER_DEFAULT_PARAMS,
+                **GRAPH_ATTRIBUTER_DEFAULT_PARAMS},
     'contact': {'builder_params': 
                     {'dilation_kernel': 'disk',
                      'radius': 4, 
                      'include_self':True},
-                'concept_params': 
-                    {'filter_col':None,
-                    'labels':None},
-                'coordinate_keys': ['x', 'y'],
-                'mask_key': 'cellmasks'},
+                **OTHER_DEFAULT_PARAMS,
+                **GRAPH_ATTRIBUTER_DEFAULT_PARAMS},
     'radius': {'builder_params': 
                     {'radius': 36, 
                     'mode':'connectivity', 
@@ -39,9 +50,6 @@ GRAPH_BUILDER_DEFAULT_PARAMS = {
                     'metric_params':None, 
                     'include_self':True, 
                     'n_jobs':-1},
-                'concept_params': 
-                    {'filter_col':None,
-                    'labels':None},
-                'coordinate_keys': ['x', 'y'],
-                'mask_key': 'cellmasks'}
+                **OTHER_DEFAULT_PARAMS,
+                **GRAPH_ATTRIBUTER_DEFAULT_PARAMS}
 }

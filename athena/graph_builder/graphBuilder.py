@@ -16,22 +16,22 @@ def build_graph(so,
     dilation are considered to be in physical contact and connected in the `contact` graph.
 
     Args:
-        so: SpatialOmics object
-        spl: sample name in so.spl.index
-        builder_type: graph type to construct {knn, radius, contact}
-        config: dict containing a dict 'builder_params' that specifies the graph construction parameters
-        inplace: whether to return a new SpatialOmics instance
+        `so`: SpatialOmics object
+        `spl`: sample name in so.spl.index
+        `builder_type`: graph type to construct {knn, radius, contact}
+        `config`: dict containing a dict 'builder_params' that specifies the graph construction parameters
+        `inplace`: whether to return a new SpatialOmics instance
 
     Parameters in config:
-        mask_key: key in so.masks[spl] to use as segmentation masks from which the observation
+        `mask_key`: key in so.masks[spl] to use as segmentation masks from which the observation
                 coordinates are extracted, if `None` `coordinate_keys` from `obs` attribute are used
-        key_added: key added in so.G[spl][key_add] to store the graph. If not specified it defaluts to `builder_type`.
+        `key_added`: key added in so.G[spl][key_add] to store the graph. If not specified it defaluts to `builder_type`.
                 If the graph is being built on a subset of the nodes (e.g `filter_col` and `labels` are not None) 
                 then the key is `f'{builder_type} > {filter_col} > {labels}'`
-        coordinate_keys: column names of the x and y coordinates of a observation
-        filter_col: string of the column in so.obs[spl][filter_col] which has the labels on which you want 
+        `coordinate_keys`: column names of the x and y coordinates of a observation
+        `filter_col`: string of the column in so.obs[spl][filter_col] which has the labels on which you want 
                 to subset the cells.
-        labels: list of stirngs which identify the labels in so.obs[spl][filter_col] that should be included in the grapgh. 
+        `labels`: list of stirngs which identify the labels in so.obs[spl][filter_col] that should be included in the grapgh. 
                 If no list is provided the graph is built using all the cells/cell labels. 
 
     Returns:
