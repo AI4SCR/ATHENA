@@ -1,4 +1,3 @@
-import numpy as np
 from .constants import GRAPH_BUILDER_DEFAULT_PARAMS
 from .mappings import GRAPH_BUILDERS
 import copy as cp
