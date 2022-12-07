@@ -8,5 +8,5 @@ GRAPH_ATTRIBUTER_DEFAULT_PARAMS = {
            'from_X': True,
            'X_cols': 'all'},
     'deep': {},
-    'random': {}
+    'random': {'n_attrs': 3}
 }

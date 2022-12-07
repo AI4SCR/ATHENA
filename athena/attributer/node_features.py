@@ -20,7 +20,7 @@ def add_node_features(so,
         At the moment 3 possibilities.
             - 'so_feat'. Features from `so[spl].X` and/or `so[spl].obs`
             - 'deep_feat'. TODO: To be implemented.
-            - 'random_feat' TODO: To be implemented.
+            - 'random_feat' Random uniform [0, 1) featrues. 
         - `config`: Parameters of the attribute method to be used downstream. 
         If none are specified the defaults are used.
 

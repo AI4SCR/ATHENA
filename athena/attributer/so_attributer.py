@@ -11,21 +11,37 @@ class soAttributer(BaseAttributer):
                  graph_key: str,
                  config: dict) -> None:
         """
-        Attributer class constructor. Gets attributes from `so`.
+        Attributer class constructor. Gets attributes from `so`. Config must be a dict with
+        the following structure; 
+
+        config = {'from_obs': bool,
+                    'obs_cols': list,
+                    'from_X': bool,
+                    'X_cols': str or list}
+
+        The value corresponding to key 'obs_cols' must be a non empty list of column names 
+        corresponding to so.obs[spl]. The value corresponding to key 'X_cols' must be either
+        'all' or a list of column names corresponding to so.X[spl]. These columns represent the 
+        attributes to be included. 
         """
         self.features_type = 'so'
         super().__init__(so, spl, graph_key, config)
 
     def __call__(self) -> None:
-        # TODO: assign attributes to graph.
-        # 0. Check config (that it is well defined). 
-        # If no error is raised, slice and return data. 
+        """
+        Generates random features and atributes them to nodes in so.G[spl][graph_key]
+
+        Returns:
+            None. Attributes are saved to `so`.
+        """
+
+        # Check config (that it is well defined). If no error is raised, slice and return data. 
         obs_df, X_df = self.check_config()
 
-        # 1. Join data and transform into dictionary. 
+        # Join data and transform into dictionary. 
         attrs = obs_df.merge(X_df, left_index=True, right_index=True, how='inner').to_dic('index')
 
-        # 2. Add to node attributes of so.G[spl][graph_key]
+        # Add to node attributes of so.G[spl][graph_key]
         nx.set_node_attributes(self.so.G[self.spl][self.graph_key], attrs)
 
     def check_config(self) -> tuple:
