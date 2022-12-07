@@ -76,6 +76,10 @@ class soAttributer(BaseAttributer):
         # Check self.config['from_X'] if its set to true. 
         if self.config['from_X']:
             if self.config['X_cols'] != 'all':
+                # Raise error if list is empty
+                if len(self.config['X_cols']) == 0:
+                    raise NameError('self.config["X_cols"] is empty. Please provide list of columns to be included.')
+
                 if not np.all(np.isin(self.config['X_cols'], self.so.X[self.spl].columns)):
                     raise NameError(f'Not all elements provided in list config["X_cols"] are in so.X[spl].columns')
 
