@@ -3,7 +3,7 @@ import numpy as np
 import pandas as pd
 import networkx as nx
 
-class soAttributer(BaseAttributer):
+class randomAttributer(BaseAttributer):
 
     def __init__(self,
                  so,
@@ -36,7 +36,7 @@ class soAttributer(BaseAttributer):
         index = self.so.obs[self.spl].index.values
 
         # Sample and but values into dict
-        attrs = pd.DataFrame(np.random.rand(len(index), n_attrs), index=index).to_dic('index')
+        attrs = pd.DataFrame(np.random.rand(len(index), n_attrs), index=index).to_dict('index')
 
         # Assign attrs to graph
         nx.set_node_attributes(self.so.G[self.spl][self.graph_key], attrs)

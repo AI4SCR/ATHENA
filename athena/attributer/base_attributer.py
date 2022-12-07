@@ -1,6 +1,7 @@
 from abc import ABC
+import abc
 
-class BaseAttributer:
+class BaseAttributer(ABC):
     
     def __init__(self, 
                  so,

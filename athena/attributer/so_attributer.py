@@ -39,7 +39,7 @@ class soAttributer(BaseAttributer):
         obs_df, X_df = self.check_config()
 
         # Join data and transform into dictionary. 
-        attrs = obs_df.merge(X_df, left_index=True, right_index=True, how='inner').to_dic('index')
+        attrs = obs_df.merge(X_df, left_index=True, right_index=True, how='inner').to_dict('index')
 
         # Add to node attributes of so.G[spl][graph_key]
         nx.set_node_attributes(self.so.G[self.spl][self.graph_key], attrs)
@@ -55,7 +55,7 @@ class soAttributer(BaseAttributer):
         """
 
         # At least one of the config options must be set to true. Raise error otw. 
-        if self.config['from_obs'] and self.config['from_X']:
+        if not (self.config['from_obs'] or self.config['from_X']):
             raise NameError('At least one should be true (config["from_obs"] or config["from_X"])')
 
         # Check self.config['from_obs'] if its set to true. 
@@ -79,9 +79,13 @@ class soAttributer(BaseAttributer):
                 if not np.all(np.isin(self.config['X_cols'], self.so.X[self.spl].columns)):
                     raise NameError(f'Not all elements provided in list config["X_cols"] are in so.X[spl].columns')
 
-            # Subset X[spl]
-            X_df = self.so.X[self.spl][self.config['obs_cols']]
+                # Subset X[spl]
+                X_df = self.so.X[self.spl][self.config['X_cols']]
+            else:
+                # Take all columns
+                X_df = self.so.X[self.spl]
         else:
+            # Get index
             X_df = pd.DataFrame(index = self.so.X[self.spl].index)
 
         return (obs_df, X_df)
