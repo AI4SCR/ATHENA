@@ -41,6 +41,9 @@ class soAttributer(BaseAttributer):
         # Join data and transform into dictionary. 
         attrs = obs_df.merge(X_df, left_index=True, right_index=True, how='inner').to_dict('index')
 
+        # Check if the nodes already have attributes. If yes, clear them.
+        self.clear_node_attrs()
+
         # Add to node attributes of so.G[spl][graph_key]
         nx.set_node_attributes(self.so.G[self.spl][self.graph_key], attrs)
 

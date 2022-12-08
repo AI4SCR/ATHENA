@@ -82,7 +82,7 @@ def test_random_features(so_fixture, default_params):
 
     print(so.G[spl]['knn'].nodes[1])
 
-    # This assertion indirectly tests wheather the errrase functionality also works properyl. 
+    # This assertion indirectly tests whether the arrase functionality also works properly. 
     assert len(so.G[spl]['knn'].nodes[1]) == config['n_attrs']
 
 

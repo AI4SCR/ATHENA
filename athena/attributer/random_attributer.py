@@ -29,14 +29,17 @@ class randomAttributer(BaseAttributer):
             None. Attributes are saved to `so`.
         """
         
-        # Chek config. If no assertions are raised, number of attrs is returned. 
+        # Chek config. If no assertions are raised, return number of attrs. 
         n_attrs = self.check_config()
 
         # Get index values form so
         index = self.so.obs[self.spl].index.values
 
-        # Sample and but values into dict
+        # Sample and put values into dict
         attrs = pd.DataFrame(np.random.rand(len(index), n_attrs), index=index).to_dict('index')
+
+        # Check if the nodes already have attributes. If yes, clear them.
+        self.clear_node_attrs()
 
         # Assign attrs to graph
         nx.set_node_attributes(self.so.G[self.spl][self.graph_key], attrs)

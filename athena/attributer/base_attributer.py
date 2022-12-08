@@ -21,3 +21,12 @@ class BaseAttributer(ABC):
         """Attributes graph. Implemented in subclasses.
         """
         raise NotImplementedError('Implemented in subclasses.')
+
+    def clear_node_attrs(self) -> None:
+        # Get key from the first node
+        any_node = list(self.so.G[self.spl][self.graph_key].nodes)[0]
+
+        # If the any_node ditionary (attrs) is not empty then clear all nodes. 
+        if len(self.so.G[self.spl][self.graph_key].nodes[any_node]) > 0:
+            for node in self.so.G[self.spl][self.graph_key].nodes:
+                self.so.G[self.spl][self.graph_key].nodes[node].clear()
