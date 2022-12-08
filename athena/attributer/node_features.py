@@ -1,5 +1,5 @@
 import copy as cp
-from .constants import GRAPH_ATTRIBUTER_DEFAULT_PARAMS
+from ..utils.default_configs import GRAPH_ATTRIBUTER_DEFAULT_PARAMS
 from .mappings import GRAPH_ATTRIBUTER
 
 def add_node_features(so,

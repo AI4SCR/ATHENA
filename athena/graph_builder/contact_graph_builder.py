@@ -4,8 +4,8 @@ import numpy as np
 from skimage.morphology import binary_dilation
 
 from .base_graph_builder import BaseGraphBuilder
-from .constants import EDGE_WEIGHT
-from .constants import DILATION_KERNELS
+from ..utils.default_configs import EDGE_WEIGHT
+from ..utils.default_configs import DILATION_KERNELS
 
 from tqdm import tqdm
 

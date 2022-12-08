@@ -1,4 +1,4 @@
-from athena.graph_builder.constants import GRAPH_BUILDER_DEFAULT_PARAMS
+from athena.utils.default_configs import GRAPH_BUILDER_DEFAULT_PARAMS
 from athena.graph_builder import build_graph
 import copy as cp
 import pytest

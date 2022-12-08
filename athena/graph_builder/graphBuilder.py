@@ -1,7 +1,6 @@
-from .constants import GRAPH_BUILDER_DEFAULT_PARAMS
+from ..utils.default_configs import GRAPH_BUILDER_DEFAULT_PARAMS
 from .mappings import GRAPH_BUILDERS
 import copy as cp
-
 
 def build_graph(so, 
                 spl: str, 

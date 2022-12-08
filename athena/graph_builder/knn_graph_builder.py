@@ -4,7 +4,7 @@ import pandas as pd
 import numpy as np
 from ..utils.tools.graph import df2node_attr
 from .base_graph_builder import BaseGraphBuilder
-from .constants import EDGE_WEIGHT
+from ..utils.default_configs import EDGE_WEIGHT
 
 
 # %%

@@ -1,7 +1,7 @@
 import pytest
 import athena as ath
 import copy as cp
-from athena.attributer.constants import GRAPH_ATTRIBUTER_DEFAULT_PARAMS
+from athena.utils.default_configs import GRAPH_ATTRIBUTER_DEFAULT_PARAMS
 
 @pytest.fixture(scope="module")
 def so_fixture():

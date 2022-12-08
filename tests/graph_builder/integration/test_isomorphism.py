@@ -1,7 +1,7 @@
 import networkx as nx
 import athena as ath
 import copy as cp
-from athena.graph_builder.constants import GRAPH_BUILDER_DEFAULT_PARAMS
+from athena.utils.default_configs import GRAPH_BUILDER_DEFAULT_PARAMS
 import pytest
 
 # This tests wheather a sub set graph is sub graph isomorphic of the full graph. 

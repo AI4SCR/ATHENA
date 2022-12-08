@@ -8,21 +8,25 @@ DILATION_KERNELS = {
 
 EDGE_WEIGHT = 'weight'
 
-GRAPH_ATTRIBUTER_DEFAULT_PARAMS = {
-    'so_feat': {'from_obs': True,
-                    'obs_cols': [],
-                    'from_X': True,
-                    'X_cols': []},
-    'deep_feat': {},
-    'random_feat': {}
-}
-
 OTHER_DEFAULT_PARAMS = {
     'concept_params': 
                 {'filter_col':None,
                 'labels':None},
     'coordinate_keys': ['x', 'y'],
     'mask_key': 'cellmasks'
+}
+
+GRAPH_ATTRIBUTER_DEFAULT_PARAMS = {
+    'so': {'from_obs': True,
+           'obs_cols': ['meta_id', 
+                        'cell_type_id',
+                        'phenograph_cluster', 
+                        'y', 
+                        'x'],
+           'from_X': True,
+           'X_cols': 'all'},
+    'deep': {},
+    'random': {'n_attrs': 3}
 }
 
 GRAPH_BUILDER_DEFAULT_PARAMS = {
