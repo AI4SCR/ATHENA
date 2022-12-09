@@ -17,6 +17,8 @@ OTHER_DEFAULT_PARAMS = {
 }
 
 GRAPH_ATTRIBUTER_DEFAULT_PARAMS = {
+    'build_and_attribute': False,
+    'use_attrs_from': 'so', 
     'so': {'from_obs': True,
            'obs_cols': ['meta_id', 
                         'cell_type_id',

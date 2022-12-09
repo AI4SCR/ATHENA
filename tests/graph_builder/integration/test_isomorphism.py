@@ -5,13 +5,7 @@ from athena.utils.default_configs import GRAPH_BUILDER_DEFAULT_PARAMS
 import pytest
 
 # This tests wheather a sub set graph is sub graph isomorphic of the full graph. 
-def test_is_isomorphic():
-    # Loead data
-    so = ath.dataset.imc()
-
-    # Define sample
-    spl = 'slide_49_By2x5'
-
+def test_is_isomorphic(so_fixture):
     # Extrac centroids
     ath.pp.extract_centroids(so, spl, mask_key='cellmasks')
 

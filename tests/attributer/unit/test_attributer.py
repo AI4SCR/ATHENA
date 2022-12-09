@@ -74,15 +74,16 @@ def test_features_from_so(so_fixture, default_params):
 
 # Test that random attributes are in graph. 
 def test_random_features(so_fixture, default_params):
+    # unpack and change parameters
     so, spl = so_fixture
     config = cp.deepcopy(default_params['random'])
     config['n_attrs'] = 5
 
+    # Add node features
     add_node_features(so=so, spl=spl, graph_key='knn', features_type='random', config=config)
-
-    print(so.G[spl]['knn'].nodes[1])
 
     # This assertion indirectly tests whether the arrase functionality also works properly. 
     assert len(so.G[spl]['knn'].nodes[1]) == config['n_attrs']
+
 
 

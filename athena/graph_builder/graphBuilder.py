@@ -1,5 +1,6 @@
 from ..utils.default_configs import GRAPH_BUILDER_DEFAULT_PARAMS
 from .mappings import GRAPH_BUILDERS
+from ..attributer.node_features import add_node_features
 import copy as cp
 
 def build_graph(so, 
@@ -17,10 +18,11 @@ def build_graph(so,
         `so`: SpatialOmics object
         `spl`: sample name in so.spl.index
         `builder_type`: graph type to construct {knn, radius, contact}
-        `config`: dict containing a dict 'builder_params' that specifies the graph construction parameters
+        `config`: dict containing a dict 'builder_params' that specifies the graph construction parameters.
+        Also includes other parameters. See other prameters in config section below. 
         `inplace`: whether to return a new SpatialOmics instance
 
-    Parameters in config:
+    Other parameters in `config`:
         `mask_key`: key in so.masks[spl] to use as segmentation masks from which the observation
                 coordinates are extracted, if `None` `coordinate_keys` from `obs` attribute are used
         `key_added`: key added in so.G[spl][key_add] to store the graph. If not specified it defaluts to `builder_type`.
@@ -30,7 +32,8 @@ def build_graph(so,
         `filter_col`: string of the column in so.obs[spl][filter_col] which has the labels on which you want 
                 to subset the cells.
         `labels`: list of stirngs which identify the labels in so.obs[spl][filter_col] that should be included in the grapgh. 
-                If no list is provided the graph is built using all the cells/cell labels. 
+                If no list is provided the graph is built using all the cells/cell labels.
+        `build_and_attribute: bool indicating whether to call the attributer functionality. 
 
     Returns:
         None or SpatialOmics if inplace = False
@@ -65,3 +68,14 @@ def build_graph(so,
     else:
         # otherwise initialize new dictionary object at key `spl`
         so.G[spl] = {key_added: g}
+
+    # If in config build_and_attribute == True then attribute graph.
+    if config['build_and_attribute']:
+        features_type = config['use_attrs_from']
+
+        # Check that the feature type is valid
+        assert features_type in ['so', 'deep', 'random'], 'features_type (in the config) must be one of the following: "so", "deep", "random"'
+
+        # Extract config and attribute graph
+        attrs_config = config[features_type]
+        add_node_features(so=so, spl=spl, graph_key=key_added, features_type=features_type, config=attrs_config)
