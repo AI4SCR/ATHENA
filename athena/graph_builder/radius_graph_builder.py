@@ -14,7 +14,7 @@ class RadiusGraphBuilder(BaseGraphBuilder):
     Radius graph class for graph building.
     '''
 
-    def __init__(self, config: dict, key_added: str):
+    def __init__(self, config: dict):
         """Build topology using a radius algorithm based on the distance between the centroid of the nodes.
 
         Args:
@@ -22,7 +22,7 @@ class RadiusGraphBuilder(BaseGraphBuilder):
             key_added: string to use as key for the graph in the spatial omics object
         """
         self.builder_type = 'radius'
-        super().__init__(config, key_added)
+        super().__init__(config)
 
     def __call__(self, so, spl):
         '''
@@ -48,9 +48,6 @@ class RadiusGraphBuilder(BaseGraphBuilder):
             subset_specified = True
         else:
             subset_specified = False
-
-        # Set key. Depends on the config file. Method defined in the superclass.
-        self.add_key(filter_col, labels)
 
         # If a cell subset is well are specified then simplify the mask
         if mask_key is None:
@@ -87,4 +84,4 @@ class RadiusGraphBuilder(BaseGraphBuilder):
         nx.set_node_attributes(self.graph, attrs)
         nx.set_edge_attributes(self.graph, 1, EDGE_WEIGHT)
 
-        return (self.graph, self.key_added)
+        return self.graph

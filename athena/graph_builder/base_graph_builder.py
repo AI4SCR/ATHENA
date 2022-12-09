@@ -7,7 +7,7 @@ from skimage.measure import regionprops_table
 
 class BaseGraphBuilder(ABC):
 
-    def __init__(self, config: dict, key_added: str):
+    def __init__(self, config: dict):
         """Base-Graph Builder constructor
 
         Args:
@@ -16,7 +16,6 @@ class BaseGraphBuilder(ABC):
         """
 
         self.config = config
-        self.key_added = key_added
         self.graph = nx.Graph()
 
     @abc.abstractmethod
@@ -65,13 +64,3 @@ class BaseGraphBuilder(ABC):
         # Raise error if not all `labels` have a match in `so.obs[spl][filter_col].cat.categories.values`
         if not np.all(np.isin(labels, so.obs[spl][filter_col].values)):
             raise NameError(f'Not all elements provided in variable labels are in so.obs[spl][filter_col]')
-
-    def add_key(self, filter_col, labels):
-        ''' Sets the key of the graph
-        '''
-        # If no title for the graph is provided use builder_type    
-        if self.key_added is None:
-            if labels is not None:
-                self.key_added = f'{self.builder_type} > {filter_col} > {labels}'
-            else:
-                self.key_added = self.builder_type

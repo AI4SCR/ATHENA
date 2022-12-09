@@ -96,5 +96,6 @@ def test_name(so_object):
     build_graph(so_object, 
                 spl='a', 
                 builder_type='contact', 
-                config=config,)
-    assert "contact > cell_type > ['tumor']" in so_object.G['a']
+                config=config,
+                key_added='foo')
+    assert "foo" in so_object.G['a']

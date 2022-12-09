@@ -12,19 +12,18 @@ class KNNGraphBuilder(BaseGraphBuilder):
     '''KNN (K-Nearest Neighbors) class for graph building.
     '''
 
-    def __init__(self, config: dict, key_added: str):
+    def __init__(self, config: dict):
         """KNN-Graph Builder constructor
 
         Args:
             config: Dictionary containing `builder_params`. Refer to [1] for possible parameters
-            key_added: string to use as key for the graph in the spatial omics object
 
         Notes:
             [1] https://scikit-learn.org/stable/modules/generated/sklearn.neighbors.kneighbors_graph.html
 
         """
         self.builder_type = 'knn'
-        super().__init__(config, key_added)
+        super().__init__(config)
 
     def __call__(self, so, spl):
         '''Build topology using a kNN algorithm based on the distance between the centroid of the nodes.
@@ -50,9 +49,6 @@ class KNNGraphBuilder(BaseGraphBuilder):
             subset_specified = True
         else:
             subset_specified = False
-
-        # Set key. Depends on the config file. Method defined in the superclass.
-        self.add_key(filter_col, labels)
 
         # If no masks are provided build graph with centroids.
         if mask_key is None:
@@ -90,4 +86,4 @@ class KNNGraphBuilder(BaseGraphBuilder):
         nx.set_node_attributes(self.graph, attrs)
         nx.set_edge_attributes(self.graph, 1, EDGE_WEIGHT)
 
-        return (self.graph, self.key_added)
+        return self.graph

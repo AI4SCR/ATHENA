@@ -47,10 +47,14 @@ def build_graph(so,
         config = cp.deepcopy(GRAPH_BUILDER_DEFAULT_PARAMS[builder_type])
 
     # Instantiate graph builder object
-    builder = GRAPH_BUILDERS[builder_type](config, key_added)
+    builder = GRAPH_BUILDERS[builder_type](config)
 
     # Build graph and get key
-    g, key_added = builder(so, spl)
+    g = builder(so, spl)
+
+    # If no graph key is provided then use builder_type
+    if key_added is None:
+        key_added = builder_type
 
     # Copys `so` if inplace == Ture.
     so = so if inplace else so.copy()

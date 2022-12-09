@@ -35,12 +35,11 @@ class ContactGraphBuilder(BaseGraphBuilder):
     Build contact graph based on pixel expansion of cell masks.
     '''
 
-    def __init__(self, config: dict, key_added: str):
+    def __init__(self, config: dict):
         """Base-Graph Builder constructor
 
         Args:
             config: Dictionary containing a dict called `builder_params` that provides function call arguments to the build_topology function
-            key_added: string to use as key for the graph in the spatial omics object
 
         Default config:
             config = {'builder_params': 
@@ -54,7 +53,7 @@ class ContactGraphBuilder(BaseGraphBuilder):
                 'mask_key': 'cellmasks'}
         """
         self.builder_type = 'contact'
-        super().__init__(config, key_added)
+        super().__init__(config)
 
     def __call__(self, so, spl):
         """Build topology using pixel expansion of segmentation masks provided by topo_data['mask']. Masks that overlap after expansion are connected in the graph.
@@ -84,9 +83,6 @@ class ContactGraphBuilder(BaseGraphBuilder):
             subset_specified = True
         else:
             subset_specified = False
-
-        # Set key. Depends on the config file. Method defined in the superclass.
-        self.add_key(filter_col, labels)
 
         # Get masks
         mask = so.get_mask(spl, mask_key)
@@ -134,6 +130,6 @@ class ContactGraphBuilder(BaseGraphBuilder):
             edge_list = [(i, i) for i in self.graph.nodes]
             self.graph.add_edges_from(edge_list)
 
-        return (self.graph, self.key_added)
+        return self.graph
 
 # %%
