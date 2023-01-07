@@ -14,7 +14,7 @@ class BaseAttributer(ABC):
         self.so = so
         self.spl = spl
         self.graph_key = graph_key
-        self.config = config
+        self.config = config['attrs_params']
 
     @abc.abstractmethod
     def __call__(self):

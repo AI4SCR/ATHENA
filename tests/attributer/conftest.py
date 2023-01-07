@@ -6,8 +6,7 @@ from athena.utils.default_configs import GRAPH_ATTRIBUTER_DEFAULT_PARAMS
 @pytest.fixture(scope="module")
 def so_fixture():
     # Loead data
-    so = ath.dataset.imc()
-    print('I was called')
+    so = ath.dataset.imc_sample()
 
     # Define sample
     spl = 'slide_49_By2x5'

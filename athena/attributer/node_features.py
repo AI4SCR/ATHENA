@@ -32,7 +32,7 @@ def add_node_features(so,
     try:
         so.G[spl][graph_key]
     except KeyError:
-        raise KeyError(f'Either spl: "{spl}" or graph_key: "{graph_key}" is invalid.' )
+        raise KeyError(f'Either spl: "{spl}" or graph_key: "{graph_key}" is invalid.')
 
     # If no config is specified, use default config. 
     if config is None:

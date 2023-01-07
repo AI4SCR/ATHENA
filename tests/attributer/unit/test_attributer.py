@@ -6,8 +6,8 @@ import pytest
 def test_raise_both_false(so_fixture, default_params):
     so, spl = so_fixture
     config = cp.deepcopy(default_params['so'])
-    config['from_obs'] = False
-    config['from_X'] = False
+    config['attrs_params']['from_obs'] = False
+    config['attrs_params']['from_X'] = False
 
     with pytest.raises(NameError):
         add_node_features(so=so, spl=spl, graph_key='knn', features_type='so', config=config)
@@ -16,15 +16,15 @@ def test_raise_both_false(so_fixture, default_params):
 def test_raise_empty_list(so_fixture, default_params):
     so, spl = so_fixture
     config = cp.deepcopy(default_params['so'])
-    config['obs_cols'] = []
+    config['attrs_params']['obs_cols'] = []
 
     # Test empty list on obs
     with pytest.raises(NameError):
         add_node_features(so=so, spl=spl, graph_key='knn', features_type='so', config=config)
 
     # Test empty list on X
-    config['obs_cols'] = ['x', 'y']
-    config['X_cols'] = []
+    config['attrs_params']['obs_cols'] = ['x', 'y']
+    config['attrs_params']['X_cols'] = []
     with pytest.raises(NameError):
         add_node_features(so=so, spl=spl, graph_key='knn', features_type='so', config=config)
 
@@ -32,14 +32,14 @@ def test_raise_empty_list(so_fixture, default_params):
 def test_invalid_colnames(so_fixture, default_params):
     so, spl = so_fixture
     config = cp.deepcopy(default_params['so'])
-    config['obs_cols'] = ['x', 'not_a_col_name']
+    config['attrs_params']['obs_cols'] = ['x', 'not_a_col_name']
 
     # Test wrong col name on obs
     with pytest.raises(NameError):
         add_node_features(so=so, spl=spl, graph_key='knn', features_type='so', config=config)
 
-    config['obs_cols'] = ['x', 'y']
-    config['X_cols'] = ['Cytokeratin5', 'not_a_col_name']
+    config['attrs_params']['obs_cols'] = ['x', 'y']
+    config['attrs_params']['X_cols'] = ['Cytokeratin5', 'not_a_col_name']
 
     # Test wrong col name on X
     with pytest.raises(NameError):
@@ -49,8 +49,8 @@ def test_invalid_colnames(so_fixture, default_params):
 def test_features_from_so(so_fixture, default_params):
     so, spl = so_fixture
     config = cp.deepcopy(default_params['so'])
-    config['obs_cols'] = ['x']
-    config['from_X'] = False
+    config['attrs_params']['obs_cols'] = ['x']
+    config['attrs_params']['from_X'] = False
 
     # By modifying obs
     add_node_features(so=so, spl=spl, graph_key='knn', features_type='so', config=config)
@@ -63,9 +63,9 @@ def test_features_from_so(so_fixture, default_params):
     assert 'x' in so.G[spl]['knn'].nodes[1].keys(), 'Attribute not found.'
 
     # By modifying X
-    config['from_obs'] = False
-    config['from_X'] = True
-    config['X_cols'] = ['Cytokeratin5']
+    config['attrs_params']['from_obs'] = False
+    config['attrs_params']['from_X'] = True
+    config['attrs_params']['X_cols'] = ['Cytokeratin5']
 
     add_node_features(so=so, spl=spl, graph_key='knn', features_type='so', config=config)
 
@@ -77,13 +77,13 @@ def test_random_features(so_fixture, default_params):
     # unpack and change parameters
     so, spl = so_fixture
     config = cp.deepcopy(default_params['random'])
-    config['n_attrs'] = 5
+    config['attrs_params']['n_attrs'] = 5
 
     # Add node features
     add_node_features(so=so, spl=spl, graph_key='knn', features_type='random', config=config)
 
     # This assertion indirectly tests whether the arrase functionality also works properly. 
-    assert len(so.G[spl]['knn'].nodes[1]) == config['n_attrs']
+    assert len(so.G[spl]['knn'].nodes[1]) == config['attrs_params']['n_attrs']
 
 
 

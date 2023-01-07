@@ -24,7 +24,6 @@ class soAttributer(BaseAttributer):
         'all' or a list of column names corresponding to so.X[spl]. These columns represent the 
         attributes to be included. 
         """
-        self.features_type = 'so'
         super().__init__(so, spl, graph_key, config)
 
     def __call__(self) -> None:

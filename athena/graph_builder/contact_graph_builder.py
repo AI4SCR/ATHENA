@@ -68,8 +68,11 @@ class ContactGraphBuilder(BaseGraphBuilder):
         """
 
         # Unpack parameters for building
-        filter_col = self.config['concept_params']['filter_col']
-        labels = self.config['concept_params']['labels']
+        if self.config['build_concept_graph']:
+            filter_col = self.config['concept_params']['filter_col']
+            labels = self.config['concept_params']['labels']
+            self.look_for_miss_specification_error(so, spl, filter_col, labels)
+
         mask_key = self.config['mask_key']
         params = self.config['builder_params']
 
@@ -77,18 +80,11 @@ class ContactGraphBuilder(BaseGraphBuilder):
         if mask_key is None:
             raise ValueError('Contact-graph requires segmentations masks. To compute a contact graph please specify `the mask_key` to use in so.masks[spl]')
 
-        # Check whether the graph subset is well specified. Method defined in the superclass.
-        if labels is not None or filter_col is not None:
-            self.look_for_miss_specification_error(so, spl, filter_col, labels)
-            subset_specified = True
-        else:
-            subset_specified = False
-
         # Get masks
         mask = so.get_mask(spl, mask_key)
 
         # If a cell subset is well are specified then simplify the mask
-        if subset_specified:
+        if self.config['build_concept_graph']:
             # Get cell_ids of the cells that are in `labels`
             cell_ids = so.obs[spl].query(f'{filter_col} in @labels').index.values
             # Simplify masks filling it with 0s for cells that are not in `labels`
@@ -131,5 +127,3 @@ class ContactGraphBuilder(BaseGraphBuilder):
             self.graph.add_edges_from(edge_list)
 
         return self.graph
-
-# %%

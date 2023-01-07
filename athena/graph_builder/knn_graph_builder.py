@@ -38,22 +38,18 @@ class KNNGraphBuilder(BaseGraphBuilder):
         '''
 
         # Unpack parameters for building
-        filter_col = self.config['concept_params']['filter_col']
-        labels = self.config['concept_params']['labels']
+        if self.config['build_concept_graph']:
+            filter_col = self.config['concept_params']['filter_col']
+            labels = self.config['concept_params']['labels']
+            self.look_for_miss_specification_error(so, spl, filter_col, labels)
+
         mask_key = self.config['mask_key']
         coordinate_keys = self.config['coordinate_keys']
-        
-        # Check weather the graph subset is well specified. Method defined in the superclass.
-        if labels is not None or filter_col is not None:
-            self.look_for_miss_specification_error(so, spl, filter_col, labels)
-            subset_specified = True
-        else:
-            subset_specified = False
 
         # If no masks are provided build graph with centroids.
         if mask_key is None:
             # If labels is specified, get rid of coordinates that are in the out-set. # Else get all coordinates.
-            if subset_specified:
+            if self.config['build_concept_graph']:
                 # Get coordinates
                 ndata = so.obs[spl].query(f'{filter_col} in @labels')[coordinate_keys[0], coordinate_keys[1]]
             else:
@@ -65,7 +61,7 @@ class KNNGraphBuilder(BaseGraphBuilder):
             mask = so.get_mask(spl, mask_key)
 
             # If a cell subset is well are specified then simplify the mask
-            if subset_specified:
+            if self.config['build_concept_graph']:
                 # Get cell_ids of the cells that are in `labels`
                 cell_ids = so.obs[spl].query(f'{filter_col} in @labels').index.values
                 # Simplify masks filling it with 0s for cells that are not in `labels`
