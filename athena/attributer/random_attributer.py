@@ -18,7 +18,6 @@ class randomAttributer(BaseAttributer):
 
         where `n_attrs` is the number of random attributes to generate. 
         """
-        self.features_type = 'random'
         super().__init__(so, spl, graph_key, config)
 
     def __call__(self) -> None:

@@ -1,11 +1,14 @@
-from athena.utils.default_configs import GRAPH_BUILDER_DEFAULT_PARAMS
+from athena.utils.default_configs import get_default_config
 from athena.graph_builder import build_graph
 import copy as cp
 import pytest
 
 def test_empty_labels(so_object):
     # This tests whether passing the labels varaible as an empty list returns and error
-    config = cp.deepcopy(GRAPH_BUILDER_DEFAULT_PARAMS['knn'])
+    config = get_default_config(
+        builder_type='knn',
+        build_concept_graph=True
+    )
     config['builder_params']['n_neighbors'] = 2 # set parameter k
     config['concept_params']['filter_col'] = 'cell_type'
     config['concept_params']['labels'] = []
@@ -17,7 +20,10 @@ def test_empty_labels(so_object):
 
 def test_incongruent_labels_in_labels(so_object):
     # This tests whether passing labes that are not 'filter_col' returns and error
-    config = cp.deepcopy(GRAPH_BUILDER_DEFAULT_PARAMS['knn'])
+    config = get_default_config(
+        builder_type='knn',
+        build_concept_graph=True
+    )
     config['builder_params']['n_neighbors'] = 2 # set parameter k
     config['concept_params']['filter_col'] = 'cell_type'
     config['concept_params']['labels'] = ['tumor', 'stromal', 'not_a_type']
@@ -29,7 +35,10 @@ def test_incongruent_labels_in_labels(so_object):
 
 def test_filter_col_not_in_columns(so_object):
     # This tests whether passing an invalid 'filter_col' returns and error
-    config = cp.deepcopy(GRAPH_BUILDER_DEFAULT_PARAMS['knn'])
+    config = get_default_config(
+        builder_type='knn',
+        build_concept_graph=True
+    )
     config['builder_params']['n_neighbors'] = 2 # set parameter k
     config['concept_params']['filter_col'] = 'not_a_filter_col'
     config['concept_params']['labels'] = ['tumor', 'stromal']
@@ -41,7 +50,10 @@ def test_filter_col_not_in_columns(so_object):
   
 def test_filter_col_or_labels_not_specified(so_object):
     # This tests whether filter_col was passed but not labels or the other why around
-    config = cp.deepcopy(GRAPH_BUILDER_DEFAULT_PARAMS['knn'])
+    config = get_default_config(
+        builder_type='knn',
+        build_concept_graph=True
+    )
     config['builder_params']['n_neighbors'] = 2 # set parameter k
     config['concept_params']['filter_col'] = 'cell_type'
     print(config['concept_params'])
@@ -52,7 +64,10 @@ def test_filter_col_or_labels_not_specified(so_object):
                     config=config)
 
 def test_knn(so_object):
-    config = cp.deepcopy(GRAPH_BUILDER_DEFAULT_PARAMS['knn'])
+    config = get_default_config(
+        builder_type='knn',
+        build_concept_graph=True
+    )
     config['builder_params']['n_neighbors'] = 3
     config['concept_params']['filter_col'] = 'cell_type'
     config['concept_params']['labels'] = ['tumor']
@@ -65,7 +80,10 @@ def test_knn(so_object):
     assert len(so_object.G['a']['knn'].edges) == 6
 
 def test_radius(so_object):
-    config = cp.deepcopy(GRAPH_BUILDER_DEFAULT_PARAMS['radius'])
+    config = get_default_config(
+        builder_type='radius',
+        build_concept_graph=True
+    )
     config['concept_params']['filter_col'] = 'cell_type'
     config['concept_params']['labels'] = ['tumor']
     build_graph(so_object, 
@@ -77,7 +95,10 @@ def test_radius(so_object):
     assert len(so_object.G['a']['radius'].edges) == 6
 
 def test_contact(so_object):
-    config = cp.deepcopy(GRAPH_BUILDER_DEFAULT_PARAMS['contact'])
+    config = get_default_config(
+        builder_type='contact',
+        build_concept_graph=True
+    )
     config['concept_params']['filter_col'] = 'cell_type'
     config['concept_params']['labels'] = ['tumor']
     build_graph(so_object, 
@@ -90,7 +111,10 @@ def test_contact(so_object):
 
 def test_name(so_object):
     # this testes whther the name gets assigned 
-    config = cp.deepcopy(GRAPH_BUILDER_DEFAULT_PARAMS['contact'])
+    config = get_default_config(
+        builder_type='contact',
+        build_concept_graph=True
+    )
     config['concept_params']['filter_col'] = 'cell_type'
     config['concept_params']['labels'] = ['tumor']
     build_graph(so_object, 

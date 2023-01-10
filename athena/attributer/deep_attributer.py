@@ -13,8 +13,6 @@ class deepAttributer(BaseAttributer):
         """
         Attributer class constructor. TODO: Compleate description, specify config structure. 
         """
-        
-        self.features_type = 'deep'
         super().__init__(so, spl, graph_key, config)
 
     def __call__(self) -> None:

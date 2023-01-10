@@ -1,4 +1,4 @@
-from ..utils.default_configs import GRAPH_BUILDER_DEFAULT_PARAMS
+from ..utils.default_configs import get_default_config
 from .mappings import GRAPH_BUILDERS
 from ..attributer.node_features import add_node_features
 import copy as cp
@@ -45,9 +45,9 @@ def build_graph(so,
     if builder_type not in GRAPH_BUILDERS:
         raise ValueError(f'invalid type {builder_type}. Available types are {GRAPH_BUILDERS.keys()}')
 
-    # Get default bulding parameters if non are specified    
-    if config is None:
-        config = cp.deepcopy(GRAPH_BUILDER_DEFAULT_PARAMS[builder_type])
+    # Get default bulding parameters if non are specified
+    if config is None:    
+        config = get_default_config(builder_type=builder_type)
 
     # Instantiate graph builder object
     builder = GRAPH_BUILDERS[builder_type](config)
@@ -71,11 +71,4 @@ def build_graph(so,
 
     # If in config build_and_attribute == True then attribute graph.
     if config['build_and_attribute']:
-        features_type = config['use_attrs_from']
-
-        # Check that the feature type is valid
-        assert features_type in ['so', 'deep', 'random'], 'features_type (in the config) must be one of the following: "so", "deep", "random"'
-
-        # Extract config and attribute graph
-        attrs_config = config[features_type]
-        add_node_features(so=so, spl=spl, graph_key=key_added, features_type=features_type, config=attrs_config)
+        add_node_features(so=so, spl=spl, graph_key=key_added, features_type=config['attrs_type'], config=config)
