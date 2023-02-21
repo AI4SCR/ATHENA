@@ -80,9 +80,9 @@ def get_default_config(builder_type: str,
 
     Args:
         builder_type: string indicating the type of graph to build, namely 'knn', 'contact', or 'radius'.
-        build_concept_graph: idnicates wheter to build a concept graph (True) of a graph using all the cells (False)
+        build_concept_graph: idnicates wheter to build a concept graph (True) or a graph using all the cells (False)
         build_and_attribute: whether to assign attributes to the nodes of the graph. 
-        attrs_type:  string indicating which type of attributes to assign.
+        attrs_type: string indicating which type of attributes to assign.
     
     Raetuns:
         A dictionary with the default configuration. 
