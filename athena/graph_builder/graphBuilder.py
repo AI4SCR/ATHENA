@@ -51,7 +51,7 @@ def build_graph(so: SpatialOmics,
     elif config is not None and builder_type is not None:
         raise ValueError('Either config or builder_type must be specified, but not both.')
 
-    # If builder_type = None then gr
+    # If builder_type = None then get builder_type from config
     if builder_type is None:
         builder_type = config["builder_type"]
 
@@ -62,6 +62,7 @@ def build_graph(so: SpatialOmics,
     # Get default building parameters if non are specified
     if config is None:
         config = get_default_config(builder_type=builder_type)
+        print("Warning: config not specified, defaulting to predefined configuration.")
 
     # Instantiate graph builder object
     builder = GRAPH_BUILDERS[builder_type](config)

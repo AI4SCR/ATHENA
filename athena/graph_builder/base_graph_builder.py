@@ -63,4 +63,4 @@ class BaseGraphBuilder(ABC):
 
         # Raise error if not all `labels` have a match in `so.obs[spl][filter_col].cat.categories.values`
         if not np.all(np.isin(labels, so.obs[spl][filter_col].values)):
-            raise NameError('Not all elements provided in variable labels are in so.obs[spl][filter_col]')
+            raise NameError(f'Not all labels are present in column "{filter_col}". Labels: {labels}. In {filter_col}: {so.obs[spl][filter_col].values}')
