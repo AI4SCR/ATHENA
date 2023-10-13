@@ -5,6 +5,7 @@ import pandas as pd
 from abc import ABC
 from skimage.measure import regionprops_table
 
+
 class BaseGraphBuilder(ABC):
 
     def __init__(self, config: dict):
@@ -12,7 +13,7 @@ class BaseGraphBuilder(ABC):
 
         Args:
             config: Dictionary containing a dict called `builder_params` that provides function call arguments to the build_topology function
-            key_added: The key asociated with the graph in the so object
+            key_added: The key associated with the graph in the so object
         """
 
         self.config = config
@@ -44,23 +45,22 @@ class BaseGraphBuilder(ABC):
 
         return ndata
 
-    
     def look_for_miss_specification_error(self, so, spl, filter_col, labels):
-        ''' Looks for a miss especification error in the config
+        ''' Looks for a miss specification error in the config
         '''
 
         # Raise error if either `filter_col` or `labels` is specified but not the other.
         if (filter_col is None) ^ (labels is None):
-            raise NameError(f'failed to specify either `filter_col` or `labels`')
+            raise NameError('failed to specify either `filter_col` or `labels`')
 
         # Raise error if `filter_col` is not found in 
         if filter_col not in so.obs[spl].columns:
             raise NameError(f'{filter_col} is not in so.obs[spl].columns')
-                
+
         # Raise error if `labels` is an empty list
         if labels == []:
-            raise NameError(f'labels varaibel is empty. You need to give a non-empty list')
+            raise NameError('labels variable is empty. You need to give a non-empty list')
 
         # Raise error if not all `labels` have a match in `so.obs[spl][filter_col].cat.categories.values`
         if not np.all(np.isin(labels, so.obs[spl][filter_col].values)):
-            raise NameError(f'Not all elements provided in variable labels are in so.obs[spl][filter_col]')
+            raise NameError('Not all elements provided in variable labels are in so.obs[spl][filter_col]')
