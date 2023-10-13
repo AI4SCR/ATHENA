@@ -47,7 +47,9 @@ def build_graph(so: SpatialOmics,
     """
     # Check that both config and builder_type are not none
     if config is None and builder_type is None:
-        raise ValueError('Either config or builder_type must be specified.')
+        raise ValueError('Either config or builder_type must be specified. Both are None')
+    elif config is not None and builder_type is not None:
+        raise ValueError('Either config or builder_type must be specified, but not both.')
 
     # If builder_type = None then gr
     if builder_type is None:
