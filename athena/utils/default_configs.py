@@ -106,6 +106,10 @@ def get_default_config(builder_type: str,
     other_params = cp.deepcopy(OTHER_PARAMETERS)
     config = {**config, **other_params}
 
+    if builder_type == "contact":
+        config["mask_key"] = "cellmasks"
+        config["coordinate_keys"] = None
+
     if build_concept_graph:
         concept_config = cp.deepcopy(CONCEPT_DEFAULT_PARAMS)
         config = {**config, **concept_config}
