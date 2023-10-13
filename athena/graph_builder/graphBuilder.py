@@ -1,11 +1,12 @@
 from ..utils.default_configs import get_default_config
 from .mappings import GRAPH_BUILDERS
 from ..attributer.node_features import add_node_features
+from spatialOmics import SpatialOmics
 
 
-def build_graph(so,
+def build_graph(so: SpatialOmics,
                 spl: str,
-                builder_type: str = 'knn',
+                builder_type: str = None,
                 key_added: str = None,
                 config: dict = None,
                 inplace: bool = True):
@@ -44,6 +45,13 @@ def build_graph(so,
 
     .. _dilation: https://scikit-image.org/docs/stable/api/skimage.morphology.html#skimage.morphology.binary_dilation
     """
+    # Check that both config and builder_type are not none
+    if config is None and builder_type is None:
+        raise ValueError('Either config or builder_type must be specified.')
+
+    # If builder_type = None then gr
+    if builder_type is None:
+        builder_type = config["builder_type"]
 
     # Raise error is the builder_type is invalid
     if builder_type not in GRAPH_BUILDERS:
