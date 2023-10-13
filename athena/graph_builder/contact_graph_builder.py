@@ -1,16 +1,11 @@
-import networkx as nx
 import numpy as np
-
 from skimage.morphology import binary_dilation
-
 from .base_graph_builder import BaseGraphBuilder
 from ..utils.default_configs import EDGE_WEIGHT
 from ..utils.default_configs import DILATION_KERNELS
-
 from tqdm import tqdm
 
 
-# %%
 def dilation(args) -> list:
     """Compute dilation of a given object in a segmentation mask
 
@@ -28,12 +23,11 @@ def dilation(args) -> list:
     return [(obj, cell, {EDGE_WEIGHT: 1}) for cell in cells]
 
 
-# %%
 class ContactGraphBuilder(BaseGraphBuilder):
-    '''Contact-Graph class.
+    """Contact-Graph class.
 
     Build contact graph based on pixel expansion of cell masks.
-    '''
+    """
 
     def __init__(self, config: dict):
         """Base-Graph Builder constructor
@@ -42,17 +36,17 @@ class ContactGraphBuilder(BaseGraphBuilder):
             config: Dictionary containing a dict called `builder_params` that provides function call arguments to the build_topology function
 
         Default config:
-            config = {'builder_params': 
+            config = {'builder_params':
                     {'dilation_kernel': 'disk',
-                     'radius': 4, 
+                     'radius': 4,
                      'include_self':False},
-                'concept_params': 
+                'concept_params':
                     {'filter_col':None,
                     'labels':None},
                 'coordinate_keys': ['x', 'y'],
                 'mask_key': 'cellmasks'}
         """
-        self.builder_type = 'contact'
+        self.builder_type = "contact"
         super().__init__(config)
 
     def __call__(self, so, spl):
@@ -68,36 +62,39 @@ class ContactGraphBuilder(BaseGraphBuilder):
         """
 
         # Unpack parameters for building
-        if self.config['build_concept_graph']:
-            filter_col = self.config['concept_params']['filter_col']
-            labels = self.config['concept_params']['labels']
+        if self.config["build_concept_graph"]:
+            filter_col = self.config["concept_params"]["filter_col"]
+            labels = self.config["concept_params"]["labels"]
             self.look_for_miss_specification_error(so, spl, filter_col, labels)
 
-        mask_key = self.config['mask_key']
-        params = self.config['builder_params']
+        mask_key = self.config["mask_key"]
+        params = self.config["builder_params"]
 
         # Raise error if mask is not provided
         if mask_key is None:
-            raise ValueError('Contact-graph requires segmentations masks. To compute a contact graph please specify `the mask_key` to use in so.masks[spl]')
+            raise ValueError(
+                "Contact-graph requires segmentation masks. To compute a contact graph please specify `the mask_key` to use in so.masks[spl]"
+            )
 
         # Get masks
         mask = so.get_mask(spl, mask_key)
 
         # If a cell subset is well are specified then simplify the mask
-        if self.config['build_concept_graph']:
+        if self.config["build_concept_graph"]:
             # Get cell_ids of the cells that are in `labels`
-            cell_ids = so.obs[spl].query(f'{filter_col} in @labels').index.values
+            cell_ids = so.obs[spl].query(f"{filter_col} in @labels").index.values
             # Simplify masks filling it with 0s for cells that are not in `labels`
             mask = np.where(np.isin(mask, cell_ids), mask, 0)
 
         # If dilation_kernel instantiate kernel object, else raise error
-        if params['dilation_kernel'] in DILATION_KERNELS:
-            kernel = DILATION_KERNELS[params['dilation_kernel']](params['radius'])
+        if params["dilation_kernel"] in DILATION_KERNELS:
+            kernel = DILATION_KERNELS[params["dilation_kernel"]](params["radius"])
         else:
             raise ValueError(
-                f'Specified dilate kernel not available. Please use one of {{{", ".join(DILATION_KERNELS)}}}.')
+                f'Specified dilate kernel not available. Please use one of {{{", ".join(DILATION_KERNELS)}}}.'
+            )
 
-        # Context: Each pixel that belongs to cell i, was value i in the mask. 
+        # Context: Each pixel that belongs to cell i, was value i in the mask.
         # get object ids, 0 is background.
         objs = np.unique(mask)
         objs = objs[objs != 0]
@@ -105,13 +102,13 @@ class ContactGraphBuilder(BaseGraphBuilder):
         # Add nodes to graph
         self.graph.add_nodes_from(objs)
 
-        # compute neighbours (object = the mask of a single cell)
+        # compute neighbors (object = the mask of a single cell)
         edges = []
         for obj in tqdm(objs):
-            # This creates the augemnted object mask in a bool array from
+            # This creates the augmented object mask in a bool array from
             dilated_img = binary_dilation(mask == obj, kernel)
 
-            cells = np.unique(mask[dilated_img]) # This identifies the intersecting objects
+            cells = np.unique(mask[dilated_img])  # This identifies the intersecting objects
             cells = cells[cells != obj]  # remove object itself
             cells = cells[cells != 0]  # remove background
 
@@ -121,8 +118,12 @@ class ContactGraphBuilder(BaseGraphBuilder):
         # Adds edges to instance variable graph object
         self.graph.add_edges_from(edges)
 
-        # Include self edges if desired 
-        if 'include_self' in self.config['builder_params'] and self.config['builder_params']['include_self'] and self.builder_type == 'contact':
+        # Include self edges if desired
+        if (
+            "include_self" in self.config["builder_params"]
+            and self.config["builder_params"]["include_self"]
+            and self.builder_type == "contact"
+        ):
             edge_list = [(i, i) for i in self.graph.nodes]
             self.graph.add_edges_from(edge_list)
 
