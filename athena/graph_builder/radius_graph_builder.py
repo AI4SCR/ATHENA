@@ -71,6 +71,7 @@ class RadiusGraphBuilder(BaseGraphBuilder):
             ndata = self.extract_location(mask)
 
         # compute adjacency matrix, put into df with cell_id for index and columns and ad to graph
+        ndata.dropna(inplace=True)
         adj = radius_neighbors_graph(ndata.to_numpy(), **self.config['builder_params'])
         df = pd.DataFrame(adj.A, index=ndata.index, columns=ndata.index)
         self.graph = nx.from_pandas_adjacency(df)  # this does not add the nodes in the same sequence as the index, column
