@@ -50,7 +50,7 @@ def spatial(so, spl: str, attr: str, *, mode: str = 'scatter', node_size: float 
         show: whether to show the plot or not
         save: path to the file in which the plot is saved
         tight_layout: whether to apply tight_layout or not.
-        filter_col: string identifying the column in so.obs to use to filter ot cells that should not be plotted.
+        filter_col: string identifying the column in so.obs to use to filter out cells that should not be plotted.
         labels: list of strings that identify the cells that should be included in the plot. These should be entries in filter_col.
 
     Examples:
