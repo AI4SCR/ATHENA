@@ -3,7 +3,8 @@ import numpy as np
 import pandas as pd
 import networkx as nx
 
-class randomAttributer(BaseAttributer):
+
+class RandomAttributer(BaseAttributer):
 
     def __init__(self,
                  so,
@@ -11,24 +12,24 @@ class randomAttributer(BaseAttributer):
                  graph_key: str,
                  config: dict) -> None:
         """
-        Attributer class constructor. Assigns uniform [0, 1) random values to each attribute. 
+        Attributer class constructor. Assigns uniform [0, 1) random values to each attribute.
         `config` must a dict with the following structure;
 
         `config = {'n_attrs': n_attrs}`
 
-        where `n_attrs` is the number of random attributes to generate. 
+        where `n_attrs` is the number of random attributes to generate.
         """
         super().__init__(so, spl, graph_key, config)
 
     def __call__(self) -> None:
         """
-        Generates random features and atributes them to nodes in so.G[spl][graph_key]
+        Generates random features and attributes them to nodes in so.G[spl][graph_key]
 
         Returns:
             None. Attributes are saved to `so`.
         """
-        
-        # Chek config. If no assertions are raised, return number of attrs. 
+
+        # Check config. If no assertions are raised, return number of attrs.
         n_attrs = self.check_config()
 
         # Get index values form so
@@ -48,8 +49,8 @@ class randomAttributer(BaseAttributer):
         Check config integrity.
 
         Returns:
-            Number of attributes to be generated. 
+            Number of attributes to be generated.
         """
         assert type(self.config['n_attrs']) is int, "Number of attributes must be an integer."
-        assert self.config['n_attrs'] > 0, "Number of attributes connot be zero."
+        assert self.config['n_attrs'] > 0, "Number of attributes cannot be zero."
         return self.config['n_attrs']

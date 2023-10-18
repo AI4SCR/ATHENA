@@ -1,9 +1,9 @@
-from .so_attributer import soAttributer
-from .deep_attributer import deepAttributer
-from .random_attributer import randomAttributer
+from .so_attributer import SoAttributer
+from .deep_attributer import DeepAttributer
+from .random_attributer import RandomAttributer
 
 GRAPH_ATTRIBUTER = {
-    'so': soAttributer,
-    'deep': deepAttributer,
-    'random': randomAttributer
+    'so': SoAttributer,
+    'deep': DeepAttributer,
+    'random': RandomAttributer
 }
