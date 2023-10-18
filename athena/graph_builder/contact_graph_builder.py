@@ -79,7 +79,7 @@ class ContactGraphBuilder(BaseGraphBuilder):
         # Get masks
         mask = so.get_mask(spl, mask_key)
 
-        # If a cell subset is well are specified then simplify the mask
+        # If a cell subset is well-specified then simplify the mask
         if self.config["build_concept_graph"]:
             # Get cell_ids of the cells that are in `labels`
             cell_ids = so.obs[spl].query(f"{filter_col} in @labels").index.values
