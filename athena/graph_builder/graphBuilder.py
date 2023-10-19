@@ -30,12 +30,12 @@ def build_graph(so: SpatialOmics,
         key_added (str): key added in so.G[spl][key_add] to store the graph.
             If not specified it defaults to builder_type.
             If the graph is being built on a subset of the nodes
-            (e.g filter_col and labels are not None) then the key is
-            f'{builder_type} > {filter_col} > {labels}'
+            (e.g filter_col and include_labels are not None) then the key is
+            f'{builder_type} > {filter_col} > {include_labels}'
         coordinate_keys (list): column names of the x and y coordinates of a observation
         filter_col (str): string of the column in so.obs[spl][filter_col] which has the
             labels on which you want to subset the cells.
-        labels (list): list of strings which identify the labels in so.obs[spl][filter_col]
+        include_labels (list): list of strings which identify the labels in so.obs[spl][filter_col]
             that should be included in the graph. If no list is provided the graph is built
             using all the cells/cell labels.
         build_and_attribute (bool): bool indicating whether to call the attributer functionality.

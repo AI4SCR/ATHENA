@@ -11,7 +11,7 @@ def test_empty_labels(so_object):
     )
     config['builder_params']['n_neighbors'] = 2  # set parameter k
     config['concept_params']['filter_col'] = 'cell_type'
-    config['concept_params']['labels'] = []
+    config['concept_params']['include_labels'] = []
     with pytest.raises(NameError):
         build_graph(so_object,
                     spl='a',
@@ -26,7 +26,7 @@ def test_incongruent_labels_in_labels(so_object):
     )
     config['builder_params']['n_neighbors'] = 2  # set parameter k
     config['concept_params']['filter_col'] = 'cell_type'
-    config['concept_params']['labels'] = ['tumor', 'stromal', 'not_a_type']
+    config['concept_params']['include_labels'] = ['tumor', 'stromal', 'not_a_type']
     with pytest.raises(NameError):
         build_graph(so_object,
                     spl='a',
@@ -41,7 +41,7 @@ def test_filter_col_not_in_columns(so_object):
     )
     config['builder_params']['n_neighbors'] = 2  # set parameter k
     config['concept_params']['filter_col'] = 'not_a_filter_col'
-    config['concept_params']['labels'] = ['tumor', 'stromal']
+    config['concept_params']['include_labels'] = ['tumor', 'stromal']
     with pytest.raises(NameError):
         build_graph(so_object,
                     spl='a',
@@ -70,7 +70,7 @@ def test_knn(so_object):
     )
     config['builder_params']['n_neighbors'] = 3
     config['concept_params']['filter_col'] = 'cell_type'
-    config['concept_params']['labels'] = ['tumor']
+    config['concept_params']['include_labels'] = ['tumor']
     build_graph(so_object,
                 spl='a',
                 config=config,
@@ -85,7 +85,7 @@ def test_radius(so_object):
         build_concept_graph=True
     )
     config['concept_params']['filter_col'] = 'cell_type'
-    config['concept_params']['labels'] = ['tumor']
+    config['concept_params']['include_labels'] = ['tumor']
     build_graph(so_object,
                 spl='a',
                 config=config,
@@ -100,7 +100,7 @@ def test_contact(so_object):
         build_concept_graph=True
     )
     config['concept_params']['filter_col'] = 'cell_type'
-    config['concept_params']['labels'] = ['tumor']
+    config['concept_params']['include_labels'] = ['tumor']
     build_graph(so_object,
                 spl='a',
                 config=config,
@@ -116,7 +116,7 @@ def test_name(so_object):
         build_concept_graph=True
     )
     config['concept_params']['filter_col'] = 'cell_type'
-    config['concept_params']['labels'] = ['tumor']
+    config['concept_params']['include_labels'] = ['tumor']
     build_graph(so_object,
                 spl='a',
                 config=config,

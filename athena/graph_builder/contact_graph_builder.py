@@ -42,7 +42,7 @@ class ContactGraphBuilder(BaseGraphBuilder):
                      'include_self':False},
                 'concept_params':
                     {'filter_col':None,
-                    'labels':None},
+                    'include_labels':None},
                 'coordinate_keys': ['x', 'y'],
                 'mask_key': 'cellmasks'}
         """
@@ -64,8 +64,8 @@ class ContactGraphBuilder(BaseGraphBuilder):
         # Unpack parameters for building
         if self.config["build_concept_graph"]:
             filter_col = self.config["concept_params"]["filter_col"]
-            labels = self.config["concept_params"]["labels"]
-            self.look_for_miss_specification_error(so, spl, filter_col, labels)
+            include_labels = self.config["concept_params"]["include_labels"]
+            self.look_for_miss_specification_error(so, spl, filter_col, include_labels)
 
         mask_key = self.config["mask_key"]
         params = self.config["builder_params"]
@@ -81,9 +81,9 @@ class ContactGraphBuilder(BaseGraphBuilder):
 
         # If a cell subset is well-specified then simplify the mask
         if self.config["build_concept_graph"]:
-            # Get cell_ids of the cells that are in `labels`
-            cell_ids = so.obs[spl].query(f"{filter_col} in @labels").index.values
-            # Simplify masks filling it with 0s for cells that are not in `labels`
+            # Get cell_ids of the cells that are in `include_labels`
+            cell_ids = so.obs[spl].query(f"{filter_col} in @include_labels").index.values
+            # Simplify masks filling it with 0s for cells that are not in `include_labels`
             mask = np.where(np.isin(mask, cell_ids), mask, 0)
 
         # If dilation_kernel instantiate kernel object, else raise error

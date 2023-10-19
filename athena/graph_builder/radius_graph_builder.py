@@ -38,8 +38,8 @@ class RadiusGraphBuilder(BaseGraphBuilder):
         # Unpack parameters for building
         if self.config['build_concept_graph']:
             filter_col = self.config['concept_params']['filter_col']
-            labels = self.config['concept_params']['labels']
-            self.look_for_miss_specification_error(so, spl, filter_col, labels)
+            include_labels = self.config['concept_params']['include_labels']
+            self.look_for_miss_specification_error(so, spl, filter_col, include_labels)
 
         mask_key = self.config['mask_key']
         coordinate_keys = self.config['coordinate_keys']
@@ -50,7 +50,7 @@ class RadiusGraphBuilder(BaseGraphBuilder):
             # get rid of coordinates that are in the out-set.
             if self.config['build_concept_graph']:
                 # Get coordinates
-                ndata = so.obs[spl].query(f'{filter_col} in @labels')[[coordinate_keys[0], coordinate_keys[1]]]
+                ndata = so.obs[spl].query(f'{filter_col} in @include_labels')[[coordinate_keys[0], coordinate_keys[1]]]
             # Else get all coordinates.
             else:
                 ndata = so.obs[spl][[coordinate_keys[0], coordinate_keys[1]]]
@@ -60,11 +60,11 @@ class RadiusGraphBuilder(BaseGraphBuilder):
             # Get masks
             mask = so.get_mask(spl, mask_key)
 
-            # If labels are specified then simplify the mask
+            # If include_labels are specified then simplify the mask
             if self.config['build_concept_graph']:
-                # Get cell_ids of the cells that are in `labels`
-                cell_ids = so.obs[spl].query(f'{filter_col} in @labels').index.values
-                # Simplify masks filling it with 0s for cells that are not in `labels`
+                # Get cell_ids of the cells that are in `include_labels`
+                cell_ids = so.obs[spl].query(f'{filter_col} in @include_labels').index.values
+                # Simplify masks filling it with 0s for cells that are not in `include_labels`
                 mask = np.where(np.isin(mask, cell_ids), mask, 0)
 
             # Extract location:

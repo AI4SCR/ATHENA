@@ -45,22 +45,22 @@ class BaseGraphBuilder(ABC):
 
         return ndata
 
-    def look_for_miss_specification_error(self, so, spl, filter_col, labels):
+    def look_for_miss_specification_error(self, so, spl, filter_col, include_labels):
         ''' Looks for a miss specification error in the config
         '''
 
-        # Raise error if either `filter_col` or `labels` is specified but not the other.
-        if (filter_col is None) ^ (labels is None):
-            raise NameError('failed to specify either `filter_col` or `labels`')
+        # Raise error if either `filter_col` or `include_labels` is specified but not the other.
+        if (filter_col is None) ^ (include_labels is None):
+            raise NameError('failed to specify either `filter_col` or `include_labels`')
 
         # Raise error if `filter_col` is not found in 
         if filter_col not in so.obs[spl].columns:
             raise NameError(f'{filter_col} is not in so.obs[spl].columns')
 
-        # Raise error if `labels` is an empty list
-        if labels == []:
-            raise NameError('labels variable is empty. You need to give a non-empty list')
+        # Raise error if `include_labels` is an empty list
+        if include_labels == []:
+            raise NameError('include_labels variable is empty. You need to give a non-empty list')
 
-        # Raise error if not all `labels` have a match in `so.obs[spl][filter_col].cat.categories.values`
-        if not np.all(np.isin(labels, so.obs[spl][filter_col].values)):
-            raise NameError(f'Not all labels are present in column "{filter_col}". Labels: {labels}. In {filter_col}: {so.obs[spl][filter_col].values}')
+        # Raise error if not all `include_labels` have a match in `so.obs[spl][filter_col].cat.categories.values`
+        if not np.all(np.isin(include_labels, so.obs[spl][filter_col].values)):
+            raise NameError(f'Not all labels are present in column "{filter_col}". Labels: {include_labels}. In {filter_col}: {so.obs[spl][filter_col].values}')

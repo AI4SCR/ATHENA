@@ -12,7 +12,7 @@ EDGE_WEIGHT = 'weight'
 CONCEPT_DEFAULT_PARAMS = {
     'concept_params': {
         'filter_col' : None,
-        'labels' : None
+        'include_labels' : None
     },
 }
 

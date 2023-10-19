@@ -17,7 +17,7 @@ def spatial(so, spl: str, attr: str, *, mode: str = 'scatter', node_size: float 
             edge_color: str = 'black', edge_zorder: int = 2, background_color: str = 'white', ax: plt.Axes = None,
             norm=None, set_title: bool = True, cmap=None, cmap_labels: list = None, cbar: bool = True,
             cbar_title: bool = True, show: bool = True, save: str = None, tight_layout: bool = True,
-            filter_col: str = None, labels: list = None):
+            filter_col: str = None, include_labels: list = None):
     """Various functionalities to visualise samples.
     Allows to visualise the samples and color observations according to features in either so.X or so.obs by setting the ``attr`` parameter accordingly.
     Furthermore, observations (cells) within a sample can be quickly visualised using scatter plots (requires extraction of centroids with :func:`~.extract_centroids`)
@@ -51,7 +51,7 @@ def spatial(so, spl: str, attr: str, *, mode: str = 'scatter', node_size: float 
         save: path to the file in which the plot is saved
         tight_layout: whether to apply tight_layout or not.
         filter_col: string identifying the column in so.obs to use to filter out cells that should not be plotted.
-        labels: list of strings that identify the cells that should be included in the plot. These should be entries in filter_col.
+        include_labels: list of strings that identify the cells that should be included in the plot. These should be entries in filter_col.
 
     Examples:
 
@@ -83,8 +83,8 @@ def spatial(so, spl: str, attr: str, *, mode: str = 'scatter', node_size: float 
 
     # filter cells
     if filter_col is not None:
-        data = so.obs[spl].query(f'{filter_col} in @labels')[attr]
-        loc = so.obs[spl].query(f'{filter_col} in @labels')[coordinate_keys].copy()
+        data = so.obs[spl].query(f'{filter_col} in @include_labels')[attr]
+        loc = so.obs[spl].query(f'{filter_col} in @include_labels')[coordinate_keys].copy()
     else:
         loc = so.obs[spl][coordinate_keys].copy()
 
