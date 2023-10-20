@@ -1,7 +1,7 @@
 import pandas as pd
 import pytest
 import numpy as np
-from spatialHeterogeneity.metrics.heterogeneity.base_metrics import _shannon, _shannon_evenness, _simpson,\
+from athena.metrics.heterogeneity.base_metrics import _shannon, _shannon_evenness, _simpson,\
     _simpson_evenness, _gini_simpson, _richness, _hill_number, _renyi, _abundance, _quadratic_entropy
 from collections import Counter
 
@@ -38,7 +38,7 @@ _expected = [1, 1, 2]
 def test_richness(input, res):
     assert np.isclose(_richness(input),res)
 
-_expected = [1, 1, np.sqrt(0.5)]
+_expected = [1, 1, 2]
 @pytest.mark.parametrize('input, res', [(c,e) for c,e in zip(_counts, _expected)])
 def test_hill_number(input, res, q=2):
     assert _hill_number(input, q=q) == res
