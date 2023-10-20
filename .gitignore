@@ -126,3 +126,6 @@ single_cell_values_visium_cellmasks.pkl
 ~/
 /issues
 
+# Ignore .vscode
+.vscode
+

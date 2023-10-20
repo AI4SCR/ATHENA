@@ -1,35 +1,28 @@
 # %% imports
 import logging
-import warnings
 from ..utils.general import is_numeric, is_categorical, make_iterable
-
-from matplotlib import cm
 import matplotlib.pyplot as plt
-from matplotlib.colors import Normalize, NoNorm, to_rgba, to_rgb, Colormap, ListedColormap
+from matplotlib.colors import Normalize, NoNorm, to_rgba, to_rgb, ListedColormap
 import seaborn as sns
 import pandas as pd
-
 # import matplotlib.ticker as mticker  # https://stackoverflow.com/questions/63723514/userwarning-fixedformatter-should-only-be-used-together-with-fixedlocator
-
 import numpy as np
-import os
 import napari
-
 # %% figure constants
 from .utils import dpi, label_fontdict, title_fontdict, make_cbar, savefig
 
-# %%
 
 def spatial(so, spl: str, attr: str, *, mode: str = 'scatter', node_size: float = 4, coordinate_keys: list = ['x', 'y'],
             mask_key: str = 'cellmasks', graph_key: str = 'knn', edges: bool = False, edge_width: float = .5,
             edge_color: str = 'black', edge_zorder: int = 2, background_color: str = 'white', ax: plt.Axes = None,
             norm=None, set_title: bool = True, cmap=None, cmap_labels: list = None, cbar: bool = True,
-            cbar_title: bool = True, show: bool = True, save: str = None, tight_layout: bool = True):
+            cbar_title: bool = True, show: bool = True, save: str = None, tight_layout: bool = True,
+            filter_col: str = None, include_labels: list = None):
     """Various functionalities to visualise samples.
     Allows to visualise the samples and color observations according to features in either so.X or so.obs by setting the ``attr`` parameter accordingly.
     Furthermore, observations (cells) within a sample can be quickly visualised using scatter plots (requires extraction of centroids with :func:`~.extract_centroids`)
     or by their actual segmentatio mask by setting ``mode`` accordingly.
-    Finally, the graph representation of the sample can be overlayed by setting ``edges=True`` and specifing the ``graph_key`` as in ``so.G[spl][graph_key]``.
+    Finally, the graph representation of the sample can be overlaid by setting ``edges=True`` and specifying the ``graph_key`` as in ``so.G[spl][graph_key]``.
 
     For more examples on how to use this function have a look at the tutorial_ section.
 
@@ -57,6 +50,8 @@ def spatial(so, spl: str, attr: str, *, mode: str = 'scatter', node_size: float 
         show: whether to show the plot or not
         save: path to the file in which the plot is saved
         tight_layout: whether to apply tight_layout or not.
+        filter_col: string identifying the column in so.obs to use to filter out cells that should not be plotted.
+        include_labels: list of strings that identify the cells that should be included in the plot. These should be entries in filter_col.
 
     Examples:
 
@@ -86,10 +81,15 @@ def spatial(so, spl: str, attr: str, *, mode: str = 'scatter', node_size: float 
         cmap = 'black'
         cbar = False
 
+    # filter cells
+    if filter_col is not None:
+        data = so.obs[spl].query(f'{filter_col} in @include_labels')[attr]
+        loc = so.obs[spl].query(f'{filter_col} in @include_labels')[coordinate_keys].copy()
+    else:
+        loc = so.obs[spl][coordinate_keys].copy()
+
     # broadcast if necessary
     _is_categorical_flag = is_categorical(data)
-
-    loc = so.obs[spl][coordinate_keys].copy()
 
     # set colormap
     if cmap is None:
@@ -220,7 +220,7 @@ def spatial(so, spl: str, attr: str, *, mode: str = 'scatter', node_size: float 
         savefig(fig, save)
 
 
-def napari_viewer(so, spl: str, attrs: list, censor: float = .95, add_masks='cellmasks', attrs_key='target', index_key:str='fullstack_index'):
+def napari_viewer(so, spl: str, attrs: list, censor: float = .95, add_masks='cellmasks', attrs_key='target', index_key: str = 'fullstack_index'):
     """Starts interactive Napari viewer to visualise raw images and explore samples.
     ``attrs`` are measured features in the high dimensional images in ``so.images[spl]``.
     All specified ``attrs`` should be in ``so.var[spl][attrs_key]`` along with the index in the high dimensional images.
@@ -427,6 +427,7 @@ def get_cmap(so, attr: str, data):
 
     return cmap, cmap_labels
 
+
 def ripleysK(so, spl: str, attr: str, ids, *, mode='K', correction='ripley',
              key=None, ax=None, legend='auto'):
     """Visualise results from :func:`~neigh.ripleysK` results.
@@ -476,10 +477,9 @@ def ripleysK(so, spl: str, attr: str, ids, *, mode='K', correction='ripley',
     res[attr] = res[attr].astype('category')
 
     cmap, labels = get_cmap(so, attr, res[attr])
-    cmap_dict = {j:i for i,j in zip(cmap.colors, labels.values())}
+    cmap_dict = {j: i for i, j in zip(cmap.colors, labels.values())}
     if labels:
         res[attr] = res[attr].astype(type(list(labels.keys())[0])).map(labels)
-
 
     if ax is None:
         fig, ax = plt.subplots()
@@ -491,9 +491,10 @@ def ripleysK(so, spl: str, attr: str, ids, *, mode='K', correction='ripley',
     fig.tight_layout()
     fig.show()
 
-def infiltration(so, spl: str, attr: str ='infiltration', step_size: int = 10,
+
+def infiltration(so, spl: str, attr: str = 'infiltration', step_size: int = 10,
                  interpolation: str = 'gaussian',
-                 cmap: str ='plasma',
+                 cmap: str = 'plasma',
                  collision_strategy='mean',
                  ax=None,
                  show=True):
