@@ -53,7 +53,7 @@ class BaseGraphBuilder(ABC):
         if (filter_col is None) ^ (include_labels is None):
             raise NameError('failed to specify either `filter_col` or `include_labels`')
 
-        # Raise error if `filter_col` is not found in 
+        # Raise error if `filter_col` is not found in so.obs[spl].columns
         if filter_col not in so.obs[spl].columns:
             raise NameError(f'{filter_col} is not in so.obs[spl].columns')
 
@@ -61,6 +61,12 @@ class BaseGraphBuilder(ABC):
         if include_labels == []:
             raise NameError('include_labels variable is empty. You need to give a non-empty list')
 
-        # Raise error if not all `include_labels` have a match in `so.obs[spl][filter_col].cat.categories.values`
-        if not np.all(np.isin(include_labels, so.obs[spl][filter_col].values)):
-            raise NameError(f'Not all labels are present in column "{filter_col}". Labels: {include_labels}. In {filter_col}: {so.obs[spl][filter_col].values}')
+        # Raise error if not even one of the `include_labels` have a match in `so.obs[spl][filter_col]`
+        if not np.any(np.isin(include_labels, so.obs[spl][filter_col].values)):
+            raise NameError(
+                f'''
+                None of the specified labels are present in column "{filter_col}".
+                Labels: {include_labels}.
+                In {filter_col}: {so.obs[spl][filter_col].unique()}
+                '''
+            )
