@@ -53,7 +53,7 @@ class BaseGraphBuilder(ABC):
         if (filter_col is None) ^ (include_labels is None):
             raise NameError('failed to specify either `filter_col` or `include_labels`')
 
-        # Raise error if `filter_col` is not found in
+        # Raise error if `filter_col` is not found in so.obs[spl].columns
         if filter_col not in so.obs[spl].columns:
             raise NameError(f'{filter_col} is not in so.obs[spl].columns')
 
