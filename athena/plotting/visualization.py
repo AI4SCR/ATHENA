@@ -376,11 +376,11 @@ def interactions(so, spl, attr, mode='proportion', prediction_type='diff', graph
 
     data = so.uns[spl]['interactions'][f'{attr}_{mode}_{prediction_type}_{graph_key}']
     score = 'diff' if prediction_type == 'diff' else 'score'
-    data = data.reset_index().pivot('source_label', 'target_label', score)
+    data = data.reset_index().pivot(index = 'source_label',columns = 'target_label', values = score)
     data.index = data.index.astype(int)
     data.columns = data.columns.astype(int)
-    data.sort_index(0, inplace=True)
-    data.sort_index(1, inplace=True)
+    data.sort_index(axis=0, inplace=True)
+    data.sort_index(axis=1, inplace=True)
 
     if norm is None:
         v = np.abs(data).max().max()
