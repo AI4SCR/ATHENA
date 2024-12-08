@@ -4,6 +4,15 @@ from collections.abc import Iterable
 import numpy as np
 from pandas.api.types import is_categorical_dtype, is_numeric_dtype
 from sklearn.utils.validation import check_is_fitted as sklearn_check_is_fitted
+from anndata import AnnData
+
+def get_nx_graph_from_anndata(ad: AnnData, key: str):
+    import networkx as nx
+    adj = ad.obsp[key]
+    g = nx.from_scipy_sparse_array(adj)
+    mapping = {k:v for v,k in zip(ad.obs.index, range(len(ad.obs.index)))}
+    g = nx.relabel_nodes(g, mapping)
+    return g
 
 # import pandas as pd
 def is_numeric(*args, **kwargs):
