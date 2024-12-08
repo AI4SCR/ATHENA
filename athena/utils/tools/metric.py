@@ -50,30 +50,3 @@ def compute_metrics(df: Union[pd.DataFrame, pd.Series],
 
     return df
 
-def get_group_feature(expr: np.ndarray,
-                      groups: dict,
-                      reducer: Callable[[Union[int, float, Iterable]], np.ndarray],
-                      axis = 0,
-                      **kwargs):
-
-    # cast to int
-    # np.fromiter(val dtype=int)
-    grps = {key:np.array(val, dtype=int) for key,val in groups.items()}
-
-    out = np.zeros((len(grps), expr.shape[1]))
-    for idx, grp in enumerate(grps.values()):
-        out[idx,:] = reducer(expr[grp, :], axis, **kwargs)
-
-    return pd.DataFrame(out, index=groups.keys())
-
-def extract_metric_results(so):
-    # TODO
-    '''Extract all the computed results from the spatialOmics instance.
-
-    Args:
-        so:
-
-    Returns:
-
-    '''
-    pass

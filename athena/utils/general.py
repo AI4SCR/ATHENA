@@ -1,25 +1,30 @@
+from collections.abc import Iterable
 from typing import Any
 
-from collections.abc import Iterable
 import numpy as np
-from pandas.api.types import is_categorical_dtype, is_numeric_dtype
-from sklearn.utils.validation import check_is_fitted as sklearn_check_is_fitted
 from anndata import AnnData
+from pandas.api.types import is_categorical_dtype, is_numeric_dtype
+from pandas.api.types import is_dtype_equal, CategoricalDtype
+from sklearn.utils.validation import check_is_fitted as sklearn_check_is_fitted
+
 
 def get_nx_graph_from_anndata(ad: AnnData, key: str):
     import networkx as nx
     adj = ad.obsp[key]
     g = nx.from_scipy_sparse_array(adj)
-    mapping = {k:v for v,k in zip(ad.obs.index, range(len(ad.obs.index)))}
+    mapping = {k: v for v, k in zip(ad.obs.index, range(len(ad.obs.index)))}
     g = nx.relabel_nodes(g, mapping)
     return g
+
 
 # import pandas as pd
 def is_numeric(*args, **kwargs):
     return is_numeric_dtype(*args, **kwargs)
 
-def is_categorical(*args, **kwargs):
-    return is_categorical_dtype(*args, **kwargs)
+
+def is_categorical(series):
+    return isinstance(series.dtype, CategoricalDtype)
+
 
 def make_iterable(obj: Any):
     '''
@@ -102,6 +107,7 @@ def order(x, transform=None, decreasing=False):
     _x = sorted(_x, key=lambda x: sign * x[1])
     return np.array([_x[i][0] for i in range(len(_x))])
 
+
 def _check_is_fitted(estimator):
     if not hasattr(estimator, 'fit'):
         raise TypeError("%s is not an estimator instance." % (estimator))
@@ -110,6 +116,7 @@ def _check_is_fitted(estimator):
             raise ValueError('this instance is not fitted.')
     else:
         sklearn_check_is_fitted(estimator)
+
 
 def is_fitted(estimator):
     if hasattr(estimator, 'fitted'):
@@ -120,4 +127,3 @@ def is_fitted(estimator):
             return True
         except:
             return False
-
