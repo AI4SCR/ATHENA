@@ -19,8 +19,8 @@ sys.path.insert(0, os.path.abspath(".."))
 # -- Project information -----------------------------------------------------
 
 project = "athena"
-copyright = "IBM Corp. 2021"
-author = "Adriano Martinelli (art@zurich.ibm.com)"
+copyright = "CHUV"
+author = "Adriano Martinelli (adriano.martinelli@chuv.ch)"
 
 # -- Generate API (auto) documentation ------------------------------------------------
 

@@ -22,7 +22,7 @@ def interactions(ad: AnnData, attr: str, mode: str = 'classic', prediction_type:
     Args:
         ad: AnnData instance
 
-        attr: Categorical feature in SpatialOmics.obs to use for the grouping
+        attr: Categorical feature in ad.obs to use for the grouping
         mode: One of {classic, histoCAT, proportion}, see notes
         n_permutations: Number of permutations to compute p-values and the interactions strength score (mode diff)
         random_seed: Random seed for permutations
@@ -65,7 +65,7 @@ from ..utils.general import get_nx_graph_from_anndata
 
 
 def infiltration(ad: AnnData, attr: str, *, interaction1=('tumor', 'immune'), interaction2=('immune', 'immune'),
-                 add_key='infiltration', inplace=True, graph_key='knn', local=False) -> None:
+                 add_key='infiltration', inplace=True, graph_key='knn', local=False) -> None | AnnData:
     """Compute infiltration score. Generalises the infiltration score presented in
     `A Structured Tumor-Immune Microenvironment in Triple Negative Breast Cancer Revealed by Multiplexed Ion Beam Imaging <https://pubmed.ncbi.nlm.nih.gov/30193111/>`_
     The score comptes a ratio between the number of interactions observed between the observation types specified in `interactions1`
@@ -75,7 +75,7 @@ def infiltration(ad: AnnData, attr: str, *, interaction1=('tumor', 'immune'), in
     Args:
         ad: AnnData instance
 
-        attr: Categorical feature in SpatialOmics.obs to use for the grouping
+        attr: Categorical feature in ad.obs to use for the grouping
         interaction1: labels in `attr` of enumerator interaction
         interaction2: labels in `attr` of denominator interaction
         key_added: Key added to SpatialOmics.uns[spl][metric][key_added]
@@ -140,7 +140,7 @@ def ripleysK(ad: AnnData, attr: str, id, *, mode='K', radii=None, correction='ri
     Args:
         ad: AnnData instance
 
-        attr: Categorical feature in SpatialOmics.obs to use for the grouping
+        attr: Categorical feature in ad.obs to use for the grouping
         id: The category in the categorical feature `attr`, for which Ripley's K should be computed
         mode: {K, csr-deviation}. If `K`, Ripley's K is estimated, with `csr-deviation` the deviation from a poission process is computed.
         radii: List of radiis for which Ripley's K is computed

@@ -18,7 +18,7 @@ def richness(ad: AnnData, attr: str, *, local=True, key_added=None, graph_key='k
 
     Args:
         ad: AnnData instance
-        attr: Categorical feature in SpatialOmics.obs to use for the grouping
+        attr: Categorical feature in ad.obs to use for the grouping
         local: Whether to compute the metric on the observation or the sample level
         key_added: Key added to either obs or spl depending on the choice of `local`
         graph_key: Specifies the graph representation to use in ad.obsp if `local=True`.
@@ -51,7 +51,7 @@ def shannon(ad: AnnData, attr: str, *, local=True, key_added=None, graph_key='kn
 
     Args:
         ad: AnnData instance
-        attr: Categorical feature in SpatialOmics.obs to use for the grouping
+        attr: Categorical feature in ad.obs to use for the grouping
         local: Whether to compute the metric on the observation or the sample level
         key_added: Key added to either obs or spl depending on the choice of `local`
         graph_key: Specifies the graph representation to use in ad.obsp if `local=True`.
@@ -84,7 +84,7 @@ def simpson(ad: AnnData, attr: str, *, local=True, key_added=None, graph_key='kn
 
     Args:
         ad: AnnData instance
-        attr: Categorical feature in SpatialOmics.obs to use for the grouping
+        attr: Categorical feature in ad.obs to use for the grouping
         local: Whether to compute the metric on the observation or the sample level
         key_added: Key added to either obs or spl depending on the choice of `local`
         graph_key: Specifies the graph representation to use in ad.obsp if `local=True`.
@@ -118,7 +118,7 @@ def hill_number(ad: AnnData, attr: str, q: float, *, local=True, key_added=None,
     Args:
         ad: AnnData instance
 
-        attr: Categorical feature in SpatialOmics.obs to use for the grouping
+        attr: Categorical feature in ad.obs to use for the grouping
         q: The hill coefficient as defined here_.
         local: Whether to compute the metric on the observation or the sample level
         key_added: Key added to either obs or spl depending on the choice of `local`
@@ -154,7 +154,7 @@ def renyi_entropy(ad: AnnData, attr: str, q: float, *, local=True, key_added=Non
     Args:
         ad: AnnData instance
 
-        attr: Categorical feature in SpatialOmics.obs to use for the grouping
+        attr: Categorical feature in ad.obs to use for the grouping
         q: The renyi coefficient as defined here_
         local: Whether to compute the metric on the observation or the sample level
         key_added: Key added to either obs or spl depending on the choice of `local`
@@ -192,7 +192,7 @@ def quadratic_entropy(ad: AnnData, attr: str, *, metric='minkowski', metric_kwar
     Args:
         ad: AnnData instance
 
-        attr: Categorical feature in SpatialOmics.obs to use for the grouping
+        attr: Categorical feature in ad.obs to use for the grouping
         metric: metric used to compute distance of observations in the features space ad.X
         metric_kwargs: key word arguments for metric
         scale: whether to scale features of observations to unit variance and 0 mean
@@ -248,7 +248,7 @@ def abundance(ad: AnnData, attr: str, *, mode='proportion', key_added: str = Non
     Args:
         ad: AnnData instance
 
-        attr: Categorical feature in SpatialOmics.obs to use for the grouping
+        attr: Categorical feature in ad.obs to use for the grouping
         local: Whether to compute the metric on the observation or the sample level
         key_added: Key added to either uns[spl] or obs depending on the choice of `local`
         graph_key: Specifies the graph representation to use in ad.obsp if `local=True`.

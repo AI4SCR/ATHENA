@@ -1,21 +1,25 @@
 # %% imports
 import logging
-from ..utils.general import is_numeric, is_categorical, make_iterable
+
 import matplotlib.pyplot as plt
-from matplotlib.colors import Normalize, NoNorm, to_rgba, to_rgb, ListedColormap
-import seaborn as sns
-import pandas as pd
+import napari
 # import matplotlib.ticker as mticker  # https://stackoverflow.com/questions/63723514/userwarning-fixedformatter-should-only-be-used-together-with-fixedlocator
 import numpy as np
-import napari
+import pandas as pd
+import seaborn as sns
+from anndata import AnnData
+from matplotlib.colors import Normalize, NoNorm, to_rgba, ListedColormap
+
 # %% figure constants
 from .utils import dpi, label_fontdict, title_fontdict, make_cbar, savefig
+from ..utils.general import get_nx_graph_from_anndata
+from ..utils.general import is_numeric, is_categorical, make_iterable
 
 
-def spatial(so, spl: str, attr: str, *, mode: str = 'scatter', node_size: float = 4, coordinate_keys: list = ['x', 'y'],
-            mask_key: str = 'cellmasks', graph_key: str = 'knn', edges: bool = False, edge_width: float = .5,
+def spatial(ad: AnnData, attr: str, *, mode: str = 'scatter', node_size: float = 4, coordinate_keys: list = ['x', 'y'],
+            mask: np.ndarray, graph_key: str = 'knn', edges: bool = False, edge_width: float = .5,
             edge_color: str = 'black', edge_zorder: int = 2, background_color: str = 'white', ax: plt.Axes = None,
-            norm=None, set_title: bool = True, cmap=None, cmap_labels: list = None, cbar: bool = True,
+            norm=None, title: str = None, cmap=None, cmap_labels: list = None, cbar: bool = True,
             cbar_title: bool = True, show: bool = True, save: str = None, tight_layout: bool = True,
             filter_col: str = None, include_labels: list = None):
     """Various functionalities to visualise samples.
@@ -27,13 +31,12 @@ def spatial(so, spl: str, attr: str, *, mode: str = 'scatter', node_size: float 
     For more examples on how to use this function have a look at the tutorial_ section.
 
     Args:
-        so: SpatialOmics instance
-        spl: sample to visualise
+        ad: AnnData
         attr: feature to visualise
         mode: {scatter, mask}. In `scatter` mode, observations are represented by their centroid, in `mask` mode by their actual segmentation mask
         node_size: size of the node when plotting the graph representation
         coordinate_keys: column names in SpatialOmics.obs[spl] that indicates the x and y coordinates
-        mask_key: key for the segmentation masks when in `mask` mode
+        mask: mask of segmented cells when in `mask` mode
         graph_key: which graph representation to use
         edges: whether to plot the graph or not
         edge_width: width of edges
@@ -42,7 +45,7 @@ def spatial(so, spl: str, attr: str, *, mode: str = 'scatter', node_size: float 
         background_color: background color of plot
         ax: axes object in which to plot
         norm: normalisation instance to normalise the values of `attr`
-        set_title: title of plot
+        title: title of plot
         cmap: colormap to use
         cmap_labels: colormap labels to use
         cbar: whether to plot a colorbar or not
@@ -57,7 +60,6 @@ def spatial(so, spl: str, attr: str, *, mode: str = 'scatter', node_size: float 
 
         .. code-block:: python
 
-            so = sh.dataset.imc()
             sh.pl.spatial(so, 'slide_7_Cy2x2', 'meta_id', mode='mask')
             sh.pl.spatial(so, 'slide_7_Cy2x2', 'meta_id', mode='scatter', edges=True)
 
@@ -70,10 +72,10 @@ def spatial(so, spl: str, attr: str, *, mode: str = 'scatter', node_size: float 
 
     # try to fetch the attr data
     if attr:
-        if attr in so.obs[spl].columns:
-            data = so.obs[spl][attr]
-        elif attr in so.X[spl].columns:
-            data = so.X[spl][attr]
+        if attr in ad.obs:
+            data = ad.obs[attr]
+        elif attr in ad.var.index:
+            data = ad.X[ad.var.index == attr]
         else:
             raise KeyError(f'{attr} is not an column of X nor obs')
     else:
@@ -83,17 +85,17 @@ def spatial(so, spl: str, attr: str, *, mode: str = 'scatter', node_size: float 
 
     # filter cells
     if filter_col is not None:
-        data = so.obs[spl].query(f'{filter_col} in @include_labels')[attr]
-        loc = so.obs[spl].query(f'{filter_col} in @include_labels')[coordinate_keys].copy()
+        data = ad.obs.query(f'{filter_col} in @include_labels')[attr]
+        loc = ad.obs.query(f'{filter_col} in @include_labels')[coordinate_keys].copy()
     else:
-        loc = so.obs[spl][coordinate_keys].copy()
+        loc = ad.obs[coordinate_keys].copy()
 
     # broadcast if necessary
     _is_categorical_flag = is_categorical(data)
 
     # set colormap
     if cmap is None:
-        cmap, cmap_labels = get_cmap(so, attr, data)
+        cmap, cmap_labels = get_cmap(ad=ad, attr=attr, data=data)
     elif isinstance(cmap, str) and colors is None:
         cmap = plt.get_cmap(cmap)
 
@@ -114,7 +116,7 @@ def spatial(so, spl: str, attr: str, *, mode: str = 'scatter', node_size: float 
 
     # compute edge lines
     if edges:
-        g = so.G[spl][graph_key]
+        g = get_nx_graph_from_anndata(ad=ad, key=graph_key)
         e = np.array(g.edges, dtype=type(loc.index.dtype))
 
         tmp1 = loc.loc[e.T[0]]
@@ -123,7 +125,7 @@ def spatial(so, spl: str, attr: str, *, mode: str = 'scatter', node_size: float 
         x = np.stack((tmp1[coordinate_keys[0]], tmp2[coordinate_keys[0]]))
         y = np.stack((tmp1[coordinate_keys[1]], tmp2[coordinate_keys[1]]))
 
-        # we have to plot sequentially nodes and edges, this takes a bit longer but is more flexible
+        # we have to plot sequential nodes and edges, this takes a bit longer but is more flexible
         im = ax.plot(x, y, linestyle='-', linewidth=edge_width, marker=None, color=edge_color, zorder=edge_zorder)
 
     # plot
@@ -134,8 +136,8 @@ def spatial(so, spl: str, attr: str, *, mode: str = 'scatter', node_size: float 
         _broadcast_to_numeric = not is_numeric(data)  # if data is now still categorical, map to numeric
 
         if _broadcast_to_numeric and data is not None:
-            if attr in so.uns['cmap_labels']:
-                cmap_labels = so.uns['cmap_labels'][attr]
+            if attr in ad.uns['cmap_labels']:
+                cmap_labels = ad.uns['cmap_labels'][attr]
                 encoder = {value: key for key, value in cmap_labels.items()}  # invert to get encoder
             else:
                 uniq = np.unique(data)
@@ -147,7 +149,7 @@ def spatial(so, spl: str, attr: str, *, mode: str = 'scatter', node_size: float 
         # map to colors
         if colors is None:
             no_na = data[~np.isnan(data)]
-            _ = norm(no_na)  # initialise norm with no NA data.
+            _ = norm(no_na)  # initialize norm with no NA data.
 
             colors = cmap(norm(data))
 
@@ -155,9 +157,6 @@ def spatial(so, spl: str, attr: str, *, mode: str = 'scatter', node_size: float 
         ax.set_facecolor(background_color)
 
     elif mode == 'mask':
-
-        # get cell mask
-        mask = so.get_mask(spl, mask_key)
 
         # generate mapping
         if data is not None:
@@ -167,7 +166,7 @@ def spatial(so, spl: str, attr: str, *, mode: str = 'scatter', node_size: float 
             uniq = np.unique(mask)
             uniq = uniq[uniq != 0]
             mapping = {i: j for i, j in zip(uniq, np.ones(len(uniq), dtype=int))}  # map everything to 1
-            cmap = ListedColormap([to_rgba('white'), colors])
+            cmap = ListedColormap([to_rgba('white'), *colors])
         else:
             raise RuntimeError('Unknown case')
         mapping.update({0: 0})
@@ -206,8 +205,7 @@ def spatial(so, spl: str, attr: str, *, mode: str = 'scatter', node_size: float 
     ax.set_xlabel('spatial x', label_fontdict)
     ax.set_ylabel('spatial y', label_fontdict)
     ax.set_aspect(1)
-    if set_title:
-        title = f'{spl}' if cbar else f'{spl}, {attr}'
+    if title is not None:
         ax.set_title(title, title_fontdict)
 
     if tight_layout:
@@ -220,15 +218,15 @@ def spatial(so, spl: str, attr: str, *, mode: str = 'scatter', node_size: float 
         savefig(fig, save)
 
 
-def napari_viewer(so, spl: str, attrs: list, censor: float = .95, add_masks='cellmasks', attrs_key='target', index_key: str = 'fullstack_index'):
+def napari_viewer(ad: AnnData, image: np.ndarray, mask: np.ndarray, attrs: list, censor: float = .95, add_masks='cellmasks', attrs_key='target',
+                  index_key: str = 'fullstack_index'):
     """Starts interactive Napari viewer to visualise raw images and explore samples.
     ``attrs`` are measured features in the high dimensional images in ``so.images[spl]``.
     All specified ``attrs`` should be in ``so.var[spl][attrs_key]`` along with the index in the high dimensional images.
     The column with the index in the high dimensional image where the measurement of an attribute is stored.
 
     Args:
-        so: SpatialOmics instance
-        spl: sample to visualise
+        ad: AnnData instance
         attrs: list of attributes/features to add as channels to the viewer
         censor: percentil to use to censore pixle values in the raw images
         add_masks: segmentation masks to add as channels to the viewer
@@ -254,11 +252,11 @@ def napari_viewer(so, spl: str, attrs: list, censor: float = .95, add_masks='cel
 
     """
     attrs = list(make_iterable(attrs))
-    var = so.var[spl]
+    var = ad.var
     index = var[var[attrs_key].isin(attrs)][index_key]
     names = var[var[attrs_key].isin(attrs)][attrs_key]
 
-    img = so.get_image(spl)[index,]
+    img = image
     if censor:
         for j in range(img.shape[0]):
             v = np.quantile(img[j,], censor)
@@ -270,75 +268,16 @@ def napari_viewer(so, spl: str, attrs: list, censor: float = .95, add_masks='cel
     if add_masks:
         add_masks = make_iterable(add_masks)
         for m in add_masks:
-            mask = so.masks[spl][m]
             labels_layer = viewer.add_labels(mask, name=m)
 
 
-def _channel(so, spl: str, attrs: str, ax=None, colors=None, censor: float = None, show=True):
-    """Plot challnels. Decreapted, will be removed.
-
-    Args:
-        so:
-        spl:
-        attrs:
-        ax:
-        colors:
-        censor:
-        show:
-
-    Returns:
-
-    """
-    attrs = list(make_iterable(attrs))
-    var = so.var[spl]
-    i = var[var.target.isin(attrs)][index_key]
-
-    img = so.get_image(spl)[i,]
-
-    if censor:
-        for j in range(img.shape[0]):
-            v = np.quantile(img[j,], censor)
-            img[j, img[j] > v] = v
-            img[j,] = img[j,] / img[j,].max()
-
-    res = []
-    for c in colors:
-        tmp = np.ones((*img.shape[1:], 3))
-        col = np.array(to_rgb(c))
-        res.append(tmp * col)
-    res = np.stack(res)
-
-    res = res * img.reshape((*img.shape, 1))
-    res = res.sum(axis=0) / len(res)
-    res = np.squeeze(res)
-
-    if ax is None:
-        fig, ax = plt.subplots()
-    else:
-        fig = ax.get_figure()
-        show = False
-
-    ax.imshow(res)
-    ax.invert_yaxis()
-    ax.set_xticks([])
-    ax.set_yticks([])
-    ax.set_ylabel('spatial y')
-    ax.set_xlabel('spatial x')
-    ax.set_title(spl)
-    fig.tight_layout()
-
-    if show:
-        fig.show()
-
-
-def interactions(so, spl, attr, mode='proportion', prediction_type='diff', graph_key='knn', linewidths=.5, cmap=None,
+def interactions(ad: AnnData, attr, mode='proportion', prediction_type='diff', graph_key='knn', linewidths=.5, cmap=None,
                  norm=None, ax=None, show=True, cbar=True):
     """Visualise results from :func:`~neigh.interactions` results.
 
     Args:
-        so: SpatialOmics instance
-        spl: Spl for which to compute the metric
-        attr: Categorical feature in SpatialOmics.obs to use for the grouping
+        ad: AnnData instance
+        attr: Categorical feature in ad.obs to use for the grouping
         mode: One of {classic, histoCAT, proportion}, see notes
         prediction_type: prediction_type: One of {observation, pvalue, diff}
         graph_key: Specifies the graph representation to use in so.G[spl]
@@ -374,7 +313,7 @@ def interactions(so, spl, attr, mode='proportion', prediction_type='diff', graph
     if cmap is None:
         cmap = 'coolwarm'
 
-    data = so.uns[spl]['interactions'][f'{attr}_{mode}_{prediction_type}_{graph_key}']
+    data = ad.uns['interactions'][f'{attr}_{mode}_{prediction_type}_{graph_key}']
     score = 'diff' if prediction_type == 'diff' else 'score'
     data = data.reset_index().pivot('source_label', 'target_label', score)
     data.index = data.index.astype(int)
@@ -394,16 +333,13 @@ def interactions(so, spl, attr, mode='proportion', prediction_type='diff', graph
         fig.show()
 
 
-def get_cmap(so, attr: str, data):
+def get_cmap(ad: AnnData, attr: str, data):
     '''
     Return the cmap and cmap labels for a given attribute if available, else a default
 
     Parameters
     ----------
-    so: IMCData
-        so object form which to fetch the data
-    spl: str
-        spl for which to get data
+    ad: AnnData from which to extract cmap
     attr: str
         attribute for which to get the cmap and cmap labels if available
 
@@ -415,31 +351,30 @@ def get_cmap(so, attr: str, data):
 
     # TODO: recycle cmap if more observations than colors
     cmap, cmap_labels = None, None
-    if attr in so.uns['cmaps'].keys():
-        cmap = so.uns['cmaps'][attr]
+    if attr in ad.uns['cmaps'].keys():
+        cmap = ad.uns['cmaps'][attr]
     elif is_categorical(data):
-        cmap = so.uns['cmaps']['category']
+        cmap = ad.uns['cmaps']['category']
     else:
-        cmap = so.uns['cmaps']['default']
+        cmap = ad.uns['cmaps']['default']
 
-    if attr in so.uns['cmap_labels'].keys():
-        cmap_labels = so.uns['cmap_labels'][attr]
+    if attr in ad.uns['cmap_labels'].keys():
+        cmap_labels = ad.uns['cmap_labels'][attr]
 
     return cmap, cmap_labels
 
 
-def ripleysK(so, spl: str, attr: str, ids, *, mode='K', correction='ripley',
+def ripleysK(ad: AnnData, attr: str, ids, *, mode='K', correction='ripley',
              key=None, ax=None, legend='auto'):
     """Visualise results from :func:`~neigh.ripleysK` results.
 
     Args:
-        so: SpatialOmics instance
-        spl: Spl for which to compute the metric
-        attr: Categorical feature in SpatialOmics.obs to use for the grouping
+        ad: AnnData instance
+        attr: Categorical feature in ad.obs to use for the grouping
         ids: The category in the categorical feature `attr`, for which Ripley's K should be plotted
         mode: {K, csr-deviation}. If `K`, Ripley's K is estimated, with `csr-deviation` the deviation from a poission process is computed.
         correction: Correction method to use to correct for boarder effects, see [1].
-        key: key to use in so.uns['ripleysK'] for the plot, if None it is constructed from spl,attr,ids,mode and correction
+        key: key to use in so.uns['ripleysK'] for the plot, if None it is constructed from attr,ids,mode and correction
         ax: axes to use for the plot
 
     Examples:
@@ -463,9 +398,9 @@ def ripleysK(so, spl: str, attr: str, ids, *, mode='K', correction='ripley',
 
     res = []
     for i in keys:
-        res.append(so.uns[spl]['ripleysK'][i])
+        res.append(ad.uns['ripleysK'][i])
 
-    res = pd.concat(res, 1)
+    res = pd.concat(res, axis=1)
     if key is None:
         colnames = [i.split('_')[0] for i in keys]
     else:
@@ -476,7 +411,7 @@ def ripleysK(so, spl: str, attr: str, ids, *, mode='K', correction='ripley',
     res = res.melt(id_vars='radii', var_name=attr)
     res[attr] = res[attr].astype('category')
 
-    cmap, labels = get_cmap(so, attr, res[attr])
+    cmap, labels = get_cmap(ad=ad, attr=attr, data=res[attr])
     cmap_dict = {j: i for i, j in zip(cmap.colors, labels.values())}
     if labels:
         res[attr] = res[attr].astype(type(list(labels.keys())[0])).map(labels)
@@ -492,8 +427,9 @@ def ripleysK(so, spl: str, attr: str, ids, *, mode='K', correction='ripley',
     fig.show()
 
 
-def infiltration(so, spl: str, attr: str = 'infiltration', step_size: int = 10,
+def infiltration(ad: AnnData, attr: str = 'infiltration', step_size: int = 10,
                  interpolation: str = 'gaussian',
+                 obsm_key: str = 'spatial',
                  cmap: str = 'plasma',
                  collision_strategy='mean',
                  ax=None,
@@ -505,9 +441,8 @@ def infiltration(so, spl: str, attr: str = 'infiltration', step_size: int = 10,
     in `collision_strategy` is employed (any value accepted by pandas aggregate function, i.e. 'mean', 'max', ...)
 
     Args:
-        so: SpatialOmics instance
-        spl: Spl for which to compute the metric
-        attr: feature in SpatialOmics.obs to plot
+        ad: AnnData instance
+        attr: feature in ad.obs to plot
         step_size: grid step size
         interpolation: interpolation method to use between grid values, see [1]
         cmap: colormap to use
@@ -531,11 +466,13 @@ def infiltration(so, spl: str, attr: str = 'infiltration', step_size: int = 10,
         .. [1] https://matplotlib.org/stable/gallery/images_contours_and_fields/interpolation_methods.html
     """
 
-    dat = so.obs[spl][[attr] + ['x', 'y']]
+    dat = ad.obs[[attr]]
+    loc = pd.DataFrame(ad.obsm[obsm_key], index=ad.obs.index, columns=['y', 'x'])
+    dat = pd.concat((dat, loc), axis=1)
     dat = dat[~dat.infiltration.isna()]
 
     # we add step_size to prevent out of bounds indexing should the `{x,y}_img` values be rounded up.
-    x, y = np.arange(0, so.images[spl].shape[2], step_size), np.arange(0, so.images[spl].shape[1], step_size)
+    x, y = np.arange(0, ad.uns['x'], step_size), np.arange(0, ad.uns['y'], step_size)
     img = np.zeros((len(y), len(x)))
 
     dat['x_img'] = np.round(dat.x / step_size).astype(int)

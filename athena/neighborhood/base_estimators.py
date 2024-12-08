@@ -12,36 +12,10 @@ logging.basicConfig(level=logging.INFO)
 
 from ..utils.general import make_iterable
 from .utils import get_node_interactions, get_interaction_score, permute_labels
-from collections import Counter
 from anndata import AnnData
 
 
 # %%
-
-def _infiltration_local_deprecated(G: Graph,
-                                   interaction1=('tumor', 'immune'),
-                                   interaction2=('immune', 'immune')):
-    ids = np.unique(interaction1, interaction2)
-    nodes_inter1 = [node for node in G.nodes if G.nodes[node]['attr'] in ids]
-    nodes_inter1 = [node for node in G.nodes if G.nodes[node]['attr'] in interaction1]
-    nodes_inter2 = [node for node in G.nodes if G.nodes[node]['attr'] in interaction2]
-
-    for node in ids:
-        neigh = G[node]
-        counts = Counter([G.nodes[i]['attr'] for i in neigh])
-
-
-def _infiltration_local(G: Graph,
-                        interaction1=('tumor', 'immune'),
-                        interaction2=('immune', 'immune')):
-    ids = np.unique(interaction1, interaction2)
-    nodes = [node for node in G.nodes if G.nodes[node]['attr'] in ids]
-    for node in nodes:
-        neigh = G[node]
-        subG = G.subgraph()
-
-    pass
-
 
 def _infiltration(node_interactions: pd.DataFrame, interaction1=('tumor', 'immune'),
                   interaction2=('immune', 'immune')) -> float:
@@ -87,7 +61,7 @@ class Interactions:
         Args:
             so: SpatialOmics
             spl: Sample for which to compute the interaction strength
-            attr: Categorical feature in SpatialOmics.obs to use for the grouping
+            attr: Categorical feature in ad.obs to use for the grouping
             mode: One of {classic, histoCAT, proportion}, see notes
             n_permutations: Number of permutations to compute p-values and the interactions strength score (mode diff)
             random_seed: Random seed for permutations
@@ -249,7 +223,7 @@ class RipleysK():
         Args:
             ad: AnnData
             id: The category in the categorical feature `attr`, for which Ripley's K should be computed
-            attr: Categorical feature in SpatialOmics.obs to use for the grouping
+            attr: Categorical feature in ad.obs to use for the grouping
             obsm_key: Key in ad.obsm that contain the spatial coordinates in 'yx' format
 
         """
