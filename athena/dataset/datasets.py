@@ -59,8 +59,3 @@ def mibi():
     return so()
 
 
-# mibi_pop = DataSet(
-#     name='mibi',
-#     url=None,
-#     doc_header='Processed and populated data (graphs, metrics) from https://www.angelolab.com/mibi-data and https://mibi-share.ionpath.com/tracker/imageset'
-# )
