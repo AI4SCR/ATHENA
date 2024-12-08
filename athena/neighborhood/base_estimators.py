@@ -1,27 +1,26 @@
 # %%
-import networkx as nx
-import pandas as pd
-from pandas.api.types import CategoricalDtype
-import numpy as np
-from networkx import Graph
-import os
-import time
-from astropy.stats import RipleysKEstimator
 import logging
+import time
+
+import numpy as np
+import pandas as pd
+from astropy.stats import RipleysKEstimator
+from networkx import Graph
+from pandas.api.types import CategoricalDtype
 
 logging.basicConfig(level=logging.INFO)
 
 from ..utils.general import make_iterable
 from .utils import get_node_interactions, get_interaction_score, permute_labels
 from collections import Counter
+from anndata import AnnData
 
 
 # %%
 
 def _infiltration_local_deprecated(G: Graph,
-                        interaction1=('tumor', 'immune'),
-                        interaction2=('immune', 'immune')):
-
+                                   interaction1=('tumor', 'immune'),
+                                   interaction2=('immune', 'immune')):
     ids = np.unique(interaction1, interaction2)
     nodes_inter1 = [node for node in G.nodes if G.nodes[node]['attr'] in ids]
     nodes_inter1 = [node for node in G.nodes if G.nodes[node]['attr'] in interaction1]
@@ -31,10 +30,10 @@ def _infiltration_local_deprecated(G: Graph,
         neigh = G[node]
         counts = Counter([G.nodes[i]['attr'] for i in neigh])
 
+
 def _infiltration_local(G: Graph,
                         interaction1=('tumor', 'immune'),
                         interaction2=('immune', 'immune')):
-
     ids = np.unique(interaction1, interaction2)
     nodes = [node for node in G.nodes if G.nodes[node]['attr'] in ids]
     for node in nodes:
@@ -42,6 +41,7 @@ def _infiltration_local(G: Graph,
         subG = G.subgraph()
 
     pass
+
 
 def _infiltration(node_interactions: pd.DataFrame, interaction1=('tumor', 'immune'),
                   interaction2=('immune', 'immune')) -> float:
@@ -69,6 +69,9 @@ def _infiltration(node_interactions: pd.DataFrame, interaction1=('tumor', 'immun
     return num / denom if denom > 0 else np.nan  # TODO: np.inf or np.nan
 
 
+from ..utils.general import get_nx_graph_from_anndata
+
+
 class Interactions:
     """
     Estimator to quantify interaction strength between different species in the sample.
@@ -77,8 +80,8 @@ class Interactions:
     VALID_MODES = ['classic', 'histoCAT', 'proportion']
     VALID_PREDICTION_TYPES = ['pvalue', 'observation', 'diff']
 
-    def __init__(self, so, spl: str, attr: str = 'meta_id', mode: str = 'classic', n_permutations: int = 500,
-                 random_seed=None, alpha: float = .01, graph_key: str = 'knn'):
+    def __init__(self, ad: AnnData, attr: str = 'meta_id', mode: str = 'classic', n_permutations: int = 500,
+                 random_seed=42, alpha: float = .01, graph_key: str = 'knn'):
         """Estimator to quantify interaction strength between different species in the sample.
 
         Args:
@@ -92,32 +95,27 @@ class Interactions:
             graph_key: Specifies the graph representation to use in so.G[spl] if `local=True`.
 
         Notes:
-            classic and histoCAT are python implementations of the corresponding methods pubished by the Bodenmiller lab at UZH.
+            classic and histoCAT are python implementations of the corresponding methods published by the Bodenmiller lab at UZH.
             The proportion method is similar to the classic method but normalises the score by the number of edges and is thus bound [0,1].
         """
 
-        self.so = so
-        self.spl: str = spl
+        self.ad = ad
         self.graph_key = graph_key
-        self.g: Graph = so.G[spl][graph_key]
+        self.g: Graph = get_nx_graph_from_anndata(ad=ad, key=graph_key)
         self.attr: str = attr
-        self.data: pd.Series = so.obs[spl][attr]
+        self.data: pd.Series = ad.obs[attr]
         self.mode: str = mode
         self.n_perm: int = int(n_permutations)
-        self.random_seed = random_seed if random_seed else so.random_seed
+        self.random_seed = random_seed
         self.rng = np.random.default_rng(random_seed)
         self.alpha: float = alpha
         self.fitted: bool = False
 
         # set dtype categories of data to attributes that are in the data
         self.data = self.data.astype(CategoricalDtype(categories=self.data.unique(), ordered=False))
-
-        # path where h0 models would be
-        self.path = os.path.expanduser(f'~/.cache/spatialHeterogeneity/h0-models/')
-        self.h0_file = f'{spl}_{attr}_{graph_key}_{mode}.pkl'
         self.h0 = None
 
-    def fit(self, prediction_type: str = 'observation', try_load: bool = True) -> None:
+    def fit(self, prediction_type: str = 'observation') -> None:
         """Compute the interactions scores for the sample.
 
         Args:
@@ -154,12 +152,6 @@ class Interactions:
         self.obs_interaction = obs_interaction.set_index(['source_label', 'target_label'])
 
         if not prediction_type == 'observation':
-            if try_load:
-                if os.path.isdir(self.path) and self.h0_file in os.listdir(self.path):
-                    logging.info(
-                        f'loading h0 for {self.spl}, graph type {self.graph_key} and mode {self.mode}')
-                    self.h0 = pd.read_pickle(os.path.join(self.path, self.h0_file))
-            # if try_load was not successful
             if self.h0 is None:
                 logging.info(
                     f'generate h0 for {self.spl}, graph type {self.graph_key} and mode {self.mode} and attribute {self.attr}')
@@ -168,7 +160,7 @@ class Interactions:
         self.fitted = True
 
     def predict(self) -> pd.DataFrame:
-        """Predict interactions strengths of observations.
+        """Predict interaction strengths of observations.
 
         Returns: A dataframe with the interaction results.
 
@@ -249,40 +241,35 @@ class Interactions:
         h0 = pd.concat(res_perm)
         self.h0 = pd.pivot(h0, index=['source_label', 'target_label'], columns='permutation_id', values='score')
 
-        # create folders
-        if not os.path.isdir(self.path):
-            os.makedirs(self.path)
-        self.h0.to_pickle(os.path.join(self.path, self.h0_file))
-
 
 class RipleysK():
-    def __init__(self, so, spl: str, id, attr: str):
+    def __init__(self, ad: AnnData, id, attr: str, obsm_key: str = 'spatial'):
         """Compute Ripley's K for a given sample and group.
 
         Args:
-            so: SpatialOmics
-            spl: Sample for which to compute the interaction strength
+            ad: AnnData
             id: The category in the categorical feature `attr`, for which Ripley's K should be computed
             attr: Categorical feature in SpatialOmics.obs to use for the grouping
-            graph_key: Specifies the graph representation to use in so.G[spl] if `local=True`.
+            obsm_key: Key in ad.obsm that contain the spatial coordinates in 'yx' format
 
         """
 
         self.id = id
-        self.area = so.spl.loc[spl].area
-        self.width = so.spl.loc[spl].width
-        self.height = so.spl.loc[spl].height
+        self.width = ad.uns['width']
+        self.height = ad.uns['height']
+        self.area = self.width * self.height
         self.rkE = RipleysKEstimator(area=float(self.area),
                                      # we need to cast since the implementation checks for type int/float and does not recognise np.int64
                                      x_max=float(self.width), x_min=0,
                                      y_max=float(self.height), y_min=0)
-        df = so.obs[spl][['x', 'y', attr]]
+
+        df = pd.DataFrame(ad.obsm[obsm_key], columns=['y', 'x'], index=ad.obs.index)
         self.df = df[df[attr] == id]
 
     def fit(self):
         pass
 
-    def predict(self, radii: list, correction: str='ripley', mode: str='K'):
+    def predict(self, radii: list, correction: str = 'ripley', mode: str = 'K'):
         """Estimate Ripley's K
 
         Args:

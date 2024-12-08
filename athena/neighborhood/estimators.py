@@ -1,32 +1,35 @@
 # %%
-import pandas as pd
 import numpy as np
+import pandas as pd
+from anndata import AnnData
+from tqdm import tqdm
 
 from .base_estimators import Interactions, _infiltration, RipleysK
-
 from .utils import get_node_interactions
 from ..utils.general import is_categorical
-from tqdm import tqdm
+
+
 # %%
-def interactions(so, spl: str, attr: str, mode: str ='classic', prediction_type: str ='observation', *, n_permutations: int =100,
-                 random_seed=None, alpha: float =.01, try_load: bool =True, key_added: str =None, graph_key: str ='knn',
-                 inplace: bool =True) -> None:
+def interactions(ad: AnnData, attr: str, mode: str = 'classic', prediction_type: str = 'observation', *,
+                 n_permutations: int = 100,
+                 random_seed=42, alpha: float = .01, key_added: str = None,
+                 graph_key: str = 'knn',
+                 inplace: bool = True) -> None | AnnData:
     """Compute interaction strength between species. This is done by counting the number of interactions (edges in the graph)
         between pair-wise observation types as encdoded by `attr`. See notes for more information or the
         `methodology <https://ai4scr.github.io/ATHENA/source/methodology.html>`_ section in the docs.
 
     Args:
-        so: SpatialOmics instance
-        spl: Spl for which to compute the metric
+        ad: AnnData instance
+
         attr: Categorical feature in SpatialOmics.obs to use for the grouping
         mode: One of {classic, histoCAT, proportion}, see notes
         n_permutations: Number of permutations to compute p-values and the interactions strength score (mode diff)
         random_seed: Random seed for permutations
         alpha: Threshold for significance
         prediction_type: One of {observation, pvalue, diff}, see Notes
-        try_load: load pre-computed permutation results if available
         key_added: Key added to SpatialOmics.uns[spl][metric][key_added]
-        graph_key: Specifies the graph representation to use in so.G[spl] if `local=True`.
+        graph_key: Specifies the graph representation to use in ad.obsp if `local=True`.
         inplace: Whether to add the metric to the current SpatialOmics instance or to return a new one.
 
     Notes:
@@ -36,29 +39,32 @@ def interactions(so, spl: str, attr: str, mode: str ='classic', prediction_type:
     Returns:
 
     """
-    so = so if inplace else so.copy()
+    ad = ad if inplace else ad.copy()
 
     # NOTE: uns_path = f'{spl}/interactions/'
     if key_added is None:
         key_added = f'{attr}_{mode}_{prediction_type}_{graph_key}'
 
     if random_seed is None:
-        random_seed = so.random_seed
+        random_seed = 42
 
-    estimator = Interactions(so=so, spl=spl, attr=attr, mode=mode, n_permutations=n_permutations,
+    estimator = Interactions(ad=ad, attr=attr, mode=mode, n_permutations=n_permutations,
                              random_seed=random_seed, alpha=alpha, graph_key=graph_key)
 
-    estimator.fit(prediction_type=prediction_type, try_load=try_load)
+    estimator.fit(prediction_type=prediction_type)
     res = estimator.predict()
 
     # add result to uns attribute
-    add2uns(so, res, spl, 'interactions', key_added)
+    add2uns(ad, res, 'interactions', key_added)
 
     if not inplace:
-        return so
+        return ad
 
 
-def infiltration(so, spl: str, attr: str, *, interaction1=('tumor', 'immune'), interaction2=('immune', 'immune'),
+from ..utils.general import get_nx_graph_from_anndata
+
+
+def infiltration(ad: AnnData, attr: str, *, interaction1=('tumor', 'immune'), interaction2=('immune', 'immune'),
                  add_key='infiltration', inplace=True, graph_key='knn', local=False) -> None:
     """Compute infiltration score. Generalises the infiltration score presented in
     `A Structured Tumor-Immune Microenvironment in Triple Negative Breast Cancer Revealed by Multiplexed Ion Beam Imaging <https://pubmed.ncbi.nlm.nih.gov/30193111/>`_
@@ -67,14 +73,14 @@ def infiltration(so, spl: str, attr: str, *, interaction1=('tumor', 'immune'), i
     be undefined. See notes for more information.
 
     Args:
-        so: SpatialOmics instance
-        spl: Spl for which to compute the metric
+        ad: AnnData instance
+
         attr: Categorical feature in SpatialOmics.obs to use for the grouping
         interaction1: labels in `attr` of enumerator interaction
         interaction2: labels in `attr` of denominator interaction
         key_added: Key added to SpatialOmics.uns[spl][metric][key_added]
         inplace: Whether to add the metric to the current SpatialOmics instance or to return a new one.
-        graph_key: Specifies the graph representation to use in so.G[spl] if `local=True`.
+        graph_key: Specifies the graph representation to use in ad.obsp if `local=True`.
 
     Returns:
 
@@ -87,9 +93,9 @@ def infiltration(so, spl: str, attr: str, *, interaction1=('tumor', 'immune'), i
     .. _infiltrationScore: https://pubmed.ncbi.nlm.nih.gov/30193111/
 
     """
-    so = so if inplace else so.copy()
+    ad = ad if inplace else ad.copy()
 
-    data = so.obs[spl][attr]
+    data = ad.obs[attr]
     if isinstance(data, pd.DataFrame):
         raise ValueError(f'multidimensional attr ({data.shape}) is not supported.')
 
@@ -101,7 +107,7 @@ def infiltration(so, spl: str, attr: str, *, interaction1=('tumor', 'immune'), i
         missing = np.array(interaction1 + interaction2)[~mask]
         raise ValueError(f'specified interaction categories are not all in `attr`. Missing {missing}')
 
-    G = so.G[spl][graph_key]
+    G = get_nx_graph_from_anndata(ad=ad, key=graph_key)
     if local:
         cont = []
         for node in tqdm(G.nodes):
@@ -112,28 +118,28 @@ def infiltration(so, spl: str, attr: str, *, interaction1=('tumor', 'immune'), i
             cont.append(res)
 
         res = pd.DataFrame(cont, index=G.nodes, columns=[add_key])
-        if add_key in so.obs[spl]:
-            so.obs[spl] = so.obs[spl].drop(columns=[add_key])
+        if add_key in ad.obs:
+            ad.obs = ad.obs.drop(columns=[add_key])
 
-        so.obs[spl] = pd.concat((so.obs[spl], res), axis=1)
+        ad.obs = pd.concat((ad.obs, res), axis=1)
 
     else:
         nint = get_node_interactions(G, data)
 
         res = _infiltration(node_interactions=nint, interaction1=interaction1, interaction2=interaction2)
 
-        so.spl.loc[spl, add_key] = res
+        ad.uns[add_key] = res
 
     if not inplace:
-        return so
+        return ad
 
 
-def ripleysK(so, spl: str, attr: str, id, *, mode='K', radii=None, correction='ripley', inplace=True, key_added=None):
+def ripleysK(ad: AnnData, attr: str, id, *, mode='K', radii=None, correction='ripley', inplace=True, key_added=None):
     """Compute Ripley's K as implemented by `[1]`_.
 
     Args:
-        so: SpatialOmics instance
-        spl: Spl for which to compute the metric
+        ad: AnnData instance
+
         attr: Categorical feature in SpatialOmics.obs to use for the grouping
         id: The category in the categorical feature `attr`, for which Ripley's K should be computed
         mode: {K, csr-deviation}. If `K`, Ripley's K is estimated, with `csr-deviation` the deviation from a poission process is computed.
@@ -149,27 +155,24 @@ def ripleysK(so, spl: str, attr: str, id, *, mode='K', radii=None, correction='r
         .. _[1]: https://docs.astropy.org/en/stable/stats/ripley.html
 
     """
-    so = so if inplace else so.copy()
+    ad = ad if inplace else ad.copy()
 
     # NOTE: uns_path = f'{spl}/clustering/'
     if key_added is None:
         key_added = f'{id}_{attr}_{mode}_{correction}'
 
-    estimator = RipleysK(so=so, spl=spl, id=id, attr=attr)
+    estimator = RipleysK(ad, id=id, attr=attr)
     res = estimator.predict(radii=radii, correction=correction, mode=mode)
 
     # add result to uns attribute
-    add2uns(so, res, spl, 'ripleysK', key_added)
+    add2uns(ad, res, 'ripleysK', key_added)
 
     if not inplace:
-        return so
+        return ad
 
 
-def add2uns(so, res, spl: str, parent_key, key_added):
-    if spl in so.uns:
-        if parent_key in so.uns[spl]:
-            so.uns[spl][parent_key][key_added] = res
-        else:
-            so.uns[spl].update({parent_key: {key_added: res}})
+def add2uns(ad, res, parent_key, key_added):
+    if parent_key in ad.uns:
+        ad.uns[parent_key][key_added] = res
     else:
-        so.uns.update({spl: {parent_key: {key_added: res}}})
+        ad.uns.update({parent_key: {key_added: res}})
