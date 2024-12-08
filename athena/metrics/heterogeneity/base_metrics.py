@@ -1,9 +1,5 @@
 import numpy as np
 from ..utils import _process_input, _validate_counts_vector
-# from spatialHeterogeneity.metrics.utils import _process_input, _validate_counts_vector
-# from ...utils.general import make_iterable
-
-# from scipy.spatial.distance import pdist
 import pandas as pd
 from collections import Counter
 from typing import Counter as ct, Iterable, Union

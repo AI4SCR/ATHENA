@@ -9,7 +9,7 @@ from sklearn.preprocessing import StandardScaler
 from .base_metrics import _shannon, _richness, _simpson, _hill_number, \
     _renyi, _abundance, _quadratic_entropy
 from ...utils.general import is_categorical
-
+from ...utils.general import get_nx_graph_from_anndata
 
 # %%
 
@@ -280,9 +280,6 @@ def abundance(ad: AnnData, attr: str, *, mode='proportion', key_added: str = Non
 
     return _compute_metric(ad=ad, attr=attr, key_added=key_added, metric=metric, graph_key=graph_key,
                            kwargs_metric=kwargs_metric, local=local, inplace=inplace)
-
-
-from ...utils.general import get_nx_graph_from_anndata
 
 
 def _compute_metric(ad, attr, key_added, graph_key, metric, kwargs_metric, local, inplace=True):
