@@ -13,11 +13,11 @@ from matplotlib.colors import Normalize, NoNorm, to_rgba, ListedColormap
 # %% figure constants
 from .utils import dpi, label_fontdict, title_fontdict, make_cbar, savefig
 from ..utils.general import get_nx_graph_from_anndata
-from ..utils.general import is_numeric, is_categorical, make_iterable
+from ..utils.general import is_categorical, make_iterable
 
 
 def spatial(ad: AnnData, attr: str, *, mode: str = 'scatter', node_size: float = 4, coordinate_keys: list = ['x', 'y'],
-            mask: np.ndarray, graph_key: str = 'knn', edges: bool = False, edge_width: float = .5,
+            mask: np.ndarray = None, graph_key: str = 'knn', edges: bool = False, edge_width: float = .5,
             edge_color: str = 'black', edge_zorder: int = 2, background_color: str = 'white', ax: plt.Axes = None,
             norm=None, title: str = None, cmap=None, cmap_labels: list = None, cbar: bool = True,
             cbar_title: bool = True, show: bool = True, save: str = None, tight_layout: bool = True,
@@ -71,33 +71,41 @@ def spatial(ad: AnnData, attr: str, *, mode: str = 'scatter', node_size: float =
     colors = None  # array holding the colormappig of data
 
     # try to fetch the attr data
-    if attr:
-        if attr in ad.obs:
-            data = ad.obs[attr]
-        elif attr in ad.var.index:
-            data = ad.X[ad.var.index == attr]
-        else:
-            raise KeyError(f'{attr} is not an column of X nor obs')
+    if attr in ad.obs:
+        data = ad.obs[attr].copy()
+    elif attr in ad.var.index:
+        data = ad.X[:, ad.var.index == attr]
+        data = pd.Series(data.flatten(), index=ad.obs.index)
     else:
-        colors = 'black'
-        cmap = 'black'
-        cbar = False
+        raise KeyError(f'{attr} is not an column of X nor obs')
 
-    # filter cells
-    if filter_col is not None:
-        data = ad.obs.query(f'{filter_col} in @include_labels')[attr]
-        loc = ad.obs.query(f'{filter_col} in @include_labels')[coordinate_keys].copy()
-    else:
-        loc = ad.obs[coordinate_keys].copy()
+    data.index = data.index.astype(int)
 
-    # broadcast if necessary
-    _is_categorical_flag = is_categorical(data)
+    loc = ad.obs[coordinate_keys].copy()
 
     # set colormap
     if cmap is None:
         cmap, cmap_labels = get_cmap(ad=ad, attr=attr, data=data)
     elif isinstance(cmap, str) and colors is None:
         cmap = plt.get_cmap(cmap)
+
+    # NOTE: we project the data to a numeric representation if it is categorical
+    _is_categorical_flag = is_categorical(data)
+    if _is_categorical_flag:
+        uniq = np.unique(data)
+        n = len(uniq)
+        encoder = {i: j for i, j in zip(uniq, range(len(uniq)))}
+        decoder = {value: key for key, value in encoder.items()}
+
+        data = data.map(encoder)
+        data = data.astype(int)
+
+        if isinstance(cmap, list):
+            cmap = ListedColormap([to_rgba(c) for c in cmap[:n]])
+            cmap_labels = decoder
+        elif isinstance(cmap, dict):
+            cmap = ListedColormap([to_rgba(cmap[i]) for i in uniq])
+            cmap_labels = decoder
 
     # normalisation
     if norm is None:
@@ -130,45 +138,18 @@ def spatial(ad: AnnData, attr: str, *, mode: str = 'scatter', node_size: float =
 
     # plot
     if mode == 'scatter':
-        # convert data to numeric
-        data = np.asarray(
-            data) if data is not None else None  # categorical data does not work with cmap, therefore we construct an array
-        _broadcast_to_numeric = not is_numeric(data)  # if data is now still categorical, map to numeric
-
-        if _broadcast_to_numeric and data is not None:
-            if attr in ad.uns['cmap_labels']:
-                cmap_labels = ad.uns['cmap_labels'][attr]
-                encoder = {value: key for key, value in cmap_labels.items()}  # invert to get encoder
-            else:
-                uniq = np.unique(data)
-                encoder = {i: j for i, j in zip(uniq, range(len(uniq)))}
-                cmap_labels = {value: key for key, value in encoder.items()}  # invert to get cmap_labels
-
-            data = np.asarray([encoder[i] for i in data])
-
-        # map to colors
-        if colors is None:
+        if data is not None:
             no_na = data[~np.isnan(data)]
             _ = norm(no_na)  # initialize norm with no NA data.
-
             colors = cmap(norm(data))
 
         im = ax.scatter(loc[coordinate_keys[0]], loc[coordinate_keys[1]], s=node_size, c=colors, zorder=2.5)
         ax.set_facecolor(background_color)
 
     elif mode == 'mask':
+        mask = mask or ad.uns['mask']
 
-        # generate mapping
-        if data is not None:
-            mapping = data.to_dict()
-        elif colors:
-            # case in which attr is a color
-            uniq = np.unique(mask)
-            uniq = uniq[uniq != 0]
-            mapping = {i: j for i, j in zip(uniq, np.ones(len(uniq), dtype=int))}  # map everything to 1
-            cmap = ListedColormap([to_rgba('white'), *colors])
-        else:
-            raise RuntimeError('Unknown case')
+        mapping = data.to_dict()
         mapping.update({0: 0})
         mapping.update({np.nan: np.nan})
 
@@ -200,7 +181,7 @@ def spatial(ad: AnnData, attr: str, *, mode: str = 'scatter', node_size: float =
     ax_pad = min(loc[coordinate_keys[0]].max() * .05, loc[coordinate_keys[1]].max() * .05, 10)
     ax.set_xlim(loc[coordinate_keys[0]].min() - ax_pad, loc[coordinate_keys[0]].max() + ax_pad)
     ax.set_ylim(loc[coordinate_keys[1]].min() - ax_pad, loc[coordinate_keys[1]].max() + ax_pad)
-    ax.set_xticks([]);
+    ax.set_xticks([])
     ax.set_yticks([])
     ax.set_xlabel('spatial x', label_fontdict)
     ax.set_ylabel('spatial y', label_fontdict)
@@ -218,7 +199,8 @@ def spatial(ad: AnnData, attr: str, *, mode: str = 'scatter', node_size: float =
         savefig(fig, save)
 
 
-def napari_viewer(ad: AnnData, image: np.ndarray, mask: np.ndarray, attrs: list, censor: float = .95, add_masks='cellmasks', attrs_key='target',
+def napari_viewer(ad: AnnData, image: np.ndarray, mask: np.ndarray, attrs: list, censor: float = .95,
+                  add_masks='cellmasks', attrs_key='target',
                   index_key: str = 'fullstack_index'):
     """Starts interactive Napari viewer to visualise raw images and explore samples.
     ``attrs`` are measured features in the high dimensional images in ``so.images[spl]``.
@@ -271,7 +253,8 @@ def napari_viewer(ad: AnnData, image: np.ndarray, mask: np.ndarray, attrs: list,
             labels_layer = viewer.add_labels(mask, name=m)
 
 
-def interactions(ad: AnnData, attr, mode='proportion', prediction_type='diff', graph_key='knn', linewidths=.5, cmap=None,
+def interactions(ad: AnnData, attr, mode='proportion', prediction_type='diff', graph_key='knn', linewidths=.5,
+                 cmap=None,
                  norm=None, ax=None, show=True, cbar=True):
     """Visualise results from :func:`~neigh.interactions` results.
 
@@ -315,11 +298,11 @@ def interactions(ad: AnnData, attr, mode='proportion', prediction_type='diff', g
 
     data = ad.uns['interactions'][f'{attr}_{mode}_{prediction_type}_{graph_key}']
     score = 'diff' if prediction_type == 'diff' else 'score'
-    data = data.reset_index().pivot('source_label', 'target_label', score)
-    data.index = data.index.astype(int)
-    data.columns = data.columns.astype(int)
-    data.sort_index(0, inplace=True)
-    data.sort_index(1, inplace=True)
+    data = data.reset_index().pivot(index='source_label', columns='target_label', values=score)
+    # data.index = data.index.astype(int)
+    # data.columns = data.columns.astype(int)
+    data.sort_index(axis=0, inplace=True)
+    data.sort_index(axis=1, inplace=True)
 
     if norm is None:
         v = np.abs(data).max().max()
@@ -330,6 +313,7 @@ def interactions(ad: AnnData, attr, mode='proportion', prediction_type='diff', g
     ax.set_yticklabels(ax.get_yticklabels(), rotation=0)
 
     if show:
+        fig.tight_layout()
         fig.show()
 
 
@@ -349,23 +333,21 @@ def get_cmap(ad: AnnData, attr: str, data):
 
     '''
 
-    # TODO: recycle cmap if more observations than colors
     cmap, cmap_labels = None, None
     if attr in ad.uns['cmaps'].keys():
         cmap = ad.uns['cmaps'][attr]
     elif is_categorical(data):
-        cmap = ad.uns['cmaps']['category']
+        from matplotlib.colors import to_rgba
+        n = len(set(data))
+        cmap = [to_rgba(c) for c in ad.uns['cmaps']['category'][:n]]
     else:
         cmap = ad.uns['cmaps']['default']
-
-    if attr in ad.uns['cmap_labels'].keys():
-        cmap_labels = ad.uns['cmap_labels'][attr]
 
     return cmap, cmap_labels
 
 
-def ripleysK(ad: AnnData, attr: str, ids, *, mode='K', correction='ripley',
-             key=None, ax=None, legend='auto'):
+def ripleysK(ad: AnnData, *, attr: str, ids: list, mode='K', correction='ripley',
+             key=None, ax=None, legend='auto', cmap=None, cmap_labels=None):
     """Visualise results from :func:`~neigh.ripleysK` results.
 
     Args:
@@ -389,12 +371,8 @@ def ripleysK(ad: AnnData, attr: str, ids, *, mode='K', correction='ripley',
     """
 
     if key is None:
-        if isinstance(ids, list):
-            keys = [f'{i}_{attr}_{mode}_{correction}' for i in ids]
-        else:
-            keys = [f'{ids}_{attr}_{mode}_{correction}']
-    else:
-        keys = [key]
+        assert isinstance(ids, list), 'ids should be a list'
+        keys = [f'{i}_{attr}_{mode}_{correction}' for i in ids]
 
     res = []
     for i in keys:
@@ -412,16 +390,13 @@ def ripleysK(ad: AnnData, attr: str, ids, *, mode='K', correction='ripley',
     res[attr] = res[attr].astype('category')
 
     cmap, labels = get_cmap(ad=ad, attr=attr, data=res[attr])
-    cmap_dict = {j: i for i, j in zip(cmap.colors, labels.values())}
-    if labels:
-        res[attr] = res[attr].astype(type(list(labels.keys())[0])).map(labels)
 
     if ax is None:
         fig, ax = plt.subplots()
     else:
         fig = ax.get_figure()
 
-    sns.lineplot(data=res, x='radii', y='value', hue=attr, palette=cmap_dict, ax=ax, legend=legend)
+    sns.lineplot(data=res, x='radii', y='value', hue=attr, palette=cmap, ax=ax, legend=legend)
     ax.plot(radii, np.repeat(0, len(radii)), color='black', linestyle=':')
     fig.tight_layout()
     fig.show()
@@ -467,12 +442,12 @@ def infiltration(ad: AnnData, attr: str = 'infiltration', step_size: int = 10,
     """
 
     dat = ad.obs[[attr]]
-    loc = pd.DataFrame(ad.obsm[obsm_key], index=ad.obs.index, columns=['y', 'x'])
+    loc = ad.obs[['y', 'x']]
     dat = pd.concat((dat, loc), axis=1)
     dat = dat[~dat.infiltration.isna()]
 
     # we add step_size to prevent out of bounds indexing should the `{x,y}_img` values be rounded up.
-    x, y = np.arange(0, ad.uns['x'], step_size), np.arange(0, ad.uns['y'], step_size)
+    x, y = np.arange(0, ad.uns['mask'].shape[1], step_size), np.arange(0, ad.uns['mask'].shape[0], step_size)
     img = np.zeros((len(y), len(x)))
 
     dat['x_img'] = np.round(dat.x / step_size).astype(int)

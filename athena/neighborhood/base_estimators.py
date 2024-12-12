@@ -128,7 +128,7 @@ class Interactions:
         if not prediction_type == 'observation':
             if self.h0 is None:
                 logging.info(
-                    f'generate h0 for {self.spl}, graph type {self.graph_key} and mode {self.mode} and attribute {self.attr}')
+                    f'generate h0 for graph type {self.graph_key} and mode {self.mode} and attribute {self.attr}')
                 self.generate_h0(relative_freq=relative_freq, observed=observed, save=True)
 
         self.fitted = True
@@ -237,7 +237,7 @@ class RipleysK():
                                      x_max=float(self.width), x_min=0,
                                      y_max=float(self.height), y_min=0)
 
-        df = pd.DataFrame(ad.obsm[obsm_key], columns=['y', 'x'], index=ad.obs.index)
+        df = ad.obs[[attr, 'y', 'x']]
         self.df = df[df[attr] == id]
 
     def fit(self):

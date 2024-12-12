@@ -1,11 +1,12 @@
 import abc
+import pickle
 from abc import ABC
 from dataclasses import dataclass, field
 import os
 from pathlib import Path
 from urllib import request
 
-from spatialOmics import SpatialOmics
+from anndata import AnnData
 from typing import Union
 
 PathLike = Union[str, Path]
@@ -25,7 +26,7 @@ class DataSet(ABC):
 
     @property
     def _extension(self) -> str:
-        return '.h5py'
+        return '.pkl'
 
     def __call__(self, path: PathLike = None, force_download: bool = False):
         return self.load(path, force_download)
@@ -45,7 +46,9 @@ class DataSet(ABC):
 
             self._download_progress(Path(fpath), self.url)
 
-        return SpatialOmics.from_h5py(fpath)
+        with open(fpath, 'rb') as f:
+            ad = pickle.load(f)
+        return ad
 
     def _download_progress(self, fpath: Path, url):
         from tqdm import tqdm

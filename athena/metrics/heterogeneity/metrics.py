@@ -221,11 +221,11 @@ def quadratic_entropy(ad: AnnData, attr: str, *, metric='minkowski', metric_kwar
 
     # collect feature vectors of all observations and add attr grouping
     features: pd.DataFrame = pd.DataFrame(ad.X, index=ad.obs.index, columns=ad.var.index)
-    features = pd.concat((features, ad.obs[attr]), axis=1)
+    features = pd.concat((features, ad.obs[[attr]]), axis=1)
     assert len(features) == len(ad.X), 'inner merge resulted in dropped index ids'
 
     # compute average feature vector for each attr group and standardise
-    features = features.groupby(attr).mean()
+    features = features.groupby(attr, observed=False).mean()
     if scale:
         tmp = StandardScaler().fit_transform(features)
         features = pd.DataFrame(tmp, index=features.index, columns=features.columns)
