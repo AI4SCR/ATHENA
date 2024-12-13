@@ -1,1 +1,1 @@
-from .visualization import spatial, napari_viewer, interactions, ripleysK, infiltration
+from .visualization import spatial, interactions, ripleysK, infiltration

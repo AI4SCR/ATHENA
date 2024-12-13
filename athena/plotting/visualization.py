@@ -2,7 +2,6 @@
 import logging
 
 import matplotlib.pyplot as plt
-import napari
 # import matplotlib.ticker as mticker  # https://stackoverflow.com/questions/63723514/userwarning-fixedformatter-should-only-be-used-together-with-fixedlocator
 import numpy as np
 import pandas as pd
@@ -13,7 +12,7 @@ from matplotlib.colors import Normalize, NoNorm, to_rgba, ListedColormap
 # %% figure constants
 from .utils import dpi, label_fontdict, title_fontdict, make_cbar, savefig
 from ..utils.general import get_nx_graph_from_anndata
-from ..utils.general import is_categorical, make_iterable
+from ..utils.general import is_categorical
 
 
 def spatial(ad: AnnData, attr: str, *, mode: str = 'scatter', node_size: float = 4, coordinate_keys: list = ['x', 'y'],
@@ -197,60 +196,6 @@ def spatial(ad: AnnData, attr: str, *, mode: str = 'scatter', node_size: float =
 
     if save:
         savefig(fig, save)
-
-
-def napari_viewer(ad: AnnData, image: np.ndarray, mask: np.ndarray, attrs: list, censor: float = .95,
-                  add_masks='cellmasks', attrs_key='target',
-                  index_key: str = 'fullstack_index'):
-    """Starts interactive Napari viewer to visualise raw images and explore samples.
-    ``attrs`` are measured features in the high dimensional images in ``so.images[spl]``.
-    All specified ``attrs`` should be in ``so.var[spl][attrs_key]`` along with the index in the high dimensional images.
-    The column with the index in the high dimensional image where the measurement of an attribute is stored.
-
-    Args:
-        ad: AnnData instance
-        attrs: list of attributes/features to add as channels to the viewer
-        censor: percentil to use to censore pixle values in the raw images
-        add_masks: segmentation masks to add as channels to the viewer
-        attrs_key: key in ``so.var[spl]`` that defines the ``attrs`` names
-        index_key: key in ``so.var[spl]`` that specifies the layer index in the high dimensional image in ``so.images[spl]``.
-
-
-    Examples:
-
-    .. code-block:: python
-
-        so = sh.dataset.imc()
-        spl = so.spl.index[0]
-
-        # add all measured features to the napari viewer
-        sh.pl.napari_viewer(so, spl, attrs=so.var[spl]['target'], add_masks=so.masks[spl].keys())
-
-        # specify the column containing the ``attrs`` names
-        sh.pl.napari_viewer(so, spl, attrs=so.var[spl]['target'], attrs_key='target')
-
-        # specify the column containing the ``attrs`` names and the columns that specifies the layer index
-        sh.pl.napari_viewer(so, spl, attrs=so.var[spl]['target'], attrs_key='target', index_key='fullstack_index')
-
-    """
-    attrs = list(make_iterable(attrs))
-    var = ad.var
-    index = var[var[attrs_key].isin(attrs)][index_key]
-    names = var[var[attrs_key].isin(attrs)][attrs_key]
-
-    img = image
-    if censor:
-        for j in range(img.shape[0]):
-            v = np.quantile(img[j,], censor)
-            img[j, img[j] > v] = v
-            img[j,] = img[j,] / img[j,].max()
-
-    viewer = napari.Viewer()
-    viewer.add_image(img, channel_axis=0, name=names)
-    if add_masks:
-        add_masks = make_iterable(add_masks)
-        for m in add_masks:
-            labels_layer = viewer.add_labels(mask, name=m)
 
 
 def interactions(ad: AnnData, attr, mode='proportion', prediction_type='diff', graph_key='knn', linewidths=.5,
