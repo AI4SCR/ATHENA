@@ -10,7 +10,8 @@ from ..utils.general import is_categorical
 
 
 # %%
-def interactions(ad: AnnData, attr: str, mode: str = 'classic', prediction_type: str = 'observation', *,
+def interactions(ad: AnnData, *, attr: str,
+                 mode: str = 'classic', prediction_type: str = 'observation',
                  n_permutations: int = 100,
                  random_seed=42, alpha: float = .01, key_added: str = None,
                  graph_key: str = 'knn',

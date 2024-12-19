@@ -198,7 +198,7 @@ def spatial(ad: AnnData, attr: str, *, mode: str = 'scatter', node_size: float =
         savefig(fig, save)
 
 
-def interactions(ad: AnnData, attr, mode='proportion', prediction_type='diff', graph_key='knn', linewidths=.5,
+def interactions(ad: AnnData, attr, mode='proportion', prediction_type='observation', graph_key='knn', linewidths=.5,
                  cmap=None,
                  norm=None, ax=None, show=True, cbar=True):
     """Visualise results from :func:`~neigh.interactions` results.
