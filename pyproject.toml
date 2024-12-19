@@ -3,7 +3,7 @@ requires = ["setuptools", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "ai4scr-athena"
+name = "ai4bmr-athena"
 description = "ATHENA package provides methods to analyse spatial heterogeneity in spatial omics data"
 authors = [
     {name = "Adriano Martinelli", email = "adriano.martinelli@chuv.ch"}
@@ -23,11 +23,13 @@ dependencies = [
     "scikit-learn",
     "scikit-image",
     "colorcet"
-
 ]
 
+[tool.setuptools]
+package-dir = {"" = "src"}
+
 [tool.setuptools.packages.find]
-where = ["."]
+where = ["src"]
 include = ["athena*"]
 exclude = ["*tests*"]
 
