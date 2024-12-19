@@ -249,6 +249,7 @@ def abundance(ad: AnnData, attr: str, *, mode='proportion', key_added: str = Non
         ad: AnnData instance
 
         attr: Categorical feature in ad.obs to use for the grouping
+        mode: Either `proportion` or `counts`. If `proportion` we compute the frequency of the species, else the absolute counts.
         local: Whether to compute the metric on the observation or the sample level
         key_added: Key added to either uns[spl] or obs depending on the choice of `local`
         graph_key: Specifies the graph representation to use in ad.obsp if `local=True`.
@@ -264,7 +265,7 @@ def abundance(ad: AnnData, attr: str, *, mode='proportion', key_added: str = Non
     """
 
     if key_added is None:
-        key_added = f'{mode}'
+        key_added = f'abundance_{attr}_{mode}'
         if local:
             key_added += f'_{graph_key}'
 

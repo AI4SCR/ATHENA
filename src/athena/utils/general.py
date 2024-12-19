@@ -12,7 +12,8 @@ def get_nx_graph_from_anndata(ad: AnnData, key: str):
     import networkx as nx
     adj = ad.obsp[key]
     g = nx.from_scipy_sparse_array(adj)
-    mapping = {k: v for v, k in zip(ad.obs.index, range(len(ad.obs.index)))}
+    # mapping = {k: v for v, k in zip(ad.obs.index, range(len(ad.obs.index)))}
+    mapping = {i: v for i, v in enumerate(ad.obs.index)}
     g = nx.relabel_nodes(g, mapping)
     return g
 

@@ -43,7 +43,7 @@ def interactions(ad: AnnData, attr: str, mode: str = 'classic', prediction_type:
 
     # NOTE: uns_path = f'{spl}/interactions/'
     if key_added is None:
-        key_added = f'{attr}_{mode}_{prediction_type}_{graph_key}'
+        key_added = f'interaction_{attr}_{mode}_{prediction_type}_{graph_key}'
 
     if random_seed is None:
         random_seed = 42
@@ -55,7 +55,8 @@ def interactions(ad: AnnData, attr: str, mode: str = 'classic', prediction_type:
     res = estimator.predict()
 
     # add result to uns attribute
-    add2uns(ad, res, 'interactions', key_added)
+    ad.uns[key_added] = res
+    # add2uns(ad, res, 'interactions', key_added)
 
     if not inplace:
         return ad
@@ -102,9 +103,8 @@ def infiltration(ad: AnnData, attr: str, *, interaction1=('tumor', 'immune'), in
     if not is_categorical(data):
         raise TypeError('`attr` needs to be categorical')
 
-    if not np.in1d(np.array(interaction1 + interaction2), data.unique()).all():
-        mask = np.in1d(np.array(interaction1 + interaction2), data.unique())
-        missing = np.array(interaction1 + interaction2)[~mask]
+    missing = set(interaction1 + interaction2) - set(data.unique())
+    if missing:
         raise ValueError(f'specified interaction categories are not all in `attr`. Missing {missing}')
 
     G = get_nx_graph_from_anndata(ad=ad, key=graph_key)
@@ -159,13 +159,14 @@ def ripleysK(ad: AnnData, attr: str, id, *, mode='K', radii=None, correction='ri
 
     # NOTE: uns_path = f'{spl}/clustering/'
     if key_added is None:
-        key_added = f'{id}_{attr}_{mode}_{correction}'
+        key_added = f'ripleysK_{attr}_{id}_{mode}_{correction}'
 
     estimator = RipleysK(ad, id=id, attr=attr)
     res = estimator.predict(radii=radii, correction=correction, mode=mode)
 
     # add result to uns attribute
-    add2uns(ad, res, 'ripleysK', key_added)
+    # add2uns(ad, res, 'ripleysK', key_added)
+    ad.uns[key_added] = res
 
     if not inplace:
         return ad

@@ -241,7 +241,7 @@ def interactions(ad: AnnData, attr, mode='proportion', prediction_type='diff', g
     if cmap is None:
         cmap = 'coolwarm'
 
-    data = ad.uns['interactions'][f'{attr}_{mode}_{prediction_type}_{graph_key}']
+    data = ad.uns[f'interaction_{attr}_{mode}_{prediction_type}_{graph_key}']
     score = 'diff' if prediction_type == 'diff' else 'score'
     data = data.reset_index().pivot(index='source_label', columns='target_label', values=score)
     # data.index = data.index.astype(int)
@@ -321,11 +321,11 @@ def ripleysK(ad: AnnData, *, attr: str, ids: list, mode='K', correction='ripley'
 
     if key is None:
         assert isinstance(ids, list), 'ids should be a list'
-        keys = [f'{i}_{attr}_{mode}_{correction}' for i in ids]
+        keys = [f'ripleysK_{attr}_{i}_{mode}_{correction}' for i in ids]
 
     res = []
     for i in keys:
-        res.append(ad.uns['ripleysK'][i])
+        res.append(ad.uns[i])
 
     res = pd.concat(res, axis=1)
     if key is None:
