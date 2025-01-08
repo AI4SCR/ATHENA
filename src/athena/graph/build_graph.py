@@ -5,11 +5,13 @@ from networkx import to_scipy_sparse_array
 from .ContactGraphBuilder import ContactGraphBuilder
 from .KNNGraphBuilder import KNNGraphBuilder
 from .RadiusGraphBuilder import RadiusGraphBuilder
+from .DelaunayGraphBuilder import DelaunayGraphBuilder
 
 GRAPH_BUILDERS = {
     "knn": KNNGraphBuilder,
     "contact": ContactGraphBuilder,
     "radius": RadiusGraphBuilder,
+    "delaunay": DelaunayGraphBuilder,
 }
 
 from anndata import AnnData
