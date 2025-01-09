@@ -5,6 +5,8 @@ import networkx as nx
 from tqdm import tqdm
 
 from skimage.morphology import square, diamond, disk
+from networkx import to_scipy_sparse_array
+
 
 DILATION_KERNELS = {"disk": disk, "square": square, "diamond": diamond}
 EDGE_WEIGHT = "weight"
@@ -20,7 +22,7 @@ class ContactGraphBuilder(BaseGraphBuilder):
                     kernel_name: str = 'disk',
                     kernel_radius: float = 4,
                     include_self: bool = True,
-                    **kwargs) -> nx.Graph:
+                    **kwargs) -> tuple[np.ndarray, list]:
         """Build topology using pixel expansion of segmentation masks provided by topo_data['mask'].
         Masks that overlap after expansion are connected in the graph.
         """
@@ -34,7 +36,7 @@ class ContactGraphBuilder(BaseGraphBuilder):
         ).tolist()  # cast to int to avoid issues with numpy casting to uint16
 
         if len(objs) == 0:
-            return nx.Graph()
+            return self.graph
 
         # Add nodes to graph
         self.graph.add_nodes_from(objs)
@@ -65,4 +67,5 @@ class ContactGraphBuilder(BaseGraphBuilder):
             edge_list = [(i, i) for i in self.graph.nodes]
             self.graph.add_edges_from(edge_list)
 
-        return self.graph
+        adj = to_scipy_sparse_array(self.graph, nodelist=objs)
+        return adj, objs

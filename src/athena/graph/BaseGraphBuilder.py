@@ -10,7 +10,7 @@ class BaseGraphBuilder(ABC):
         """Base-Graph Builder constructor"""
 
         self.EDGE_WEIGHT = 1
-        self.graph = nx.Graph()
+        self.graph = nx.DiGraph()
 
     @abc.abstractmethod
     def build_graph(self, *args, **kwargs):

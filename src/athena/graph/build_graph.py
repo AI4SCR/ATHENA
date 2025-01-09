@@ -31,8 +31,13 @@ def build_graph(ad: AnnData, topology: str, mask: np.ndarray = None, graph_key: 
     builder = GRAPH_BUILDERS[topology]()
 
     # Build graph and get key
-    g = builder.build_graph(mask, **kwargs)
-    adj = to_scipy_sparse_array(g, nodelist=ad.obs.index.astype(int))
+    adj, object_ids = builder.build_graph(mask, **kwargs)
+
+    # note: we permute the order of the adj matrix to match the order of the object_ids in anndata
+    objs_of_ad = ad.obs.index.astype(int)
+    assert set(objs_of_ad) == set(object_ids), "Object IDs do not match, ensure that the ad.obs.index (`str`) is the same as the object_ids in the segmentation mask (`int`)"
+    reorder = [object_ids.index(obj) for obj in objs_of_ad]
+    adj = adj[reorder][:, reorder]
 
     if graph_key is None:
         graph_key = topology
