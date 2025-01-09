@@ -279,14 +279,14 @@ def get_cmap(ad: AnnData, attr: str, data):
     '''
 
     cmap, cmap_labels = None, None
-    if attr in ad.uns['cmaps'].keys():
+    if ('cmaps' in ad.uns) and (attr in ad.uns['cmaps'].keys()):
         cmap = ad.uns['cmaps'][attr]
     elif is_categorical(data):
         from matplotlib.colors import to_rgba
         import colorcet as cc
         n = len(set(data))
         cmap = [to_rgba(c) for c in cc.glasbey_bw[:n]]
-    elif 'default' in ad.uns['cmaps']:
+    elif ('cmaps' in ad.uns) and ('default' in ad.uns['cmaps']):
         cmap = ad.uns['cmaps']['default']
     else:
         import matplotlib
