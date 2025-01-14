@@ -13,7 +13,7 @@ from ...utils.general import get_nx_graph_from_anndata
 
 # %%
 
-def richness(ad: AnnData, attr: str, *, local=True, key_added=None, graph_key='knn', inplace=True) -> None:
+def richness(ad: AnnData, attr: str, *, local=True, key_added=None, graph_key=None, inplace=True) -> None:
     """Computes the richness on the observation or the sample level
 
     Args:
@@ -46,7 +46,7 @@ def richness(ad: AnnData, attr: str, *, local=True, key_added=None, graph_key='k
                            local=local, inplace=inplace)
 
 
-def shannon(ad: AnnData, attr: str, *, local=True, key_added=None, graph_key='knn', base=2, inplace=True) -> None:
+def shannon(ad: AnnData, attr: str, *, local=True, key_added=None, graph_key=None, base=2, inplace=True) -> None:
     """Computes the Shannon Index on the observation or the sample level
 
     Args:
@@ -79,7 +79,7 @@ def shannon(ad: AnnData, attr: str, *, local=True, key_added=None, graph_key='kn
                            local=local, inplace=inplace)
 
 
-def simpson(ad: AnnData, attr: str, *, local=True, key_added=None, graph_key='knn', inplace=True) -> None:
+def simpson(ad: AnnData, attr: str, *, local=True, key_added=None, graph_key=None, inplace=True) -> None:
     """Computes the Simpson Index on the observation or the sample level
 
     Args:
@@ -112,7 +112,7 @@ def simpson(ad: AnnData, attr: str, *, local=True, key_added=None, graph_key='kn
                            local=local, inplace=inplace)
 
 
-def hill_number(ad: AnnData, attr: str, q: float, *, local=True, key_added=None, graph_key='knn', inplace=True):
+def hill_number(ad: AnnData, attr: str, q: float, *, local=True, key_added=None, graph_key=None, inplace=True):
     """Computes the Hill Numbers on the observation or the sample level
 
     Args:
@@ -147,7 +147,7 @@ def hill_number(ad: AnnData, attr: str, q: float, *, local=True, key_added=None,
                            local=local, inplace=inplace)
 
 
-def renyi_entropy(ad: AnnData, attr: str, q: float, *, local=True, key_added=None, graph_key='knn', base=2,
+def renyi_entropy(ad: AnnData, attr: str, q: float, *, local=True, key_added=None, graph_key=None, base=2,
                   inplace=True):
     """Computes the Renyi-Entropy.
 
@@ -186,7 +186,7 @@ def renyi_entropy(ad: AnnData, attr: str, q: float, *, local=True, key_added=Non
 
 
 def quadratic_entropy(ad: AnnData, attr: str, *, metric='minkowski', metric_kwargs={}, scale: bool = True,
-                      local=True, key_added=None, graph_key='knn', inplace=True):
+                      local=True, key_added=None, graph_key=None, inplace=True):
     """Computes the quadratic entropy, taking relative abundance and similarity between observations into account.
 
     Args:
@@ -241,7 +241,7 @@ def quadratic_entropy(ad: AnnData, attr: str, *, metric='minkowski', metric_kwar
                            local=local, inplace=inplace)
 
 
-def abundance(ad: AnnData, attr: str, *, mode='proportion', key_added: str = None, graph_key='knn',
+def abundance(ad: AnnData, attr: str, *, mode='proportion', key_added: str = None, graph_key=None,
               local=False, inplace: bool = True):
     """Computes the abundance of species on the observation or the sample level.
 

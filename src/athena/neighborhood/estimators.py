@@ -67,7 +67,7 @@ from ..utils.general import get_nx_graph_from_anndata
 
 
 def infiltration(ad: AnnData, attr: str, *, interaction1=('tumor', 'immune'), interaction2=('immune', 'immune'),
-                 add_key='infiltration', inplace=True, graph_key='knn', local=False) -> None | AnnData:
+                 add_key='infiltration', inplace=True, graph_key=None, local=False) -> None | AnnData:
     """Compute infiltration score. Generalises the infiltration score presented in
     `A Structured Tumor-Immune Microenvironment in Triple Negative Breast Cancer Revealed by Multiplexed Ion Beam Imaging <https://pubmed.ncbi.nlm.nih.gov/30193111/>`_
     The score comptes a ratio between the number of interactions observed between the observation types specified in `interactions1`
