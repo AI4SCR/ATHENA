@@ -301,21 +301,29 @@ def _compute_metric(ad, attr, key_added, graph_key, metric, kwargs_metric, local
 
         # compute metric for each observation
         res = []
+        indices = []
         # TODO: handle the `str` index of AnnData
         observation_ids = ad.obs.index
         for observation_id in observation_ids:
             n = list(g.neighbors(observation_id))
             if len(n) == 0:
-                res.append(0)
                 continue
             counts = Counter(data.loc[n].values)
-            res.append(metric(counts, **kwargs_metric))
+            score = metric(counts, **kwargs_metric)
+            res.append(score)
+            indices.append(observation_id)
 
         if np.ndim(res[0]) > 0:
-            res = pd.DataFrame(res, index=observation_ids)
+            res = pd.DataFrame(res, index=indices)
+            res = res.reindex(ad.obs.index)
+            res = res.fillna(0)
+
             ad.obsm[key_added] = res
         else:
-            res = pd.DataFrame({key_added: res}, index=observation_ids)
+            res = pd.DataFrame({key_added: res}, index=indices)
+            res = res.reindex(ad.obs.index)
+            res = res.fillna(0)
+
             if key_added in ad.obs:  # drop previous computation of metric
                 ad.obs.drop(key_added, axis=1, inplace=True)
             ad.obs = pd.concat((ad.obs, res), axis=1)
