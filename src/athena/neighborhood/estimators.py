@@ -4,9 +4,28 @@ import pandas as pd
 from anndata import AnnData
 from tqdm import tqdm
 
-from .base_estimators import Interactions, _infiltration, RipleysK
+from .base_estimators import Interactions, _infiltration, RipleysK, Distance
 from .utils import get_node_interactions
 from ..utils.general import is_categorical
+
+
+# %%
+def distance(ad: AnnData, *, attr: str, linkage: str = 'min', top_k: int | None = None, ascending: bool = True,
+             coordinate_keys: list = ['x', 'y'], key_added: str = None, inplace: bool = True) -> None | AnnData:
+
+    ad = ad if inplace else ad.copy()
+
+    if key_added is None:
+        key_added = f'distance_{attr}_{linkage}_{top_k}_{ascending}'
+
+    estimator = Distance(attr=attr, linkage=linkage, coordinate_keys = coordinate_keys,
+                         top_k=top_k, ascending=ascending)
+    res = estimator.predict(ad=ad)
+
+    ad.uns[key_added] = res
+
+    if not inplace:
+        return ad
 
 
 # %%
