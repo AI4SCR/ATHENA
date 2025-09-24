@@ -36,7 +36,7 @@ def interactions(ad: AnnData, *, attr: str,
                  graph_key: str = 'knn',
                  inplace: bool = True) -> None | AnnData:
     """Compute interaction strength between species. This is done by counting the number of interactions (edges in the graph)
-        between pair-wise observation types as encdoded by `attr`. See notes for more information or the
+        between pair-wise observation types as encoded by `attr`. See notes for more information or the
         `methodology <https://ai4scr.github.io/ATHENA/source/methodology.html>`_ section in the docs.
 
     Args:

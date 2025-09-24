@@ -155,6 +155,7 @@ def spatial(ad: AnnData, attr: str, *, mode: str = 'scatter', node_size: float =
         # apply mapping vectorized
         otype = ['int'] if _is_categorical_flag else ['float']
         func = np.vectorize(lambda x: mapping[x], otypes=otype)
+        mask = mask.data if hasattr(mask, 'data') else mask
         im = func(mask)
 
         # convert to masked array to handle np.nan values
@@ -196,6 +197,8 @@ def spatial(ad: AnnData, attr: str, *, mode: str = 'scatter', node_size: float =
 
     if save:
         savefig(fig, save)
+
+    return ax
 
 
 def interactions(ad: AnnData, attr, mode='proportion', prediction_type='observation', graph_key=None, linewidths=.5,
