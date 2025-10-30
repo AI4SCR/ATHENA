@@ -129,3 +129,4 @@ single_cell_values_visium_cellmasks.pkl
 # Ignore .vscode
 .vscode
 
+scribble/
