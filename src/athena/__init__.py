@@ -1,6 +1,6 @@
 """Module initialization."""
 
-__version__ = "1.0.0"
+__version__ = "2.0.0"
 from . import metrics as metrics
 from . import plotting as pl
 from . import neighborhood as neigh
