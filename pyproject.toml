@@ -1,13 +1,61 @@
-[tool.black]
-line-length = 88
-skip-string-normalization = false
-target-version = ['py37']
+[build-system]
+requires = ["setuptools", "wheel"]
+build-backend = "setuptools.build_meta"
 
-[tool.isort]
-multi_line_output = 3
-include_trailing_comma = true
-force_grid_wrap = 0
-use_parentheses = true
-ensure_newline_before_comments = true
-line_length = 88
-force_to_top = ["rdkit", "scikit-learn"]
+[project]
+name = "ai4bmr-athena"
+description = "ATHENA package provides methods to analyse spatial heterogeneity in spatial omics data"
+authors = [
+    {name = "Adriano Martinelli", email = "adriano.martinelli@chuv.ch"}
+]
+readme = "README.md"
+dynamic = ["version"]
+
+dependencies = [
+    "numpy",
+    "pandas",
+    "matplotlib",
+    "anndata",
+    "networkx",
+    "tqdm",
+    "seaborn",
+    "astropy",
+    "scikit-learn",
+    "scikit-image",
+    "colorcet"
+]
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+
+[tool.setuptools.packages.find]
+where = ["src"]
+include = ["athena*"]
+exclude = ["*tests*"]
+
+[tool.setuptools.package-data]
+athena = ["py.typed"]
+
+[project.optional-dependencies]
+test = [
+    "pytest",
+    "pytest-cov",
+]
+dev = [
+    "pytest",
+    "pytest-cov",
+    "black",
+    "flake8",
+    "mypy",
+    "sphinx",
+    "sphinx-autodoc-typehints",
+    "better-apidoc",
+    "six",
+    "sphinx_rtd_theme",
+    "myst-parser",
+    "nbconvert",
+    "Jinja2",
+    "jupyterlab",
+    "colorcet",
+    "twine",
+]

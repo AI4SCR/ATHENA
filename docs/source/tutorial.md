@@ -394,19 +394,18 @@ ath.pl.spatial(so, spl, 'SMA', mode='mask', ax=axs.flat[2], background_color='bl
 ## Graph construction
 Use the `.graph` submodule to construct 3 different graphs and experiment with the parameters (k, radius):
 
-
 ```python
 # import default graph builder parameters
-from athena.graph_builder.constants import GRAPH_BUILDER_DEFAULT_PARAMS
+from athena.graph.constants import GRAPH_BUILDER_DEFAULT_PARAMS
 
 # kNN graph
 config = GRAPH_BUILDER_DEFAULT_PARAMS['knn']
-config['builder_params']['n_neighbors'] = 6 # set parameter k
+config['builder_params']['n_neighbors'] = 6  # set parameter k
 ath.graph.build_graph(so, spl, builder_type='knn', mask_key='cellmasks', config=config)
 
 # radius graph
 config = GRAPH_BUILDER_DEFAULT_PARAMS['radius']
-config['builder_params']['radius'] = 20 # set radius
+config['builder_params']['radius'] = 20  # set radius
 ath.graph.build_graph(so, spl, builder_type='radius', mask_key='cellmasks', config=config)
 
 # contact graph - this takes some time
