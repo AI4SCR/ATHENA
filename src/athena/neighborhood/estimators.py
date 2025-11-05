@@ -11,7 +11,7 @@ from ..utils.general import is_categorical
 
 # %%
 def interactions(ad: AnnData, *, attr: str,
-                 mode: str = 'classic', prediction_type: str = 'observation',
+                 mode: str = 'classic', prediction_type: str = 'observation', aggregation: str = 'mean',
                  n_permutations: int = 100,
                  random_seed=42, alpha: float = .01, key_added: str = None,
                  graph_key: str = 'knn',
@@ -28,6 +28,7 @@ def interactions(ad: AnnData, *, attr: str,
         n_permutations: Number of permutations to compute p-values and the interactions strength score (mode diff)
         random_seed: Random seed for permutations
         alpha: Threshold for significance
+        aggregation: 'mean', 'sum'
         prediction_type: One of {observation, pvalue, diff}, see Notes
         key_added: Key added to SpatialOmics.uns[spl][metric][key_added]
         graph_key: Specifies the graph representation to use in ad.obsp if `local=True`.
@@ -44,12 +45,12 @@ def interactions(ad: AnnData, *, attr: str,
 
     # NOTE: uns_path = f'{spl}/interactions/'
     if key_added is None:
-        key_added = f'interaction_{attr}_{mode}_{prediction_type}_{graph_key}'
+        key_added = f'interaction_{attr}_{mode}_{prediction_type}_{aggregation}_{graph_key}'
 
     if random_seed is None:
         random_seed = 42
 
-    estimator = Interactions(ad=ad, attr=attr, mode=mode, n_permutations=n_permutations,
+    estimator = Interactions(ad=ad, attr=attr, mode=mode, aggregation=aggregation, n_permutations=n_permutations,
                              random_seed=random_seed, alpha=alpha, graph_key=graph_key)
 
     estimator.fit(prediction_type=prediction_type)
