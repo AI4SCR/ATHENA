@@ -1,3 +1,3 @@
-from .estimators import interactions, infiltration, ripleysK
+from .estimators import interactions, infiltration, ripleysK, distance
 
 

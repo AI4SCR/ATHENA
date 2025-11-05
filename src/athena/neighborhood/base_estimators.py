@@ -13,7 +13,57 @@ logging.basicConfig(level=logging.INFO)
 from ..utils.general import make_iterable
 from .utils import get_node_interactions, get_interaction_score, permute_labels
 from anndata import AnnData
+from scipy.spatial.distance import pdist, squareform
+import numpy as np
 
+class Distance:
+
+    def __init__(self, *, attr, linkage, coordinate_keys, top_k: int | None = None, ascending: bool = True):
+        self.attr = attr
+        self.linkage = linkage
+        self.coordinate_keys = coordinate_keys
+        self.top_k = top_k
+        self.ascending = ascending
+
+    def fit(self, *args, **kwargs):
+        pass
+
+    def predict(self, ad):
+        labels = ad.obs[self.attr]
+        assert labels.dtype == 'category'
+
+        xy = ad.obs[self.coordinate_keys]
+        dists = squareform(pdist(xy.astype(float), metric='euclidean'))
+        i, j = np.triu_indices_from(dists, 1)
+        dists = dists[i, j]
+
+        records = []
+        data = pd.DataFrame({'distance': dists, 'source': labels.values[i], 'target': labels.values[j]})
+        # NOTE: upper bound for the number of different edge_keys is given by (num_labels ** 2) - (num_labels * num_labels - 1) / 2
+        data['edge_key'] = data.apply(lambda row: tuple(sorted([row['source'], row['target']])), axis=1)
+        for edge_key, grp_data in data.groupby('edge_key', observed=True):
+        # for grp_name, grp_data in data.groupby(['source', 'target'], observed=True):
+
+            if self.top_k is not None and self.linkage not in ['min', 'max']:
+                grp_data = grp_data.sort_values('distance', ascending=self.ascending).head(self.top_k)
+
+            match self.linkage:
+                case 'min':
+                    d = grp_data.distance.min()
+                case 'mean':
+                    d = grp_data.distance.mean()
+                case 'median':
+                    d = grp_data.distance.median()
+                case 'max':
+                    d = grp_data.distance.max()
+                case _:
+                    raise ValueError(f'Unknown linkage method {self.linkage}')
+
+            source, target = edge_key
+            records.append({'distance': d, 'source': source, 'target': target, 'edge_key': edge_key})
+
+        data = pd.DataFrame(records)
+        return data
 
 # %%
 
