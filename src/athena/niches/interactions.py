@@ -29,26 +29,27 @@ def fix_adjacency_matrix(ad: AnnData, graph_key: str = 'radius_80'):
 
     return g_new
 
-def compute_interactions(ad: AnnData, g: nx.Graph, cell_type_column: str) -> Dict[tuple, int]:
+def compute_interactions(ad: AnnData, graph_key: str, label_type: str) -> Dict[tuple, int]:
     '''
     Compute the proportion of interactions between cell types based on the directed graph g.
 
     Args:   
         ad: AnnData object
-        g: Directed NetworkX graph
-        cell_type_column: The obs column in adata.obs that contains cell type labels
+        graph_key: Key in ad.obsp where the graph adjacency matrix is stored
+        label_type: The obs column in adata.obs that contains labels
     
     Returns:
         interactions_df: DataFrame with columns ['cell_type_1', 'cell_type_2', 'interaction_proportion']
     '''
-    labels = ad.obs[cell_type_column].unique().tolist()
+    g =  fix_adjacency_matrix(ad, graph_key=graph_key)
+    labels = ad.obs[label_type].unique().tolist()
     pairs = [tuple(sorted(t)) for t in list(itertools.combinations_with_replacement(labels, 2))]
     interactions = {pair: 0 for pair in pairs}
     for u,v in g.edges(): # (u,v) and (v,u) are counted as one interaction and appear once in the iteration because g is undirected
         if u==v:
             continue  # skip self-loops if any
-        label_u = ad.obs.loc[u, cell_type_column]
-        label_v = ad.obs.loc[v, cell_type_column]
+        label_u = ad.obs.loc[u, label_type]
+        label_v = ad.obs.loc[v, label_type]
         pair = tuple(sorted((label_u, label_v)))
         interactions[pair] +=1
     
@@ -62,14 +63,14 @@ def compute_interactions(ad: AnnData, g: nx.Graph, cell_type_column: str) -> Dic
     
 
 
-def cell_type_interactions(ad:AnnData,  cell_type_column: str, graph_key: str = 'radius_80', group: Union[str, int, list] = 'whole_sample', obs_key: str = None):
+def label_type_interactions(ad:AnnData,  label_type: str, graph_key: str = 'radius_80', group: Union[str, int, list] = 'whole_sample', obs_key: str = None):
     '''
     Compute interactions between cell types based on a graph stored in adata.obsp[graph_key].
     The interactions can be computed for the whole sample or per group in obs_key.
 
     Args:   
         ad: AnnData object
-        cell_type_column: The obs column in adata.obs that contains cell type labels
+        label_type: The obs column in adata.obs that contains labels
         graph_key: Key in adata.obsp where the graph adjacency matrix is stored
         group: cells onto which compute interactions 
                 - 'whole_sample' 
@@ -89,8 +90,7 @@ def cell_type_interactions(ad:AnnData,  cell_type_column: str, graph_key: str = 
     ### Whole sample ###
     if group == 'whole_sample':
         if 'cell_type_interactions_whole_sample' not in ad.uns.keys():
-            g = fix_adjacency_matrix(ad, graph_key=graph_key)
-            interactions_df = compute_interactions(ad, g, cell_type_column)
+            interactions_df = compute_interactions(ad, graph_key, label_type)
             ad.uns['cell_type_interactions_whole_sample'] = interactions_df
     
     ### Per group and optionally whole sample ###
@@ -101,24 +101,21 @@ def cell_type_interactions(ad:AnnData,  cell_type_column: str, graph_key: str = 
         ### if also whole sample ###
         if group == 'whole_sample_and_per_group':
             if 'cell_type_interactions_whole_sample' not in ad.uns.keys():
-                g =fix_adjacency_matrix(ad, graph_key=graph_key)
-                interactions_df = compute_interactions(ad, g, cell_type_column)
+                interactions_df = compute_interactions(ad, graph_key, label_type)
                 ad.uns['cell_type_interactions_whole_sample'] = interactions_df
 
         for group in groups:
             if f'cell_type_interactions_{obs_key}_{group}' not in ad.uns.keys():
                 ad_group = ad[ad.obs[obs_key] == group, :]
                 if ad_group.n_obs >13:                
-                    g_group = fix_adjacency_matrix(ad_group, graph_key=graph_key)
-                    interactions_df = compute_interactions(ad_group, g_group, cell_type_column)
+                    interactions_df = compute_interactions(ad_group, graph_key, label_type)
                     ad.uns[f'cell_type_interactions_{obs_key}_{group}'] = interactions_df
 
     ### List of cell ids ###    
     elif isinstance(group, list):
         if f'cell_type_interactions_{obs_key}_{group}' not in ad.uns.keys():
             ad_group = ad[group, :]
-            g_group = fix_adjacency_matrix(ad_group, graph_key=graph_key)
-            interactions_df = compute_interactions(ad_group, g_group, cell_type_column)
+            interactions_df = compute_interactions(ad_group, graph_key, label_type)
             ad.uns[f'cell_type_interactions_{obs_key}_{group}'] = interactions_df
     
     ### Specific group ###
@@ -126,21 +123,20 @@ def cell_type_interactions(ad:AnnData,  cell_type_column: str, graph_key: str = 
         assert obs_key is not None, f"obs_key must be provided when group is {group}."
         if f'cell_type_interactions_{obs_key}_{group}' not in ad.uns.keys():
             ad_group = ad[ad.obs[obs_key] == group, :]
-            if ad_group.n_obs >13:   
-                g_group = fix_adjacency_matrix(ad_group, graph_key=graph_key)
-                interactions_df = compute_interactions(ad_group, g_group, cell_type_column)
+            if ad_group.n_obs >13:
+                interactions_df = compute_interactions(ad_group, graph_key, label_type)
                 ad.uns[f'cell_type_interactions_{obs_key}_{group}'] = interactions_df
 
     return
 
-def cell_type_interactions_dictionary(ad_dict: Dict[str, AnnData],  cell_type_column: str, graph_key: str = 'radius_80', group: Union[str, int, list] = 'whole_sample', obs_key: str = None):
+def label_type_interactions_dictionary(ad_dict: Dict[str, AnnData],  label_type: str, graph_key: str = 'radius_80', group: Union[str, int, list] = 'whole_sample', obs_key: str = None):
     '''
     Compute interactions between cell types for multiple AnnData objects stored in a dictionary.
     The interactions can be computed for the whole sample or per group in obs_key.
 
     Args:   
         ad_dict: Dictionary of AnnData instances with keys as sample names.
-        cell_type_column: The obs column in adata.obs that contains cell type labels
+        label_type: The obs column in adata.obs that contains labels
         graph_key: Key in adata.obsp where the graph adjacency matrix is stored
         group: cells onto which compute interactions 
                 - 'whole_sample' 
@@ -155,7 +151,7 @@ def cell_type_interactions_dictionary(ad_dict: Dict[str, AnnData],  cell_type_co
 
     '''
     for ad in ad_dict.values():
-        cell_type_interactions(ad, cell_type_column, graph_key, group, obs_key)
+        label_type_interactions(ad, label_type, graph_key, group, obs_key)
     return
 
 def aggregate_interactions(ad_dict: Dict[str,AnnData], interaction_key:Union[str, List[str]], aggregator: str = 'mean'):
@@ -238,6 +234,7 @@ def above_median_fraction(ad_dict: Dict[str,AnnData], interaction_key_group:str)
     interaction_key_whole_sample = interaction_key_group[:interaction_key_group.find('interactions') + len('interactions')]+ '_whole_sample'
     median_interaction_overall = aggregate_interactions(ad_dict, interaction_key_whole_sample, aggregator = 'median')
     above_median_count = pd.Series(0, index=median_interaction_overall.index, name='above_median_count')
+    print(above_median_count)
     for sample_id, ad in ad_dict.items():
         if interaction_key_group in ad.uns.keys():
             interactions_df = ad.uns[interaction_key_group]

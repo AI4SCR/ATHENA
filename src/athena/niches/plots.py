@@ -142,15 +142,14 @@ def dot_plots(ad_dict: Dict[str,AnnData], interaction_key_group:str, aggregator:
         dot_plot_name = save_path + f'dot_plot_interactions_{interaction_key_group}_{aggregator}.png'
         fig.savefig(dot_plot_name, dpi=300, bbox_inches="tight")
 
-
-def create_color_and_width_dicts(color_df: pd.DataFrame, width_df: pd.DataFrame, c):
+def data_for_circos_plot(color_df: pd.DataFrame, width_df: pd.DataFrame, c):
     '''
-    Create color and width dictionaries for circos plot links.
+    Create color and width dictionaries for circos plot links and pd.DataFrame for sectors.
     Args:
         color_df (pd.DataFrame): DataFrame with color values for interactions.
         width_df (pd.DataFrame): DataFrame with width values for interactions.
     Returns:
-        Dict[str, Dict[Tuple[str, str], float]]: Dictionary with 'color_dict' and 'width_dict'.
+        Dict[str, Dict[Tuple[str, str], float]] and Dict[str, pd.DataFrame]: Dictionary with 'color_dict' and 'width_dict' and 'sectors_df'.
     '''
     #WIDTH
     width_df.reset_index(inplace=True)
@@ -165,8 +164,13 @@ def create_color_and_width_dicts(color_df: pd.DataFrame, width_df: pd.DataFrame,
     color_df = color_df.dropna(subset=['Value'])
     color_dict = {(row['from'], row['to']): row['Value'] for _, row in color_df.iterrows()}
 
-    return {'color_dict': color_dict, 'width_dict': width_dict }
-        
+    #SECTORS 
+    sectors_df = width_df.copy()
+    sectors_df.columns = ['width']
+    sectors_df = width_df.pivot(index='cell_type_1', columns='cell_type_2', values='above_median_fraction')
+    sectors_df = sectors_df.fillna(0)
+
+    return {'color_dict': color_dict, 'width_dict': width_dict, 'sectors_df': sectors_df}
 
 def interactions_circos_plots(ad_dict: Dict[str,AnnData], interaction_key_group:str, aggregator: str = 'mean', color = 'interaction_values', color_map: Dict[str,str] = None, save_path: str = None):
     '''
@@ -190,21 +194,16 @@ def interactions_circos_plots(ad_dict: Dict[str,AnnData], interaction_key_group:
     above_median_fr = above_median_fraction(ad_dict, interaction_key_group)
 
     if color == 'interaction_values':
-        dicts = create_color_and_width_dicts(color_df=merged_group, width_df=above_median_fr)
-        #SECTORS 
-        df = above_median_fr.pivot(index='cell_type_1', columns='cell_type_2', values='above_median_fraction')
-        df = df.fillna(0)
+        dicts = data_for_circos_plot(color_df=merged_group, width_df=above_median_fr)
     else: 
-        dicts = create_color_and_width_dicts(color_df=above_median_fr, width_df=merged_group)
-        #SECTORS 
-        df = merged_group.pivot(index='cell_type_1', columns='cell_type_2', values=f'{aggregator}_interaction')
-        df = df.fillna(0)
+        dicts = data_for_circos_plot(color_df=above_median_fr, width_df=merged_group)
 
     color_dict = dicts['color_dict']
     width_dict = dicts['width_dict']
+    sectors_df = dicts['sectors_df']
     
     if color_map is None:
-        labels = sorted(list(set(df.index['cell_type_1'].unique()).union(set(df.index['cell_type_2'].unique())))) 
+        labels = sorted(list(set(sectors_df.index['cell_type_1'].unique()).union(set(sectors_df.index['cell_type_2'].unique())))) 
         cell_color_map= get_color_map(labels)
 
     def link_handler(from_label, to_label):
@@ -233,7 +232,7 @@ def interactions_circos_plots(ad_dict: Dict[str,AnnData], interaction_key_group:
         return dict(ec='none', lw=lw, fc=color, alpha=0.7)   
     
     circos = Circos.chord_diagram(
-        df,
+        sectors_df,
         space=2,
         cmap = cell_color_map,
         label_kws=dict(
