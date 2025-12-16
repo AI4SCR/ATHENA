@@ -38,10 +38,6 @@ def get_neighborhoods(ad: AnnData, graph_key: str = 'radius_80', inplace: bool =
         return neigh
     return
 
-def save_neighborhood_representations(representations: pd.Dataframe): 
-
-    return
-
 
 def compute_neighborhood_representations(ad: AnnData, attr: str, mode: str = 'proportion', graph_key: str = 'radius_80', min_neighbors: int = 5, inplace: bool=True):
     """Compute count and proportions of label_type for each cell in the AnnData object based on the specified topology.
@@ -83,9 +79,10 @@ def compute_neighborhood_representations(ad: AnnData, attr: str, mode: str = 'pr
         if len(neighbors) < min_neighbors:
             continue #leave as zeros
         else:
-            ad_neighborhood = ad[neighbors]
+            ad_neighborhood = ad[ad.obs.index.isin(neighbors)].copy()
             neighborhood_repr = abundance(ad=ad_neighborhood, attr=attr, mode=mode, inplace=False)
-            neighborhood_representations.loc[cell_id, neighborhood_repr.index] = neighborhood_repr.values
+            neighborhood_repr_res = neighborhood_repr.uns[f'abundance_{attr}_{mode}']
+            neighborhood_representations.loc[cell_id, neighborhood_repr_res.index] = neighborhood_repr_res.values
     
     assert neighborhood_representations.index.equals(ad.obs_names), "Row indices of neighborhood representations do not match ad.obs_names."
     if inplace:
@@ -96,7 +93,7 @@ def compute_neighborhood_representations(ad: AnnData, attr: str, mode: str = 'pr
 
     return
 
-def get_neighborhood_representations(ad: AnnData, attr: str, mode: str = 'proportion', graph_key: str = 'radius_80', min_neighbors: int = 5):
+def get_filtered_neighborhood_representations(ad: AnnData, attr: str, mode: str = 'proportion', graph_key: str = 'radius_80', min_neighbors: int = 5):
     '''Retrieve neighborhood representations from the AnnData object or compute them if not present.
 
     Args:
@@ -138,7 +135,7 @@ def get_neighborhood_representations(ad: AnnData, attr: str, mode: str = 'propor
     return neighborhood_representation
 
 
-def get_merged_neighborhood_representations(ad_dict: Dict[str, AnnData], attr: str, mode: str = 'proportion', graph_key: str = 'radius_80', min_neighbors: int = 5):
+def get_merged_filtered_neighborhood_representations(ad_dict: Dict[str, AnnData], attr: str, mode: str = 'proportion', graph_key: str = 'radius_80', min_neighbors: int = 5):
     '''Retrieve and merge neighborhood representations from the AnnData objects.
 
     Args:
@@ -155,7 +152,7 @@ def get_merged_neighborhood_representations(ad_dict: Dict[str, AnnData], attr: s
 
     merged_neighborhood_representations_list = []
     for sample_id, ad in ad_dict.items():
-        neighborhood_representation = get_neighborhood_representations(ad=ad, attr=attr, mode=mode, graph_key=graph_key, min_neighbors=min_neighbors)
+        neighborhood_representation = get_filtered_neighborhood_representations(ad=ad, attr=attr, mode=mode, graph_key=graph_key, min_neighbors=min_neighbors)
         neighborhood_representation.index = pd.MultiIndex.from_product([[sample_id], neighborhood_representation.index], names=['sample_id', 'cell_id'])
         assert neighborhood_representation.index.get_level_values('cell_id').equals(ad.obs_names), 'cell_id level of MultiIndex does not match ad.obs_names.'
         merged_neighborhood_representations_list.append(neighborhood_representation)
