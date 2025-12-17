@@ -117,11 +117,34 @@ for sample_id in ad_dict.keys():
 # %%
 from neighborhood_representation import *
 #%%
-neigh_repr = get_filtered_neighborhood_representations(ad_dict['1'], attr='label_name', mode='proportion', graph_key='radius_80', min_neighbors=5)
+neigh_repr = compute_neighborhood_representations(ad_dict['1'], attr='label_name', mode='proportion', graph_key='radius_80', min_neighbors=5)
 #%%
-merged = get_merged_filtered_neighborhood_representations(ad_dict, attr='label_name', mode='proportion', graph_key='radius_80', min_neighbors=5)
+neighborhood_representations_ad_dict(ad_dict, attr='label_name', mode='proportion', graph_key='radius_80', min_neighbors=5, inplace=True)
+#%%
+for ad in ad_dict.values():
+    ad.obs.drop('neighbors_radius_80', axis=1, inplace=True)
+#%%
+import pickle
+
+# Define your path for the dictionary specifically
+pickle_path = "/users/achiozza/workspace/niche-learning/adict_Keren.pkl"
+
+# Save the dictionary
+with open(pickle_path, 'wb') as f:
+    pickle.dump(ad_dict, f, protocol=pickle.HIGHEST_PROTOCOL)
+
+print(f"Successfully saved ad_dict to {pickle_path}")
+#%%
+with open("/users/achiozza/workspace/niche-learning/adict_Keren.pkl", 'rb') as f:
+    ad_dict_loaded = pickle.load(f)
+
+# Check the keys to verify
+print(ad_dict_loaded.keys())
+
+#%%
+filtered_merged = retrieve_merged_neighborhood_representations(ad_dict, attr='label_name', mode='proportion', graph_key='radius_80', filtered=True)
 # %%
-k_means_clustering(ad_dict, label_type='label_name', graph_key='radius_80', neighborhood_repr='proportions', k=4, random_seeds=[42, 7], merged=merged)
+k_means_clustering(ad_dict, label_type='label_name', graph_key='radius_80', neighborhood_repr='proportions', k=4, random_seeds=[42, 7], merged=filtered_merged)
 
 # %%
 z_score = z_scores(ad_dict, clustering_key='k_means_4_proportions_label_name_radius_80_seed_42', label_type='label_name')

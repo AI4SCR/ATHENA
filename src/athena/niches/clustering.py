@@ -9,7 +9,7 @@ from typing import Dict, Union, List
 from sklearn.cluster import KMeans
 from sklearn.metrics import silhouette_score
 from sklearn.preprocessing import StandardScaler
-from neighborhood_representation import get_merged_filtered_neighborhood_representations
+from neighborhood_representation import retrieve_merged_neighborhood_representations
 from sklearn.metrics import adjusted_rand_score
 #%%
 

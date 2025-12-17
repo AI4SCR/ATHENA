@@ -106,17 +106,19 @@ def neighborhood_representations_ad(ad: AnnData, attr: str, mode: str = 'proport
             ad.uns[f'neighborhood_representation_{attr}_{mode}_{graph_key}_columns']: List of attribute categories corresponding to the columns in the obsm matrix.   
         if not inplace -> new AnnData instance with the above added.
     """
-    neighborhood_representations = compute_neighborhood_representations(ad=ad, attr=attr, mode=mode, graph_key=graph_key, min_neighbors=min_neighbors)
+    if f'neighborhood_representation_{attr}_{mode}_{graph_key}' not in ad.obsm.keys() or f'neighborhood_representation_{attr}_{mode}_{graph_key}_columns' not in ad.uns.keys():       
+        neighborhood_representations = compute_neighborhood_representations(ad=ad, attr=attr, mode=mode, graph_key=graph_key, min_neighbors=min_neighbors)
 
-    if inplace:
-        ad.obsm[f'neighborhood_representation_{attr}_{mode}_{graph_key}'] = neighborhood_representations.values
-        ad.uns[f'neighborhood_representation_{attr}_{mode}_{graph_key}_columns'] = neighborhood_representations.columns.tolist()
-        return
-    else:
-        ad_copy = ad.copy()
-        ad_copy.obsm[f'neighborhood_representation_{attr}_{mode}_{graph_key}'] = neighborhood_representations.values
-        ad_copy.uns[f'neighborhood_representation_{attr}_{mode}_{graph_key}_columns'] = neighborhood_representations.columns.tolist()
-        return ad_copy
+        if inplace:
+            ad.obsm[f'neighborhood_representation_{attr}_{mode}_{graph_key}'] = neighborhood_representations.values
+            ad.uns[f'neighborhood_representation_{attr}_{mode}_{graph_key}_columns'] = neighborhood_representations.columns.tolist()
+            return
+        else:
+            ad_copy = ad.copy()
+            ad_copy.obsm[f'neighborhood_representation_{attr}_{mode}_{graph_key}'] = neighborhood_representations.values
+            ad_copy.uns[f'neighborhood_representation_{attr}_{mode}_{graph_key}_columns'] = neighborhood_representations.columns.tolist()
+            return ad_copy
+    return 'Neighborhood representations already computed.'
 
 def neighborhood_representations_ad_dict(ad_dict: Dict[str, AnnData], attr: str, mode: str = 'proportion', graph_key: str = 'radius_80', min_neighbors: int = 5, inplace: bool=True):
     """Compute neighborhood representations for each Anndata obj in the dictionary (Compute count or proportions of attr for each cell (with at least min_neighbors neighbors) in the AnnData object based on the specified topology.
@@ -139,19 +141,21 @@ def neighborhood_representations_ad_dict(ad_dict: Dict[str, AnnData], attr: str,
     if inplace:
         
         for ad in ad_dict.values():
-            neighborhood_representations = compute_neighborhood_representations(ad=ad, attr=attr, mode=mode, graph_key=graph_key, min_neighbors=min_neighbors)
-            ad.obsm[f'neighborhood_representation_{attr}_{mode}_{graph_key}'] = neighborhood_representations.values
-            ad.uns[f'neighborhood_representation_{attr}_{mode}_{graph_key}_columns'] = neighborhood_representations.columns.tolist()
+            if f'neighborhood_representation_{attr}_{mode}_{graph_key}' not in ad.obsm.keys() or f'neighborhood_representation_{attr}_{mode}_{graph_key}_columns' not in ad.uns.keys():
+                neighborhood_representations = compute_neighborhood_representations(ad=ad, attr=attr, mode=mode, graph_key=graph_key, min_neighbors=min_neighbors)
+                ad.obsm[f'neighborhood_representation_{attr}_{mode}_{graph_key}'] = neighborhood_representations.values
+                ad.uns[f'neighborhood_representation_{attr}_{mode}_{graph_key}_columns'] = neighborhood_representations.columns.tolist()
 
         return
     
     else:
         ad_dict_copy = ad_dict.copy()
         for ad in ad_dict_copy.values():
-            ad = ad.copy()
-            ad.obsm[f'neighborhood_representation_{attr}_{mode}_{graph_key}'] = neighborhood_representations.values
-            ad.uns[f'neighborhood_representation_{attr}_{mode}_{graph_key}_columns'] = neighborhood_representations.columns.tolist()
-            
+            if f'neighborhood_representation_{attr}_{mode}_{graph_key}' not in ad.obsm.keys() or f'neighborhood_representation_{attr}_{mode}_{graph_key}_columns' not in ad.uns.keys():
+                neighborhood_representations = compute_neighborhood_representations(ad=ad, attr=attr, mode=mode, graph_key=graph_key, min_neighbors=min_neighbors)
+                ad.obsm[f'neighborhood_representation_{attr}_{mode}_{graph_key}'] = neighborhood_representations.values
+                ad.uns[f'neighborhood_representation_{attr}_{mode}_{graph_key}_columns'] = neighborhood_representations.columns.tolist()
+                
         return ad_dict_copy
 
 
@@ -169,7 +173,7 @@ def retrieve_neighborhood_representations(ad: AnnData, attr: str, mode: str = 'p
     Returns:   
         filtered pd.DataFrame of neighborhood representations
     '''
-    assert f'neighborhood_representation_{attr}_{mode}_{graph_key}' not in ad.obsm.keys() or f'neighborhood_representation_{attr}_{mode}_{graph_key}_columns' not in ad.uns.keys(), f'Neighborhood representations for attr {attr}, mode {mode}, graph_key {graph_key} not found in ad.obsm and ad.uns. Please compute them first using neighborhood_representations_ad().'
+    assert f'neighborhood_representation_{attr}_{mode}_{graph_key}' in ad.obsm.keys() or f'neighborhood_representation_{attr}_{mode}_{graph_key}_columns' in ad.uns.keys(), f'Neighborhood representations for attr {attr}, mode {mode}, graph_key {graph_key} not found in ad.obsm and ad.uns. Please compute them first using neighborhood_representations_ad().'
     
     #retrieve neighborhood representations
     neighborhood_representation_name = f'{attr}_{mode}_{graph_key}'
