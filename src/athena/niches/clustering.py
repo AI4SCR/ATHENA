@@ -9,7 +9,7 @@ from typing import Dict, Union, List
 from sklearn.cluster import KMeans
 from sklearn.metrics import silhouette_score
 from sklearn.preprocessing import StandardScaler
-from neighborhood_representation import get_merged_neighborhood_representations
+from neighborhood_representation import get_merged_filtered_neighborhood_representations
 from sklearn.metrics import adjusted_rand_score
 #%%
 
@@ -338,7 +338,7 @@ def k_means_clustering(ad_dict: Dict[str, AnnData], attr: str, graph_key: str = 
         neighborhood_filtering: whether to filter neighborhoods based on the neighborhood_filtering_entity.
         neighborhood_filtering_percentage: percentage of neighborhoods to keep based on the neighborhood_filtering_entity.
         neighborhood_filtering_entity: entity to use for neighborhood filtering. Options are 'sample_id' or any categorical column in ad.obs.
-        merged: Precomputed merged DataFrame of neighborhood representations. If None, it will be computed.
+        merged: Precomputed  merged DataFrame of neighborhood representations. It must be filtered from 0/0.0 rows. If None, it will be computed.
         inplace: Whether to add the clustering results to the current AnnData instances or to return a new one.
         **kwargs: Additional arguments for KMeans and silhouette_score. -> if not provided default values will be used.
 
@@ -353,8 +353,8 @@ def k_means_clustering(ad_dict: Dict[str, AnnData], attr: str, graph_key: str = 
         assert len(k) > 1, 'If k is a list it must contain more than one value.' 
         
     if merged is None:
-        merged = get_merged_neighborhood_representations(ad_dict, attr=attr, graph_key=graph_key, mode=mode)
-    
+        merged = get_filtered_neighborhood_representations(ad_dict, attr=attr, graph_key=graph_key, mode=mode, filtered=True)
+    assert not (merged == 0).all(axis=1), 'Merged DataFrame is not filtered. Please check the neighborhood representations.'
     if neighborhood_filtering:
         neighborhood_filtering_column = get_neighborhood_filter_column(ad_dict, neighborhood_filtering_entity)
         only_in_merged = merged.index.difference(neighborhood_filtering_column.index).tolist() #check because of previous filtering steps

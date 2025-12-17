@@ -85,15 +85,77 @@ def compute_neighborhood_representations(ad: AnnData, attr: str, mode: str = 'pr
             neighborhood_representations.loc[cell_id, neighborhood_repr_res.index] = neighborhood_repr_res.values
     
     assert neighborhood_representations.index.equals(ad.obs_names), "Row indices of neighborhood representations do not match ad.obs_names."
+    
+    return neighborhood_representations
+
+def neighborhood_representations_ad(ad: AnnData, attr: str, mode: str = 'proportion', graph_key: str = 'radius_80', min_neighbors: int = 5, inplace: bool=True):
+    """Compute count or proportions of attr for each cell (with at least min_neighbors neighbors) in the AnnData object based on the specified topology.
+
+    Args:
+        ad: AnnData instance
+        attr: Categorical feature in ad.obs to use for the neighborhood representation. 
+        mode: 'proportion' or 'counts' to specify the type of neighborhood representation to compute.
+        graph_key: Specifies the graph representation to use in ad.obsp.
+        min_neighbors: Minimum number of neighbors required to compute the neighborhood representation.
+        inplace: Whether to add the metric to the current AnnData instance or to return a new one.
+
+    Returns: 
+        if inplace 
+            ad.obsm[f'neighborhood_representation_{attr}_{mode}_{graph_key}']: np.ndarray of shape (n_cells, n_unique_attr) 
+                    0 or 0.0 in all attr if cell has less than min_neighbors neighbors.
+            ad.uns[f'neighborhood_representation_{attr}_{mode}_{graph_key}_columns']: List of attribute categories corresponding to the columns in the obsm matrix.   
+        if not inplace -> new AnnData instance with the above added.
+    """
+    neighborhood_representations = compute_neighborhood_representations(ad=ad, attr=attr, mode=mode, graph_key=graph_key, min_neighbors=min_neighbors)
+
     if inplace:
         ad.obsm[f'neighborhood_representation_{attr}_{mode}_{graph_key}'] = neighborhood_representations.values
         ad.uns[f'neighborhood_representation_{attr}_{mode}_{graph_key}_columns'] = neighborhood_representations.columns.tolist()
+        return
     else:
-        return neighborhood_representations
+        ad_copy = ad.copy()
+        ad_copy.obsm[f'neighborhood_representation_{attr}_{mode}_{graph_key}'] = neighborhood_representations.values
+        ad_copy.uns[f'neighborhood_representation_{attr}_{mode}_{graph_key}_columns'] = neighborhood_representations.columns.tolist()
+        return ad_copy
 
-    return
+def neighborhood_representations_ad_dict(ad_dict: Dict[str, AnnData], attr: str, mode: str = 'proportion', graph_key: str = 'radius_80', min_neighbors: int = 5, inplace: bool=True):
+    """Compute neighborhood representations for each Anndata obj in the dictionary (Compute count or proportions of attr for each cell (with at least min_neighbors neighbors) in the AnnData object based on the specified topology.
 
-def get_filtered_neighborhood_representations(ad: AnnData, attr: str, mode: str = 'proportion', graph_key: str = 'radius_80', min_neighbors: int = 5):
+    Args:
+        ad_dict: Dictionary of AnnData instances with keys as sample names.
+        attr: Categorical feature in ad.obs to use for the neighborhood representation. 
+        mode: 'proportion' or 'counts' to specify the type of neighborhood representation to compute.
+        graph_key: Specifies the graph representation to use in ad.obsp.
+        min_neighbors: Minimum number of neighbors required to compute the neighborhood representation.
+        inplace: Whether to add the metric to the current AnnData instance or to return a new one.
+
+    Returns: 
+        if inplace -> ad_dict updated in place with 
+            ad.obsm[f'neighborhood_representation_{attr}_{mode}_{graph_key}']: np.ndarray of shape (n_cells, n_unique_attr) 
+                    0 or 0.0 in all attr if cell has less than min_neighbors neighbors.
+            ad.uns[f'neighborhood_representation_{attr}_{mode}_{graph_key}_columns']: List of attribute categories corresponding to the columns in the obsm matrix.   
+        if not inplace -> new ad_dict with the above added to each AnnData instance.
+    """
+    if inplace:
+        
+        for ad in ad_dict.values():
+            neighborhood_representations = compute_neighborhood_representations(ad=ad, attr=attr, mode=mode, graph_key=graph_key, min_neighbors=min_neighbors)
+            ad.obsm[f'neighborhood_representation_{attr}_{mode}_{graph_key}'] = neighborhood_representations.values
+            ad.uns[f'neighborhood_representation_{attr}_{mode}_{graph_key}_columns'] = neighborhood_representations.columns.tolist()
+
+        return
+    
+    else:
+        ad_dict_copy = ad_dict.copy()
+        for ad in ad_dict_copy.values():
+            ad = ad.copy()
+            ad.obsm[f'neighborhood_representation_{attr}_{mode}_{graph_key}'] = neighborhood_representations.values
+            ad.uns[f'neighborhood_representation_{attr}_{mode}_{graph_key}_columns'] = neighborhood_representations.columns.tolist()
+            
+        return ad_dict_copy
+
+
+def retrieve_neighborhood_representations(ad: AnnData, attr: str, mode: str = 'proportion', graph_key: str = 'radius_80', filtered: bool = True):
     '''Retrieve neighborhood representations from the AnnData object or compute them if not present.
 
     Args:
@@ -102,40 +164,41 @@ def get_filtered_neighborhood_representations(ad: AnnData, attr: str, mode: str 
         mode: 'proportion' or 'counts' specifying the type of neighborhood representation.
         graph_key: Specifies the graph representation used in ad.obsp.
         min_neighbors: Minimum number of neighbors required to compute the neighborhood representation.
+        filtered: Whether to filter out rows with all zeros.
     
     Returns:   
         filtered pd.DataFrame of neighborhood representations
     '''
-    if f'neighborhood_representation_{attr}_{mode}_{graph_key}' in ad.obsm.keys() and f'neighborhood_representation_{attr}_{mode}_{graph_key}_columns' in ad.uns.keys():
-        neighborhood_representation_name = f'{attr}_{mode}_{graph_key}'
-
-        neighborhood_representations_data = ad.obsm[f'neighborhood_representation_{neighborhood_representation_name}']
-        row_names = ad.obs_names.tolist()
-        columns_names = ad.uns[f'neighborhood_representation_{neighborhood_representation_name}_columns']
-        
-        if neighborhood_representations_data.shape[0] != len(row_names):
-            raise ValueError("Row count mismatch between .obsm matrix and .obs_names.")
-        if neighborhood_representations_data.shape[1] != len(columns_names):
-            raise ValueError("Column count mismatch between .obsm matrix and .uns column names.")
-        
-        neighborhood_representation = pd.DataFrame(
-            data=neighborhood_representations_data, 
-            index=row_names, 
-            columns=columns_names
-        )
-    else:
-        neighborhood_representation = compute_neighborhood_representations(ad=ad, attr=attr, mode=mode, graph_key=graph_key, min_neighbors=min_neighbors, inplace=False)
+    assert f'neighborhood_representation_{attr}_{mode}_{graph_key}' not in ad.obsm.keys() or f'neighborhood_representation_{attr}_{mode}_{graph_key}_columns' not in ad.uns.keys(), f'Neighborhood representations for attr {attr}, mode {mode}, graph_key {graph_key} not found in ad.obsm and ad.uns. Please compute them first using neighborhood_representations_ad().'
     
-    # filter out the rows that are all zeros
-    if type(neighborhood_representation.values) == int:
-        neighborhood_representation = neighborhood_representation.loc[~(neighborhood_representation==0).all(axis=1)]
-    elif type(neighborhood_representation.values) == float:
-        neighborhood_representation = neighborhood_representation.loc[~(neighborhood_representation==0.0).all(axis=1)]
+    #retrieve neighborhood representations
+    neighborhood_representation_name = f'{attr}_{mode}_{graph_key}'
 
+    neighborhood_representations_data = ad.obsm[f'neighborhood_representation_{neighborhood_representation_name}']
+    row_names = ad.obs_names.tolist()
+    columns_names = ad.uns[f'neighborhood_representation_{neighborhood_representation_name}_columns']
+        
+    if neighborhood_representations_data.shape[0] != len(row_names):
+        raise ValueError("Row count mismatch between .obsm matrix and .obs_names.")
+    if neighborhood_representations_data.shape[1] != len(columns_names):
+        raise ValueError("Column count mismatch between .obsm matrix and .uns column names.")
+        
+    neighborhood_representation = pd.DataFrame(
+        data=neighborhood_representations_data, 
+        index=row_names, 
+        columns=columns_names
+        )
+    
+    if filtered:
+        # filter out the rows that are all zeros (the cells that had less than min_neighbors neighbors)
+        if type(neighborhood_representation.values) == int:
+            neighborhood_representation = neighborhood_representation.loc[~(neighborhood_representation==0).all(axis=1)]
+        elif type(neighborhood_representation.values) == float:
+            neighborhood_representation = neighborhood_representation.loc[~(neighborhood_representation==0.0).all(axis=1)]
     return neighborhood_representation
 
 
-def get_merged_filtered_neighborhood_representations(ad_dict: Dict[str, AnnData], attr: str, mode: str = 'proportion', graph_key: str = 'radius_80', min_neighbors: int = 5):
+def retrieve_merged_neighborhood_representations(ad_dict: Dict[str, AnnData], attr: str, mode: str = 'proportion', graph_key: str = 'radius_80', filtered: bool = True):
     '''Retrieve and merge neighborhood representations from the AnnData objects.
 
     Args:
@@ -149,22 +212,17 @@ def get_merged_filtered_neighborhood_representations(ad_dict: Dict[str, AnnData]
         filtered pd.DataFrame of neighborhood representations merged
             with multiindex (sample_id, cell_id)
     '''
-
     merged_neighborhood_representations_list = []
-    for sample_id, ad in ad_dict.items():
-        neighborhood_representation = get_filtered_neighborhood_representations(ad=ad, attr=attr, mode=mode, graph_key=graph_key, min_neighbors=min_neighbors)
+    for sample_id, ad in ad_dict.items():        
+        neighborhood_representation = retrieve_neighborhood_representations(ad=ad, attr=attr, mode=mode, graph_key=graph_key, filtered=filtered)
         neighborhood_representation.index = pd.MultiIndex.from_product([[sample_id], neighborhood_representation.index], names=['sample_id', 'cell_id'])
-        assert neighborhood_representation.index.get_level_values('cell_id').equals(ad.obs_names), 'cell_id level of MultiIndex does not match ad.obs_names.'
         merged_neighborhood_representations_list.append(neighborhood_representation)
     
     assert len(merged_neighborhood_representations_list) == len(ad_dict.keys()), 'Number of neighborhood representations to merge does not match number of samples in ad_dict.'
     
     merged_neighborhood_representations = pd.concat(merged_neighborhood_representations_list, axis=0)
-    if mode == 'proportion':
-        merged_neighborhood_representations.fillna(0.0, inplace=True)
-    elif mode == 'counts':
-        merged_neighborhood_representations.fillna(0, inplace=True)
-    
 
-    
+    assert merged_neighborhood_representations.index.is_unique, 'Merged neighborhood representations index is not unique.'    
+
     return merged_neighborhood_representations
+# %%

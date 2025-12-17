@@ -117,9 +117,9 @@ for sample_id in ad_dict.keys():
 # %%
 from neighborhood_representation import *
 #%%
-neigh_repr = get_neighborhood_representations(ad_dict['1'], attr='label_name', mode='proportion', graph_key='radius_80', min_neighbors=5)
+neigh_repr = get_filtered_neighborhood_representations(ad_dict['1'], attr='label_name', mode='proportion', graph_key='radius_80', min_neighbors=5)
 #%%
-merged = get_merged_neighborhood_representations(ad_dict, attr='label_name', mode='proportion', graph_key='radius_80', min_neighbors=5)
+merged = get_merged_filtered_neighborhood_representations(ad_dict, attr='label_name', mode='proportion', graph_key='radius_80', min_neighbors=5)
 # %%
 k_means_clustering(ad_dict, label_type='label_name', graph_key='radius_80', neighborhood_repr='proportions', k=4, random_seeds=[42, 7], merged=merged)
 
