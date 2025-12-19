@@ -34,17 +34,27 @@ class Distance:
 
         xy = ad.obs[self.coordinate_keys]
         dists = squareform(pdist(xy.astype(float), metric='euclidean'))
-        i, j = np.triu_indices_from(dists, 1)
+        # i, j = np.triu_indices_from(dists, 1)
+        # dists = dists[i, j]
+
+        i, j = np.where(~np.eye(dists.shape[0], dtype=bool))
+        edges = np.column_stack((i, j))
         dists = dists[i, j]
 
         records = []
-        data = pd.DataFrame({'distance': dists, 'source': labels.values[i], 'target': labels.values[j]})
+        data = pd.DataFrame({'distance': dists,
+                             'source': i, 'source_label': labels.values[i],
+                             'target': j, 'target_label': labels.values[j]})
         # NOTE: upper bound for the number of different edge_keys is given by (num_labels ** 2) - (num_labels * num_labels - 1) / 2
-        data['edge_key'] = data.apply(lambda row: tuple(sorted([row['source'], row['target']])), axis=1)
-        for edge_key, grp_data in data.groupby('edge_key', observed=True):
-        # for grp_name, grp_data in data.groupby(['source', 'target'], observed=True):
+        # data['edge_key'] = data.apply(lambda row: tuple(sorted([row['source_label'], row['target_label']])), axis=1)
+        # for edge_key, grp_data in data.groupby('edge_key', observed=True):
+        for grp_name, grp_data in data.groupby(['source', 'target_label'], observed=True):
+            source, target_label = grp_name
+            source_label = labels.values[source]
+            edge_key = '<->'.join(sorted([source_label, target_label]))
 
-            if self.top_k is not None and self.linkage not in ['min', 'max']:
+            # if self.top_k is not None and self.linkage not in ['min', 'max']:
+            if self.top_k is not None:
                 grp_data = grp_data.sort_values('distance', ascending=self.ascending).head(self.top_k)
 
             match self.linkage:
@@ -59,10 +69,11 @@ class Distance:
                 case _:
                     raise ValueError(f'Unknown linkage method {self.linkage}')
 
-            source, target = edge_key
-            records.append({'distance': d, 'source': source, 'target': target, 'edge_key': edge_key})
+            # source, target = edge_key
+            records.append({'distance': d, 'source_label': source_label, 'target_label': target_label, 'edge_key': edge_key})
 
         data = pd.DataFrame(records)
+        data.groupby('edge_key').distance.mean()
         return data
 
 # %%
