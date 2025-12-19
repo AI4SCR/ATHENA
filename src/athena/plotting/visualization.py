@@ -147,6 +147,7 @@ def spatial(ad: AnnData, attr: str, *, mode: str = 'scatter', node_size: float =
 
     elif mode == 'mask':
         mask = mask or ad.uns['mask']
+        mask = mask.data if hasattr(mask, 'data') else mask
 
         mapping = data.to_dict()
         mapping.update({0: 0})
@@ -155,7 +156,6 @@ def spatial(ad: AnnData, attr: str, *, mode: str = 'scatter', node_size: float =
         # apply mapping vectorized
         otype = ['int'] if _is_categorical_flag else ['float']
         func = np.vectorize(lambda x: mapping[x], otypes=otype)
-        mask = mask.data if hasattr(mask, 'data') else mask
         im = func(mask)
 
         # convert to masked array to handle np.nan values
