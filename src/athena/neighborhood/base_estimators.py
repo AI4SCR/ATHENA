@@ -104,7 +104,8 @@ class Interactions:
     VALID_MODES = ['classic', 'histoCAT', 'proportion']
     VALID_PREDICTION_TYPES = ['pvalue', 'observation', 'diff']
 
-    def __init__(self, ad: AnnData, attr: str = 'meta_id', mode: str = 'classic', n_permutations: int = 500,
+    def __init__(self, ad: AnnData, attr: str = 'meta_id', mode: str = 'classic', aggregation: str = 'mean',
+                 n_permutations: int = 500,
                  random_seed=42, alpha: float = .01, graph_key: str = 'knn'):
         """Estimator to quantify interaction strength between different species in the sample.
 
@@ -112,14 +113,15 @@ class Interactions:
             so: SpatialOmics
             spl: Sample for which to compute the interaction strength
             attr: Categorical feature in ad.obs to use for the grouping
-            mode: One of {classic, histoCAT, proportion}, see notes
+            mode: One of {classic, proportion}, see notes
+            aggregation: How to aggregate the observed interactions for a given source node
             n_permutations: Number of permutations to compute p-values and the interactions strength score (mode diff)
             random_seed: Random seed for permutations
             alpha: Threshold for significance
             graph_key: Specifies the graph representation to use in so.G[spl] if `local=True`.
 
         Notes:
-            classic and histoCAT are python implementations of the corresponding methods published by the Bodenmiller lab at UZH.
+            `classic` counts for each pair-wise interaction the number of edges between the two species.
             The proportion method is similar to the classic method but normalises the score by the number of edges and is thus bound [0,1].
         """
 
@@ -129,6 +131,7 @@ class Interactions:
         self.attr: str = attr
         self.data: pd.Series = ad.obs[attr]
         self.mode: str = mode
+        self.aggregation: str = aggregation
         self.n_perm: int = int(n_permutations)
         self.random_seed = random_seed
         self.rng = np.random.default_rng(random_seed)
@@ -172,7 +175,8 @@ class Interactions:
             raise ValueError(f'invalid mode {self.mode}. Available modes are {self.VALID_MODES}')
 
         node_interactions = get_node_interactions(self.g, self.data)
-        obs_interaction = get_interaction_score(node_interactions, relative_freq=relative_freq, observed=observed)
+        obs_interaction = get_interaction_score(node_interactions, aggregation=self.aggregation,
+                                                relative_freq=relative_freq, observed=observed)
         self.obs_interaction = obs_interaction.set_index(['source_label', 'target_label'])
 
         if not prediction_type == 'observation':

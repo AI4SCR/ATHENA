@@ -38,7 +38,7 @@ def get_node_interactions(g: nx.Graph, data: pd.Series = None):
     return node_interactions
 
 
-def get_interaction_score(interactions, relative_freq=False, observed=False):
+def get_interaction_score(interactions, aggregation='mean', relative_freq=False, observed=False):
     # NOTE: this is not necessarily len(source_labels) == len(g) since only source nodes with neighbors are included
     source_label = interactions[['source', 'source_label']].drop_duplicates().set_index('source')
     source_label = source_label.squeeze()
@@ -53,14 +53,14 @@ def get_interaction_score(interactions, relative_freq=False, observed=False):
         source2target_label['relative_freq'] = source2target_label['counts'] / source2target_label['n_neigh']
         label2label = source2target_label\
             .groupby(['source_label', 'target_label'], observed=observed)['relative_freq'] \
-            .agg('mean') \
+            .agg(aggregation) \
             .rename('score') \
             .fillna(0) \
             .reset_index()
     else:
         label2label = source2target_label \
             .groupby(['source_label', 'target_label'], observed=observed)['counts'] \
-            .agg('mean') \
+            .agg(aggregation) \
             .rename('score') \
             .fillna(0) \
             .reset_index()
