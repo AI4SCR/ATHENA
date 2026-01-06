@@ -51,7 +51,7 @@ def cluster_filter_to_merge(ad_dict, merged, cluster_filtering_entity: str):
 
 
 def perform_cluster_filtering(merged: pd.DataFrame, cluster_filtering_percentage: int):
-    assert 1 <= cluster_filtering_percentage <= 100, "cluster_filtering_percentage must be between 1 and 100"
+    assert (1 <= cluster_filtering_percentage <= 100), "cluster_filtering_percentage must be between 1 and 100"
     merged_initial_index = merged.index.copy()
     total_filter_entities = merged['cluster_filter'].nunique()
     threshold = (cluster_filtering_percentage / 100) * total_filter_entities

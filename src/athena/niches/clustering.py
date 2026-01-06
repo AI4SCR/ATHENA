@@ -3,77 +3,13 @@ from random import seed
 import numpy as np
 import pandas as pd
 from anndata import AnnData
-import networkx as nx
-from collections import defaultdict, Counter
 from typing import Dict, Union, List
 from sklearn.cluster import KMeans
-from sklearn.metrics import silhouette_score
-from sklearn.preprocessing import StandardScaler
 from neighborhood_representation import retrieve_merged_neighborhood_representations
-from sklearn.metrics import adjusted_rand_score
 from cluster_filtering import cluster_filter_to_merge, perform_cluster_filtering
+from robustness_analysis import compute_robustness_analysis
+from clustering_metrics import get_metrics
 #%%
-
-def calculate_ari_vs_reference(df, reference_col_name):
-    """
-    Calculates the Adjusted Rand Index (ARI) for all clustering runs 
-    in the DataFrame against a specified reference run.
-
-    Args:
-        df (pd.DataFrame): DataFrame where index is cell_ids and columns 
-                           are clustering runs (cluster labels).
-        reference_col_name (str): The name of the column to use as the 
-                                  "ground truth" or reference clustering.
-
-    Returns:
-        pd.Series: A Series containing the ARI for each clustering run 
-                   against the reference, excluding the reference itself.
-    """
-    aris = {}
-    reference_labels = df[reference_col_name]
-    for seed in df.columns:
-        if seed != reference_col_name:
-            ari = adjusted_rand_score(reference_labels, df[seed])
-            aris[seed] = ari
-    return aris
-
-def compute_avg_ARI(labels_df: Dict[int, Dict[str, Union[pd.Series, int, Dict[str, float]]]])-> float:
-    avg_ARI = {}
-    labels_df_copy = labels_df.copy()
-    labels_df_copy.dropna(inplace=True)
-    for seed in labels_df.columns:
-        aris = calculate_ari_vs_reference(labels_df_copy, reference_col_name=seed)
-        avg_ARI[seed] = np.mean(list(aris.values()))
-        
-    return avg_ARI
-
-def assert_index_series(labels_dict: Dict[int, pd.Series]) -> bool:
-    '''Check if all pd.Series in the labels_dict have the same index.
-    '''
-    indices = [labels_dict[seed].index for seed in labels_dict.keys()]
-    first_index = indices[0]
-    for idx in indices[1:]:
-        if not first_index.equals(idx):
-            return False
-    return True
-
-def robustness_analysis(multiple_seeds_dict: Dict[int, Dict[str, Union[pd.Series, int, Dict[str, float]]]])-> dict:
-    '''Select the best seed based on average ARI with other seeds.
-    '''
-    labels = {}
-    for seed in multiple_seeds_dict.keys():
-        labels[seed] = multiple_seeds_dict[seed]['labels']
-    
-    assert assert_index_series(labels), 'Indices of all label series do not match.'
-    
-    labels_df = pd.DataFrame(labels)
-    avg_aris = compute_avg_ARI(labels_df)
-    best_seed = max(avg_aris, key=avg_aris.get)   
-
-    selected_seed_dict = multiple_seeds_dict[best_seed]
-    selected_seed_dict['metrics'] = { 'avg_ari': avg_aris[best_seed] }
-
-    return selected_seed_dict
 
 def k_selection(robustness_analysis_dict: Dict[str,Dict[str, str]], select_k_metric: str ):
     ''' '''
@@ -93,69 +29,52 @@ def k_selection(robustness_analysis_dict: Dict[str,Dict[str, str]], select_k_met
 
 
 
-def filtered_inertia(filtered_merged: pd.DataFrame, filtered_labels: pd.Series, centers: np.ndarray):
-    remaining_clusters = np.unique(filtered_labels)
-    centers_map = {i: centers[i] for i in remaining_clusters}
-    assigned_centers = np.array([centers_map[label] for label in filtered_labels])
-    squared_distances = np.sum((filtered_merged.values - assigned_centers)**2, axis=1)
-    inertia = np.sum(squared_distances)
-    return inertia
-
-
-
-def get_metrics(merged: pd.DataFrame,  labels: pd.Series, centers: np.ndarray = None, inertia: float = None):
-    assert (type(inertia) == float) or (type(centers) == np.ndarray), "Either inertia or centers must be provided to compute metrics."
-    tot_cells = len(merged.index)
-    if type(inertia) == float:
-        silhouette = silhouette_score(merged.values, labels,sample_size=tot_cells//3)
-        metrics = {'inertia': inertia, 'silhouette_score': silhouette}
-        return metrics
-    elif type(centers) == np.ndarray:
-        filtered_labels = labels.dropna()
-        filtered_labels = filtered_labels.astype(int)
-        filtered_merged = merged.loc[filtered_labels.index]
-        inertia = filtered_inertia(filtered_merged, filtered_labels, centers)
-        silhouette = silhouette_score(filtered_merged.values, filtered_labels,sample_size=tot_cells//3)
-        metrics = {'inertia': inertia, 'silhouette_score': silhouette}
-    
-        return metrics
-
-def k_means_clustering_singlek_one_seed( merged: pd.DataFrame, k: int, seed: int=None, cluster_filtering_percentage: int = None, **kmeans_params):
-    if seed is None:
-        seed = np.random.randint(0, 2**32, dtype='uint64')
-
+def compute_clustering(values_df: pd.DataFrame, merged: pd.DataFrame, k:int, seed: int, cluster_filtering_percentage: int, **kmeans_params ):
     kmeans = KMeans(n_clusters=k, random_state=seed, **kmeans_params)
-    if 'cluster_filter' in merged.columns:
-        values_df = merged.drop(columns=['cluster_filter'])
-    else:
-        values_df = merged.copy()
     kmeans.fit(values_df.values) 
-    
     labels = kmeans.labels_
-    
     assert len(merged) == len(labels), 'Length of merged DataFrame and labels do not match.'
     merged[f'labels'] = labels
     if 'cluster_filter' in merged.columns:
         filter_df = merged[['cluster_filter', 'labels']]
-        filtered_labels = perform_cluster_filtering(filter_df, cluster_filtering_percentage)
+        filtered_labels = perform_cluster_filtering(merged=filter_df, cluster_filtering_percentage=cluster_filtering_percentage)
         assert filtered_labels.index.equals(merged.index), 'Indices of filtered labels and merged DataFrame do not match.'
         merged['labels'] = filtered_labels
-    
-    
+
     if merged['labels'].hasnans:
+        # if one/multiple clusters has been removed, we need to re-compute the inertia
+        inertia = None
         centers = kmeans.cluster_centers_
+    else:
+        centers = None
+        inertia = kmeans.inertia_
+    
+    return centers, inertia, merged
+
+def k_means_clustering_singlek_one_seed( merged: pd.DataFrame, k: int, seed: int, cluster_filtering_percentage: int = None, **kmeans_params):
+
+    if 'cluster_filter' in merged.columns:
+        values_df = merged.drop(columns=['cluster_filter'])
+    else:
+        values_df = merged.copy()
+    
+    centers, inertia, merged = compute_clustering(values_df=values_df, merged=merged, k=k, seed=seed, cluster_filtering_percentage=cluster_filtering_percentage,**kmeans_params )
+
+    if inertia == None: 
         metrics = get_metrics(merged = values_df, labels = merged['labels'], centers = centers)
     else:
-        inertia = kmeans.inertia_
-        metrics = get_metrics(merged = values_df, labels = merged['labels'], inertia = inertia)
+        metrics = get_metrics(merged = values_df, labels = merged['labels'], inertia=inertia)
 
+    
     k_dict = {'labels': merged[f'labels'], 'seed': seed, 'k': k, 'metrics': metrics}
     
 
     return k_dict
+
+
     
 
-def k_means_singlek_multiple_seeds(merged: pd.DataFrame, k:int, seeds: List[int], cluster_filtering_percentage: int, **kmeans_params ):
+def k_means_singlek_multiple_seeds(merged: pd.DataFrame, k:int, seeds: List[int], cluster_filtering_percentage: int = None, **kmeans_params ):
     res_dict = {}
     centers = {}
     inertias = {}
@@ -166,26 +85,17 @@ def k_means_singlek_multiple_seeds(merged: pd.DataFrame, k:int, seeds: List[int]
         values_df = merged.copy()
     
     for seed in seeds:
-        kmeans = KMeans(n_clusters=k, random_state=seed, **kmeans_params)
-        kmeans.fit(values_df.values) 
-        labels = kmeans.labels_
-        assert len(merged) == len(labels), 'Length of merged DataFrame and labels do not match.'
-        merged[f'labels'] = labels
-        if 'cluster_filter' in merged.columns:
-            filter_df = merged[['cluster_filter', 'labels']]
-            filtered_labels = perform_cluster_filtering(filter_df, cluster_filtering_percentage)
-            assert filtered_labels.index.equals(merged.index), 'Indices of filtered labels and merged DataFrame do not match.'
-            merged['labels'] = filtered_labels
+        seed_centers, inertia, merged = compute_clustering(values_df=values_df, merged=merged, k=k, seed=seed, cluster_filtering_percentage=cluster_filtering_percentage,**kmeans_params )
 
         if merged['labels'].hasnans:
-            centers[seed] = kmeans.cluster_centers_
+            centers[seed] = seed_centers
         else:
-            inertias[seed] = kmeans.inertia_
+            inertias[seed] = inertia
         
         seed_dict = {'labels': merged[f'labels'], 'seed': seed, 'k': k}
         res_dict[seed] = seed_dict    
     
-    best_seed_dict = robustness_analysis(res_dict)
+    best_seed_dict = compute_robustness_analysis(res_dict)
     best_seed =  best_seed_dict['seed']
     if best_seed in centers.keys():
         metrics = get_metrics(merged = values_df, labels = merged['labels'], centers = centers[best_seed])
@@ -200,11 +110,10 @@ def k_means_singlek_multiple_seeds(merged: pd.DataFrame, k:int, seeds: List[int]
 
 
 
-def k_means_clustering_multik_one_seed(merged: pd.DataFrame, k:list, select_k:bool , select_k_metric: str , cluster_filtering_percentage: int, **kmeans_params ):
+def k_means_clustering_multik_one_seed(merged: pd.DataFrame, k:list, seed: int, select_k:bool , select_k_metric: str , cluster_filtering_percentage: int, **kmeans_params ):
     if select_k == True:
         assert select_k_metric in ['silhouette_score', 'inertia'], f'select_k_metric {select_k_metric} not recognized. Use "silhouette_score" or "inertia" when 1 random seed is used.'
 
-    seed = np.random.randint(0, 2**32, dtype='uint64')
     
     ks_dicts = {}
     for i in k:
@@ -219,16 +128,16 @@ def k_means_clustering_multik_one_seed(merged: pd.DataFrame, k:list, select_k:bo
     return ks_dicts
 
 
-def k_means_clustering_multik_multiple_seeds(merged: pd.DataFrame, k:list, random_seeds: int, select_k:bool , select_k_metric: str , cluster_filtering_percentage: int, **kmeans_params ):
+def k_means_clustering_multik_multiple_seeds(merged: pd.DataFrame, k:list, seeds: List[int], select_k:bool , select_k_metric: str , cluster_filtering_percentage: int, **kmeans_params ):
     if select_k == True:
         assert select_k_metric in ['silhouette_score', 'inertia', 'average_ARI'], f'select_k_metric {select_k_metric} not recognized. Use "silhouette_score" or "inertia" or "average_ARI".'
-    assert random_seeds > 1, 'random_seeds must be greater than 1'
+    
+    assert len(seeds)>1, 'length of seeds must be bigger than 1'
 
-    seeds = np.random.randint(0, 2**32, size=random_seeds, dtype='uint64').tolist()
     ks_dicts = {}
     for i in k:
         merged_copy = merged.copy()
-        best_seed_dict = k_means_singlek_multiple_seeds(merged_copy, i, seeds, cluster_filtering_percentage=cluster_filtering_percentage, **kmeans_params)        
+        best_seed_dict = k_means_singlek_multiple_seeds(merged=merged_copy, k=i, seeds=seeds, cluster_filtering_percentage=cluster_filtering_percentage, **kmeans_params)        
         ks_dicts[i] = best_seed_dict
     
     if select_k:
@@ -238,13 +147,17 @@ def k_means_clustering_multik_multiple_seeds(merged: pd.DataFrame, k:list, rando
 
 
      
-def inplace_kmeans_multik(ad_dict: Dict[str, AnnData], k_dict: Dict[int, Dict[str, Union[pd.Series, int, Dict[str, float]]]], clustering_key:str, select_k: bool = False):
-    '''Inplace addition of clustering results to AnnData objects in ad_dict.
+def save_kmeans_multik(ad_dict: Dict[str, AnnData], k_dict: Dict[int, Dict[str, Union[pd.Series, int, Dict[str, float]]]], clustering_key:str, select_k: bool = False, inplace:bool = True):
+    '''Addition of clustering results to original (inplace) or new(not inplace) AnnData objects in ad_dict.
     Args:
         ad_dict: Dictionary of AnnData instances with keys as sample names.
         k_dict: Dictionary containing clustering results for multiple k values.
         clustering_key: str.
         select_k: Whether to add only the selected k clustering results or all k results.
+        inplace: Whether to add the clustering results to the current AnnData instances or to return a new one.
+    Return
+        no return if inplace
+        new ad_dict if not inplace
     '''
     if select_k:
         for k_value in k_dict.keys():
@@ -255,6 +168,9 @@ def inplace_kmeans_multik(ad_dict: Dict[str, AnnData], k_dict: Dict[int, Dict[st
         for k_value in k_dict.keys():
             obs_add_dict[f'k_{k_value}_{clustering_key}'] = k_dict[k_value]['labels']
         obs_add = pd.DataFrame(obs_add_dict)
+    
+    if not inplace:
+        ad_dict = ad_dict.copy()
 
     for sample_id, ad in ad_dict.items():
         obs_add_sample = obs_add.xs(sample_id, level='sample_id')
@@ -263,7 +179,7 @@ def inplace_kmeans_multik(ad_dict: Dict[str, AnnData], k_dict: Dict[int, Dict[st
             complete_index = ad.obs.index.to_list()
             obs_add_sample = obs_add_sample.reindex(complete_index)
             if type(obs_add_sample )== pd.DataFrame:
-                assert obs_add_sample.loc[not_in_clusters].isna().all().all(), f'Reindexed rows that were not in clusters are not all NaN for column {col}.'
+                assert obs_add_sample.loc[not_in_clusters].isna().all().all(), f'Reindexed rows that were not in clusters are not all NaN.'
             else:
                 assert obs_add_sample.loc[not_in_clusters].isna().all(), 'Reindexed rows that were not in clusters are not all NaN.'           
         assert obs_add_sample.index.equals(ad.obs.index), 'Indices of obs_add_sample and ad.obs do not match.'
@@ -271,19 +187,29 @@ def inplace_kmeans_multik(ad_dict: Dict[str, AnnData], k_dict: Dict[int, Dict[st
             ad.obs[f'selected_k_{clustering_key}'] = obs_add_sample     
         else:
             ad.obs = ad.obs.join(obs_add_sample)
-        ad.uns[f'k_multik_{clustering_key}_metrics'] = k_dict
+        ad.uns[f'{clustering_key}_metrics'] = k_dict
+    if not inplace:
+        return ad_dict
     return    
         
 
-def inplace_kmeans_singlek(ad_dict: Dict[str, AnnData], k_dict: Dict[int, Dict[str, Union[pd.Series, int, Dict[str, float]]]], clustering_key:str):
-    '''Inplace addition of clustering results to AnnData objects in ad_dict.
+def save_kmeans_singlek(ad_dict: Dict[str, AnnData], k_dict: Dict[int, Dict[str, Union[pd.Series, int, Dict[str, float]]]], clustering_key:str, inplace:bool=True):
+    '''Addition of clustering results to original (inplace) or new(not inplace) AnnData objects in ad_dict.
     Args:
         ad_dict: Dictionary of AnnData instances with keys as sample names.
         k_dict: Dictionary containing clustering results.
         clustering_key: str.
+        inplace: Whether to add the clustering results to the current AnnData instances or to return a new one.
+    Return
+        no return if inplace
+        new ad_dict if not inplace
     '''
     obs_add = k_dict['labels']
     k = k_dict['k']
+
+    if not inplace:
+        ad_dict = ad_dict.copy()
+
     for sample_id, ad in ad_dict.items():
         obs_add_sample = obs_add.xs(sample_id, level='sample_id')
         not_in_clusters= ad.obs.index.difference(obs_add_sample.index).tolist()#check because of previous filtering steps
@@ -292,10 +218,51 @@ def inplace_kmeans_singlek(ad_dict: Dict[str, AnnData], k_dict: Dict[int, Dict[s
             obs_add_sample = obs_add_sample.reindex(complete_index)
             assert obs_add_sample.loc[not_in_clusters].isna().all(), 'Reindexed rows that were not in clusters are not all NaN.'           
         assert obs_add_sample.index.equals(ad.obs.index), 'Indices of obs_add_sample and ad.obs do not match.'
-        ad.obs[f'k_{k}_{clustering_key}'] = obs_add_sample     
-        ad.uns[f'k_{k}_{clustering_key}'] = k_dict
+        ad.obs[clustering_key] = obs_add_sample     
+        ad.uns[f'{clustering_key}_metrics'] = k_dict
            
+    if not inplace:
+        return ad_dict
+    
+    return  
+
+def k_means_multik(ad_dict: Dict[str, AnnData], merged:pd.DataFrame, k: Union[int, List[int]], random_seeds: int, clustering_key:str, cluster_filtering_percentage:int = None, select_k:bool = False, select_k_metric: str = 'silhouette_score', inplace:bool = True, **kmeans_params):
+    # generate seeds
+    if random_seeds>1: 
+        seeds = np.random.randint(0, 2**32, size=random_seeds, dtype='uint64').tolist()
+    else: 
+        seed = np.random.randint(0, 2**32, dtype='uint64')
+
+    if random_seeds == 1:
+        k_dict = k_means_clustering_multik_one_seed( merged=merged,k= k, seed=seed, select_k=select_k, select_k_metric=select_k_metric, cluster_filtering_percentage=cluster_filtering_percentage, **kmeans_params)
+    else:
+        k_dict = k_means_clustering_multik_multiple_seeds(merged=merged, k=k, seeds=seeds, select_k=select_k, select_k_metric=select_k_metric, cluster_filtering_percentage=cluster_filtering_percentage, **kmeans_params)
+    for k_value in k_dict.keys():
+        k_dict[k_value]['clustering_key'] = clustering_key 
+    
+    if not inplace:
+        ad_dict_new = save_kmeans_multik(ad_dict=ad_dict, k_dict=k_dict, clustering_key=clustering_key, select_k=select_k, inplace=inplace)
+        return ad_dict_new
+    
+    save_kmeans_multik(ad_dict=ad_dict, k_dict=k_dict, clustering_key=clustering_key, select_k=select_k, inplace=inplace)
     return
+
+def k_means_singlek(ad_dict: Dict[str, AnnData], merged:pd.DataFrame, k: Union[int, List[int]], random_seeds: int, clustering_key:str, cluster_filtering_percentage:int =None, inplace:bool = True, **kmeans_params):    
+    if random_seeds == 1:
+        seed = np.random.randint(0, 2**32, dtype='uint64') 
+        k_dict = k_means_clustering_singlek_one_seed( merged, k, seed, cluster_filtering_percentage, **kmeans_params)
+    else:
+        seeds = np.random.randint(0, 2**32, size=random_seeds, dtype='uint64').tolist()
+        k_dict = k_means_singlek_multiple_seeds(merged=merged, k=k, seeds=seeds, cluster_filtering_percentage=cluster_filtering_percentage, **kmeans_params)
+    k_dict['clustering_key'] = clustering_key
+
+    if not inplace:
+        ad_dict_new = save_kmeans_singlek(ad_dict=ad_dict, k_dict=k_dict, clustering_key=clustering_key, inplace=inplace)
+        return ad_dict_new
+    
+    save_kmeans_singlek(ad_dict=ad_dict, k_dict=k_dict, clustering_key=clustering_key, inplace=inplace)
+    return
+    
 
 def k_means_clustering(ad_dict: Dict[str, AnnData], attr: str, graph_key: str = 'radius_80', mode: str = 'proportions', k: Union[int, List[int]] = 4, random_seeds: int= 1, clustering_key:str = None, select_k:bool = False, select_k_metric: str = 'silhouette_score', cluster_filtering: bool = True, cluster_filtering_percentage: int = 30, cluster_filtering_entity: str = 'sample_id',merged: pd.DataFrame = None, inplace:bool=True, **kmeans_params):
     """K-means clustering of the merged (all samples together) local neighborhood representation of cells.
@@ -324,8 +291,8 @@ def k_means_clustering(ad_dict: Dict[str, AnnData], attr: str, graph_key: str = 
         
     """
     assert mode in ['proportion', 'counts'], f'Mode {mode} not recognized. Use "proportion" or "counts".'
-    if inplace:
-        assert clustering_key!= None, 'clustering_key must be provided when inplace is True.'
+    if clustering_key == None:
+        clustering_key = f'k_{k}_{graph_key}_{mode}_{random_seeds}seed'
     
     if type(k) == list:
         assert len(k) > 1, 'If k is a list it must contain more than one value.' 
@@ -337,154 +304,17 @@ def k_means_clustering(ad_dict: Dict[str, AnnData], attr: str, graph_key: str = 
     elif mode == 'counts':
         assert not (merged == 0).all(axis=1).any(), 'Merged DataFrame is not filtered. Please check the neighborhood representations.'
     merged_copy = merged.copy()
-    if cluster_filtering:
-        merged_copy = cluster_filter_to_merge(ad_dict, merged_copy, cluster_filtering_entity)
+    
+    if cluster_filtering: # add to merged the filtering column 
+        merged_copy = cluster_filter_to_merge(ad_dict=ad_dict, merged=merged_copy, cluster_filtering_entity=cluster_filtering_entity)
+    
+    
+    # one k 
     if type(k) == int:
-        if random_seeds == 1:
-            k_dict = k_means_clustering_singlek_one_seed( merged_copy, k, cluster_filtering_percentage=cluster_filtering_percentage, **kmeans_params)
-        else:
-            seeds = np.random.randint(0, 2**32, size=random_seeds, dtype='uint64').tolist()
-            k_dict = k_means_singlek_multiple_seeds(merged_copy, k, seeds=seeds, cluster_filtering_percentage=cluster_filtering_percentage, **kmeans_params)
-        k_dict['clustering_key'] = clustering_key
-        if inplace:
-            inplace_kmeans_singlek(ad_dict, k_dict, clustering_key=clustering_key)
-            return
-        
-
+        k_means_singlek(ad_dict=ad_dict, k=k, merged=merged_copy, random_seeds=random_seeds, clustering_key=clustering_key, cluster_filtering_percentage=cluster_filtering_percentage, inplace=inplace, **kmeans_params)
+             
+    # multiple ks 
     if type(k) == list:
-        if random_seeds == 1:
-            k_dict = k_means_clustering_multik_one_seed( merged_copy, k, select_k, select_k_metric, cluster_filtering_percentage, **kmeans_params)
-        else:
-            k_dict = k_means_clustering_multik_multiple_seeds(merged_copy, k, random_seeds, select_k, select_k_metric, cluster_filtering_percentage, **kmeans_params)
-        for k_value in k_dict.keys():
-            k_dict[k_value]['clustering_key'] = clustering_key
-        if inplace:
-            inplace_kmeans_multik(ad_dict, k_dict, select_k=select_k, clustering_key=clustering_key)
-            return
-    
-    return k_dict
+        k_means_multik(ad_dict=ad_dict, k=k, merged=merged_copy, random_seeds=random_seeds, clustering_key=clustering_key, cluster_filtering_percentage=cluster_filtering_percentage, select_k=select_k, select_k_metric=select_k_metric, inplace=inplace, **kmeans_params)
 
-def merged_info_anndata_dict(ad_dict: Dict[str, AnnData], obs_key: Union[str, List[str]]):
-    """Merge the count or proportions of label_type for each cell in the AnnData object based on the specified topology.
-
-    Args:
-        ad_dict: Dictionary of AnnData instances with keys as sample names.
-        obs_key: .obs column or list of columns to merge in one dataframe
-
-    Returns: 
-        dataframe containing the merged .obs columns of the anndata objs in the ad_dict 
-    """
-    merged = None    
-    for sample_id in ad_dict.keys():
-        ad = ad_dict[sample_id]
-        sample_df = ad.obs[obs_key]
-        # Create MultiIndex for the merged DataFrame with sample_id and cell_id as levels
-        sample_ids = [sample_id] * len(sample_df)
-        sample_df.index = pd.MultiIndex.from_arrays(
-            arrays=[sample_ids, sample_df.index], # [Outer Level (Sample ID), Inner Level (Cell ID)]
-            names=['sample_id', 'cell_id']
-        )
-        if merged is None:
-            merged = sample_df
-        else:
-            merged = pd.concat([merged, sample_df], axis=0)
-    
-    return merged
-
-
-### CLUSTER ANALYSIS FUNCTIONS ###
-
-def z_scores(ad_dict, clustering_key = str, label_type = str, include_dropped_cluster:  bool = False):
-    '''
-    Compute z-scores of label_type enrichment in each cluster.
-
-    Args:
-        ad_dict: Dictionary of AnnData instances with keys as sample names.
-        clustering_key (str): Key in AnnData.obs representing the clustering.
-        label_type (str): Key in AnnData.obs representing the labels to assess enrichment.
-
-    Returns:
-        pd.DataFrame: DataFrame of z-scores with clusters as rows and labels as columns.
-    '''
-    merged = merged_info_anndata_dict(ad_dict, obs_key=[clustering_key, label_type])
-    if include_dropped_cluster== False:
-        merged = merged.dropna()
-    clusters = np.unique(merged[clustering_key])
-    clusters = [cluster for cluster in clusters if pd.notna(cluster)]
-    labels = np.unique(merged[label_type])
-    df = pd.DataFrame(0, index=clusters, columns=labels)
-    for cluster in clusters:
-        n = Counter(list(merged[merged[clustering_key]==cluster][label_type]))
-        for label in n.keys():
-            df.loc[cluster, label] = n[label]
-    
-    # Compute column-wise z-scores
-    
-    scaler = StandardScaler()
-    z_scores = pd.DataFrame(
-        scaler.fit_transform(df),
-        index=df.index,
-        columns=df.columns )
-        
-    return z_scores
-
-
-def label_type_proportions(ad_dict: Dict[str, AnnData], label_type:str, group: Union[str, List[str]], obs_key: str):
-    '''
-    Calculate cell type proportions within a specific niche cluster across multiple samples.
-
-    Args:
-        ad_dict (Dict[str, AnnData]): Dictionary of AnnData instances with keys as sample names.
-        label_type (str): Key in AnnData.obs representing the labels to calculate proportions for.
-        group (Union[str, List[str]]): 'whole_sample', 'per_group', 'per_group and whole_sample', or specific group value.
-        obs_key (str): Key in AnnData.obs representing the grouping.   
-    '''
-    if group == 'whole_sample':
-        label_counts = None
-        for sample_id, ad in ad_dict.items():
-            label_counts_sample =ad.obs[label_type].value_counts()
-            if label_counts is None:
-                label_counts = label_counts_sample
-            else:
-                label_counts = label_counts.add(label_counts_sample, fill_value=0)
-
-        proportions = label_counts / label_counts.sum()
-        return proportions
-
-    elif group == 'per_group' or 'per_group and whole_sample':
-        assert obs_key is not None, f'obs_key must be provided when group is {group}'
-        label_counts = None
-        for sample_id, ad in ad_dict.items():
-            for group_id in ad.obs[obs_key].unique():
-                ad_group = ad[ad.obs[obs_key] == group_id,]
-                label_counts_group = ad_group.obs[label_type].value_counts()
-                if label_counts is None:
-                    label_counts = pd.DataFrame(label_counts_group, columns=[group_id])
-                else:
-                    if group_id in label_counts.columns:
-                        label_counts[group_id] = label_counts[group_id].add(label_counts_group, fill_value=0)
-                    else:
-                        label_counts[group_id] = label_counts_group
-            if group == 'per_group and whole_sample':
-                label_counts_sample =ad.obs[label_type].value_counts()
-                if 'whole_sample' in label_counts.columns:
-                    label_counts['whole_sample'] = label_counts['whole_sample'].add(label_counts_sample, fill_value=0)
-                else:
-                    label_counts['whole_sample'] = label_counts_sample
-            
-        proportions = label_counts.div(label_counts.sum(axis=0), axis=1)
-        
-        return proportions
-    
-    else: 
-        assert obs_key is not None, f'obs_key must be provided when group is {group}'
-        label_counts = None
-        for sample_id, ad in ad_dict.items():
-            ad_group = ad[ad.obs[obs_key] == group,]
-            label_counts_group = ad_group.obs[label_type].value_counts()
-            if label_counts is None:
-                label_counts = label_counts_group
-            else:
-                label_counts = label_counts.add(label_counts_group, fill_value=0)
-        proportions = label_counts / label_counts.sum()
-        return proportions
+    return 
