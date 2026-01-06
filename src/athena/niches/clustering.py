@@ -11,6 +11,7 @@ from sklearn.metrics import silhouette_score
 from sklearn.preprocessing import StandardScaler
 from neighborhood_representation import retrieve_merged_neighborhood_representations
 from sklearn.metrics import adjusted_rand_score
+from cluster_filtering import cluster_filter_to_merge, perform_cluster_filtering
 #%%
 
 def calculate_ari_vs_reference(df, reference_col_name):
@@ -90,17 +91,7 @@ def k_selection(robustness_analysis_dict: Dict[str,Dict[str, str]], select_k_met
     
     return robustness_analysis_dict
 
-def neighborhood_filtering(merged: pd.DataFrame, neighborhood_filtering_percentage: int):
-    assert 1 <= neighborhood_filtering_percentage <= 100, "neighborhood_filtering_percentage must be between 1 and 100"
-    merged_initial_index = merged.index.copy()
-    total_filter_entities = merged['neighborhood_filter'].nunique()
-    threshold = (neighborhood_filtering_percentage / 100) * total_filter_entities
-    neighborhood_counts = merged.groupby('labels')['neighborhood_filter'].nunique()
-    neighborhoods_to_filter = neighborhood_counts[neighborhood_counts < threshold].index.tolist()
-    merged.loc[merged['labels'].isin(neighborhoods_to_filter), 'labels'] = pd.NA
-    assert merged_initial_index.equals(merged.index), 'Indices of merged DataFrame have changed after neighborhood filtering.'
-    
-    return merged['labels']
+
 
 def filtered_inertia(filtered_merged: pd.DataFrame, filtered_labels: pd.Series, centers: np.ndarray):
     remaining_clusters = np.unique(filtered_labels)
@@ -129,13 +120,13 @@ def get_metrics(merged: pd.DataFrame,  labels: pd.Series, centers: np.ndarray = 
     
         return metrics
 
-def k_means_clustering_singlek_one_seed( merged: pd.DataFrame, k: int, seed: int=None, neighborhood_filtering_percentage: int = None, **kmeans_params):
+def k_means_clustering_singlek_one_seed( merged: pd.DataFrame, k: int, seed: int=None, cluster_filtering_percentage: int = None, **kmeans_params):
     if seed is None:
         seed = np.random.randint(0, 2**32, dtype='uint64')
 
     kmeans = KMeans(n_clusters=k, random_state=seed, **kmeans_params)
-    if 'neighborhood_filter' in merged.columns:
-        values_df = merged.drop(columns=['neighborhood_filter'])
+    if 'cluster_filter' in merged.columns:
+        values_df = merged.drop(columns=['cluster_filter'])
     else:
         values_df = merged.copy()
     kmeans.fit(values_df.values) 
@@ -144,9 +135,9 @@ def k_means_clustering_singlek_one_seed( merged: pd.DataFrame, k: int, seed: int
     
     assert len(merged) == len(labels), 'Length of merged DataFrame and labels do not match.'
     merged[f'labels'] = labels
-    if 'neighborhood_filter' in merged.columns:
-        filter_df = merged[['neighborhood_filter', 'labels']]
-        filtered_labels = neighborhood_filtering(filter_df, neighborhood_filtering_percentage)
+    if 'cluster_filter' in merged.columns:
+        filter_df = merged[['cluster_filter', 'labels']]
+        filtered_labels = perform_cluster_filtering(filter_df, cluster_filtering_percentage)
         assert filtered_labels.index.equals(merged.index), 'Indices of filtered labels and merged DataFrame do not match.'
         merged['labels'] = filtered_labels
     
@@ -164,13 +155,13 @@ def k_means_clustering_singlek_one_seed( merged: pd.DataFrame, k: int, seed: int
     return k_dict
     
 
-def k_means_singlek_multiple_seeds(merged: pd.DataFrame, k:int, seeds: List[int], neighborhood_filtering_percentage: int, **kmeans_params ):
+def k_means_singlek_multiple_seeds(merged: pd.DataFrame, k:int, seeds: List[int], cluster_filtering_percentage: int, **kmeans_params ):
     res_dict = {}
     centers = {}
     inertias = {}
     
-    if 'neighborhood_filter' in merged.columns:
-        values_df = merged.drop(columns=['neighborhood_filter'])
+    if 'cluster_filter' in merged.columns:
+        values_df = merged.drop(columns=['cluster_filter'])
     else:
         values_df = merged.copy()
     
@@ -180,9 +171,9 @@ def k_means_singlek_multiple_seeds(merged: pd.DataFrame, k:int, seeds: List[int]
         labels = kmeans.labels_
         assert len(merged) == len(labels), 'Length of merged DataFrame and labels do not match.'
         merged[f'labels'] = labels
-        if 'neighborhood_filter' in merged.columns:
-            filter_df = merged[['neighborhood_filter', 'labels']]
-            filtered_labels = neighborhood_filtering(filter_df, neighborhood_filtering_percentage)
+        if 'cluster_filter' in merged.columns:
+            filter_df = merged[['cluster_filter', 'labels']]
+            filtered_labels = perform_cluster_filtering(filter_df, cluster_filtering_percentage)
             assert filtered_labels.index.equals(merged.index), 'Indices of filtered labels and merged DataFrame do not match.'
             merged['labels'] = filtered_labels
 
@@ -209,7 +200,7 @@ def k_means_singlek_multiple_seeds(merged: pd.DataFrame, k:int, seeds: List[int]
 
 
 
-def k_means_clustering_multik_one_seed(merged: pd.DataFrame, k:list, select_k:bool , select_k_metric: str , neighborhood_filtering_percentage: int, **kmeans_params ):
+def k_means_clustering_multik_one_seed(merged: pd.DataFrame, k:list, select_k:bool , select_k_metric: str , cluster_filtering_percentage: int, **kmeans_params ):
     if select_k == True:
         assert select_k_metric in ['silhouette_score', 'inertia'], f'select_k_metric {select_k_metric} not recognized. Use "silhouette_score" or "inertia" when 1 random seed is used.'
 
@@ -218,7 +209,7 @@ def k_means_clustering_multik_one_seed(merged: pd.DataFrame, k:list, select_k:bo
     ks_dicts = {}
     for i in k:
         merged_copy = merged.copy()
-        k_dict = k_means_clustering_singlek_one_seed(merged_copy, i, seed=seed, neighborhood_filtering_percentage=neighborhood_filtering_percentage, **kmeans_params)
+        k_dict = k_means_clustering_singlek_one_seed(merged_copy, i, seed=seed, cluster_filtering_percentage=cluster_filtering_percentage, **kmeans_params)
         ks_dicts[i] = k_dict
     
     
@@ -228,7 +219,7 @@ def k_means_clustering_multik_one_seed(merged: pd.DataFrame, k:list, select_k:bo
     return ks_dicts
 
 
-def k_means_clustering_multik_multiple_seeds(merged: pd.DataFrame, k:list, random_seeds: int, select_k:bool , select_k_metric: str , neighborhood_filtering_percentage: int, **kmeans_params ):
+def k_means_clustering_multik_multiple_seeds(merged: pd.DataFrame, k:list, random_seeds: int, select_k:bool , select_k_metric: str , cluster_filtering_percentage: int, **kmeans_params ):
     if select_k == True:
         assert select_k_metric in ['silhouette_score', 'inertia', 'average_ARI'], f'select_k_metric {select_k_metric} not recognized. Use "silhouette_score" or "inertia" or "average_ARI".'
     assert random_seeds > 1, 'random_seeds must be greater than 1'
@@ -237,7 +228,7 @@ def k_means_clustering_multik_multiple_seeds(merged: pd.DataFrame, k:list, rando
     ks_dicts = {}
     for i in k:
         merged_copy = merged.copy()
-        best_seed_dict = k_means_singlek_multiple_seeds(merged_copy, i, seeds, neighborhood_filtering_percentage=neighborhood_filtering_percentage, **kmeans_params)        
+        best_seed_dict = k_means_singlek_multiple_seeds(merged_copy, i, seeds, cluster_filtering_percentage=cluster_filtering_percentage, **kmeans_params)        
         ks_dicts[i] = best_seed_dict
     
     if select_k:
@@ -245,34 +236,7 @@ def k_means_clustering_multik_multiple_seeds(merged: pd.DataFrame, k:list, rando
     
     return ks_dicts
 
-def get_neighborhood_filter_column(ad_dict, merged, neighborhood_filtering_entity: str):
-    ''' Adds neighborhood filtering column to merged DataFrame.
-    Args:
-        ad_dict: Dictionary of AnnData instances with keys as sample names.
-        merged: Merged DataFrame of neighborhood representations.
-        neighborhood_filtering_entity: entity to use for neighborhood filtering. Options are 'sample_id' or any categorical column in ad.obs.
 
-    Returns:
-        pd.Series: Series containing the neighborhood filtering entity for each neighborhood in the merged DataFrame.
-        '''
-    
-    if neighborhood_filtering_entity == 'sample_id':
-        final_neighborhood_filtering_column = pd.Series(
-        merged.index.get_level_values('sample_id'), 
-        index=merged.index, 
-        name='sample_id'
-        )
-        
-    else: 
-        neighborhood_filtering_column = list()
-        for sample_id, ad in ad_dict.items():
-        
-            neighborhood_filtering = ad.obs[f'{neighborhood_filtering_entity}']
-            neighborhood_filtering.index = pd.MultiIndex.from_product([[sample_id], neighborhood_filtering.index], names=['sample_id', 'cell_id'])
-            assert neighborhood_filtering.index.get_level_values('cell_id').equals(ad.obs_names), 'cell_id level of MultiIndex does not match ad.obs_names.'
-            neighborhood_filtering_column.append(neighborhood_filtering)
-        final_neighborhood_filtering_column = pd.concat(neighborhood_filtering_column, axis=0)
-    return final_neighborhood_filtering_column
      
 def inplace_kmeans_multik(ad_dict: Dict[str, AnnData], k_dict: Dict[int, Dict[str, Union[pd.Series, int, Dict[str, float]]]], clustering_key:str, select_k: bool = False):
     '''Inplace addition of clustering results to AnnData objects in ad_dict.
@@ -333,7 +297,7 @@ def inplace_kmeans_singlek(ad_dict: Dict[str, AnnData], k_dict: Dict[int, Dict[s
            
     return
 
-def k_means_clustering(ad_dict: Dict[str, AnnData], attr: str, graph_key: str = 'radius_80', mode: str = 'proportions', k: Union[int, List[int]] = 4, random_seeds: int= 1, clustering_key:str = None, select_k:bool = False, select_k_metric: str = 'silhouette_score', neighborhood_filtering: bool = True, neighborhood_filtering_percentage: int = 30, neighborhood_filtering_entity: str = 'sample_id',merged: pd.DataFrame = None, inplace:bool=True, **kmeans_params):
+def k_means_clustering(ad_dict: Dict[str, AnnData], attr: str, graph_key: str = 'radius_80', mode: str = 'proportions', k: Union[int, List[int]] = 4, random_seeds: int= 1, clustering_key:str = None, select_k:bool = False, select_k_metric: str = 'silhouette_score', cluster_filtering: bool = True, cluster_filtering_percentage: int = 30, cluster_filtering_entity: str = 'sample_id',merged: pd.DataFrame = None, inplace:bool=True, **kmeans_params):
     """K-means clustering of the merged (all samples together) local neighborhood representation of cells.
 
     if there are more than one random seed provided -> for each k the clustering with the lowest inertia will be chosen and added to the anndata objects.
@@ -349,9 +313,9 @@ def k_means_clustering(ad_dict: Dict[str, AnnData], attr: str, graph_key: str = 
         select_k: whether to select the best k based on the select_k_metric. 
         select_k_metric: metric to use for selecting the best k. Options are 'silhouette_score' or 'inertia' or 'average_ARI'.
                     it cannot be average_ARI if random_seeds == 1 is False.
-        neighborhood_filtering: whether to filter neighborhoods based on the neighborhood_filtering_entity.
-        neighborhood_filtering_percentage: percentage of neighborhoods to keep based on the neighborhood_filtering_entity.
-        neighborhood_filtering_entity: entity to use for neighborhood filtering. Options are 'sample_id' or any categorical column in ad.obs.
+        cluster_filtering: whether to filter clusters based on the cluster_filtering_entity.
+        cluster_filtering_percentage: percentage of clusters to keep based on the cluster_filtering_entity.
+        cluster_filtering_entity: entity to use for clusters filtering. Options are 'sample_id' or any categorical column in ad.obs.
         merged: Precomputed  merged DataFrame of neighborhood representations. It must be filtered from 0/0.0 rows. If None, it will be computed.
         inplace: Whether to add the clustering results to the current AnnData instances or to return a new one.
         **kwargs: Additional arguments for KMeans and silhouette_score. -> if not provided default values will be used.
@@ -373,19 +337,14 @@ def k_means_clustering(ad_dict: Dict[str, AnnData], attr: str, graph_key: str = 
     elif mode == 'counts':
         assert not (merged == 0).all(axis=1).any(), 'Merged DataFrame is not filtered. Please check the neighborhood representations.'
     merged_copy = merged.copy()
-    if neighborhood_filtering:
-        neighborhood_filtering_column = get_neighborhood_filter_column(ad_dict, merged_copy, neighborhood_filtering_entity)
-        only_in_merged = merged_copy.index.difference(neighborhood_filtering_column.index).tolist() #check because of previous filtering steps
-        if len(only_in_merged) > 0:
-            neighborhood_filtering_column = neighborhood_filtering_column.drop(index=only_in_merged)
-        assert merged_copy.index.equals(neighborhood_filtering_column.index), 'Indices of merged DataFrame and neighborhood filter column do not match.'      
-        merged_copy['neighborhood_filter'] = neighborhood_filtering_column
+    if cluster_filtering:
+        merged_copy = cluster_filter_to_merge(ad_dict, merged_copy, cluster_filtering_entity)
     if type(k) == int:
         if random_seeds == 1:
-            k_dict = k_means_clustering_singlek_one_seed( merged_copy, k, neighborhood_filtering_percentage=neighborhood_filtering_percentage, **kmeans_params)
+            k_dict = k_means_clustering_singlek_one_seed( merged_copy, k, cluster_filtering_percentage=cluster_filtering_percentage, **kmeans_params)
         else:
             seeds = np.random.randint(0, 2**32, size=random_seeds, dtype='uint64').tolist()
-            k_dict = k_means_singlek_multiple_seeds(merged_copy, k, seeds=seeds, neighborhood_filtering_percentage=neighborhood_filtering_percentage, **kmeans_params)
+            k_dict = k_means_singlek_multiple_seeds(merged_copy, k, seeds=seeds, cluster_filtering_percentage=cluster_filtering_percentage, **kmeans_params)
         k_dict['clustering_key'] = clustering_key
         if inplace:
             inplace_kmeans_singlek(ad_dict, k_dict, clustering_key=clustering_key)
@@ -394,9 +353,9 @@ def k_means_clustering(ad_dict: Dict[str, AnnData], attr: str, graph_key: str = 
 
     if type(k) == list:
         if random_seeds == 1:
-            k_dict = k_means_clustering_multik_one_seed( merged_copy, k, select_k, select_k_metric, neighborhood_filtering_percentage, **kmeans_params)
+            k_dict = k_means_clustering_multik_one_seed( merged_copy, k, select_k, select_k_metric, cluster_filtering_percentage, **kmeans_params)
         else:
-            k_dict = k_means_clustering_multik_multiple_seeds(merged_copy, k, random_seeds, select_k, select_k_metric, neighborhood_filtering_percentage, **kmeans_params)
+            k_dict = k_means_clustering_multik_multiple_seeds(merged_copy, k, random_seeds, select_k, select_k_metric, cluster_filtering_percentage, **kmeans_params)
         for k_value in k_dict.keys():
             k_dict[k_value]['clustering_key'] = clustering_key
         if inplace:
