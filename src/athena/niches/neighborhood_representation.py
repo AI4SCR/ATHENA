@@ -1,15 +1,10 @@
 from athena.metrics.heterogeneity.metrics import abundance
-from random import seed
-import numpy as np
 import pandas as pd
 from anndata import AnnData
 from athena.utils.general import get_nx_graph_from_anndata
 import networkx as nx
 from collections import defaultdict, Counter
 from typing import Dict, Union, List
-from sklearn.cluster import KMeans
-from sklearn.metrics import silhouette_score
-from sklearn.preprocessing import StandardScaler
 
 #%%
 def get_neighborhoods(ad: AnnData, graph_key: str = 'radius_80', inplace: bool = True):
@@ -52,7 +47,7 @@ def compute_neighborhood_representations(ad: AnnData, attr: str, mode: str = 'pr
 
     Returns: 
         if not inplace -> pd.DataFrame of neighborhood representations 
-        id inplace -> None
+        if inplace -> None
             ad.obsm[f'neighborhood_representation_{attr}_{mode}_{graph_key}']: np.ndarray of shape (n_cells, n_unique_attr) 
                     0 or 0.0 in all attr if cell has less than min_neighbors neighbors.
             ad.uns[f'neighborhood_representation_{attr}_{mode}_{graph_key}_columns']: List of attribute categories corresponding to the columns in the obsm matrix.
@@ -195,9 +190,9 @@ def retrieve_neighborhood_representations(ad: AnnData, attr: str, mode: str = 'p
     
     if filtered:
         # filter out the rows that are all zeros (the cells that had less than min_neighbors neighbors)
-        if type(neighborhood_representation.values) == int:
+        if mode == 'counts':
             neighborhood_representation = neighborhood_representation.loc[~(neighborhood_representation==0).all(axis=1)]
-        elif type(neighborhood_representation.values) == float:
+        elif mode == 'proportion':
             neighborhood_representation = neighborhood_representation.loc[~(neighborhood_representation==0.0).all(axis=1)]
     return neighborhood_representation
 
@@ -225,6 +220,10 @@ def retrieve_merged_neighborhood_representations(ad_dict: Dict[str, AnnData], at
     assert len(merged_neighborhood_representations_list) == len(ad_dict.keys()), 'Number of neighborhood representations to merge does not match number of samples in ad_dict.'
     
     merged_neighborhood_representations = pd.concat(merged_neighborhood_representations_list, axis=0)
+    if mode == 'counts':
+        merged_neighborhood_representations = merged_neighborhood_representations.fillna(0)
+    elif mode == 'proportion':
+        merged_neighborhood_representations = merged_neighborhood_representations.fillna(0.0)
 
     assert merged_neighborhood_representations.index.is_unique, 'Merged neighborhood representations index is not unique.'    
 
