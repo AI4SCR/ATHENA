@@ -159,13 +159,20 @@ def save_kmeans_multik(ad_dict: Dict[str, AnnData], k_dict: Dict[int, Dict[str, 
         no return if inplace
         new ad_dict if not inplace
     '''
+    
     if select_k:
         for k_value in k_dict.keys():
+            # the cells assigned to a cluster that got filtered out are assigned to cluster -1.0 
+            # this will allow to distinguish those cells from those that have been filtered out due to too low numer of clusters (they will have NaN assigned)
+            k_dict[k_value]['labels'] = k_dict[k_value]['selected'].fillna(-1.0)  
             if k_dict[k_value]['selected'] == True:
                 obs_add = k_dict[k_value]['labels']
     else:
         obs_add_dict = {}
         for k_value in k_dict.keys():
+            # the cells assigned to a cluster that got filtered out are assigned to cluster -1.0 
+            # this will allow to distinguish those cells from those that have been filtered out due to too low numer of clusters (they will have NaN assigned)
+            k_dict[k_value]['labels'] = k_dict[k_value]['selected'].fillna(-1.0)  
             obs_add_dict[f'k_{k_value}_{clustering_key}'] = k_dict[k_value]['labels']
         obs_add = pd.DataFrame(obs_add_dict)
     
@@ -204,6 +211,9 @@ def save_kmeans_singlek(ad_dict: Dict[str, AnnData], k_dict: Dict[int, Dict[str,
         no return if inplace
         new ad_dict if not inplace
     '''
+    # the cells assigned to a cluster that got filtered out are assigned to cluster -1.0 
+    # this will allow to distinguish those cells from those that have been filtered out due to too low numer of clusters (they will have NaN assigned)
+    k_dict['labels'] = k_dict['selected'].fillna(-1.0)  
     obs_add = k_dict['labels']
     k = k_dict['k']
 
