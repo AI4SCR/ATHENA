@@ -52,19 +52,19 @@ def cluster_filter_to_merge(ad_dict, merged, cluster_filtering_entity: str):
 
 def perform_cluster_filtering(merged: pd.DataFrame, cluster_filtering_percentage: int):
     assert (1 <= cluster_filtering_percentage <= 100), "cluster_filtering_percentage must be between 1 and 100"
-    # This asserts that every single cell in the dataframe is non-zero
-    assert (merged['labels'] != 0).all(), "Zero found in DataFrame!"
-    print('here')
 
     merged_initial_index = merged.index.copy()
+    # calculate the threshold 
     total_filter_entities = merged['cluster_filter'].nunique()
     threshold = (cluster_filtering_percentage / 100) * total_filter_entities
+    # count unique entities per label
     cluster_filter_counts = merged.groupby('labels')['cluster_filter'].nunique()
-    index_to_filter = cluster_filter_counts[cluster_filter_counts < threshold].index
-    cluster_to_filter = merged.loc[index_to_filter, 'labels'].unique()
-    for k in cluster_to_filter:
-        index_k = merged.loc[merged['labels']== k].index
-        merged[index_k, 'labels'] = -k
+    # identify labels (clusters) that fall below the thereshold
+    index_to_filter = cluster_filter_counts[cluster_filter_counts < threshold].index.tolist()
+    # change the labels (cluster) that have to be filtered out to nan values
+    merged.loc[merged['labels'].isin(index_to_filter),'labels'] = pd.NA
+    print(merged['labels'].hasnans)
+
 
     assert merged_initial_index.equals(merged.index), 'Indices of merged DataFrame have changed after cluster filtering.'
     

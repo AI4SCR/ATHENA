@@ -21,9 +21,10 @@ def get_metrics(merged: pd.DataFrame,  centers: np.ndarray = None, inertia: floa
     labels = merged['labels']
     if 'cluster_filter' in merged.columns:
         values_df = merged.copy()
-        values_df = values_df.drop(columns=['cluster_filter'], inplace=True)
+        values_df = values_df.drop(columns=['cluster_filter', 'labels_raw','labels'])
     else:
         values_df = merged.copy()
+        values_df = values_df.drop(columns=['labels'])
 
     tot_cells = len(values_df.index)
     if type(inertia) == float:
@@ -31,7 +32,7 @@ def get_metrics(merged: pd.DataFrame,  centers: np.ndarray = None, inertia: floa
         metrics = {'inertia': inertia, 'silhouette_score': silhouette}
         return metrics
     elif type(centers) == np.ndarray:
-        filtered_labels = labels[labels>0] # clusters labels that 'passed' the filtering step
+        filtered_labels = labels.dropna() # clusters labels that 'passed' the filtering step
         filtered_labels = filtered_labels.astype(int)
         filtered_merged = values_df.loc[filtered_labels.index]
         inertia = filtered_inertia(filtered_merged, filtered_labels, centers)

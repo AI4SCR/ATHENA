@@ -32,7 +32,7 @@ def calculate_ari_vs_reference(df, reference_col_name):
 def compute_avg_ARI(labels_df: Dict[int, Dict[str, Union[pd.Series, int, Dict[str, float]]]])-> float:
     avg_ARI = {}
     labels_df_copy = labels_df.copy()
-    labels_df_copy = labels_df_copy[~(labels_df_copy < 0).any(axis=1)]
+    labels_df_copy.dropna(inplace=True)
     for seed in labels_df.columns:
         aris = calculate_ari_vs_reference(labels_df_copy, reference_col_name=seed)
         avg_ARI[seed] = np.mean(list(aris.values()))
@@ -60,7 +60,6 @@ def compute_robustness_analysis(multiple_seeds_dict: Dict[int, Dict[str, Union[p
     assert assert_index_series(labels), 'Indices of all label series do not match.'
     
     labels_df = pd.DataFrame(labels)
-    assert (labels_df != 0).all().all(), "Zero found in DataFrame!"
     
     avg_aris = compute_avg_ARI(labels_df)
     best_seed = max(avg_aris, key=avg_aris.get)   
