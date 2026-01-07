@@ -29,20 +29,28 @@ def k_selection(robustness_analysis_dict: Dict[str,Dict[str, str]], select_k_met
 
 
 
-def compute_clustering(values_df: pd.DataFrame, merged: pd.DataFrame, k:int, seed: int, cluster_filtering_percentage: int, **kmeans_params ):
+def compute_clustering(merged: pd.DataFrame, k:int, seed: int, cluster_filtering_percentage: int, **kmeans_params ):
+    if 'cluster_filter' in merged.columns:
+        values_df = merged.copy()
+        values_df = values_df.drop(columns=['cluster_filter'])
+    else:
+        values_df = merged.copy()
+    
     kmeans = KMeans(n_clusters=k, random_state=seed, **kmeans_params)
     kmeans.fit(values_df.values) 
-    labels = kmeans.labels_
+    labels = kmeans.labels_ + 1
     assert len(merged) == len(labels), 'Length of merged DataFrame and labels do not match.'
-    merged[f'labels'] = labels
+    merged['labels'] = labels # to not have 0 cluster
     if 'cluster_filter' in merged.columns:
+        # it will change filtered out clusters to -k
         filter_df = merged[['cluster_filter', 'labels']]
         filtered_labels = perform_cluster_filtering(merged=filter_df, cluster_filtering_percentage=cluster_filtering_percentage)
         assert filtered_labels.index.equals(merged.index), 'Indices of filtered labels and merged DataFrame do not match.'
         merged['labels'] = filtered_labels
-
-    if merged['labels'].hasnans:
-        # if one/multiple clusters has been removed, we need to re-compute the inertia
+        
+    if (merged['labels'] < 0).any():
+        # if there are negative values in the labels => one/ultiple clusters have been filtered out
+        # if one/multiple clusters have been filtered out, we need to re-compute the inertia
         inertia = None
         centers = kmeans.cluster_centers_
     else:
@@ -54,11 +62,12 @@ def compute_clustering(values_df: pd.DataFrame, merged: pd.DataFrame, k:int, see
 def k_means_clustering_singlek_one_seed( merged: pd.DataFrame, k: int, seed: int, cluster_filtering_percentage: int = None, **kmeans_params):
 
     if 'cluster_filter' in merged.columns:
-        values_df = merged.drop(columns=['cluster_filter'])
+        values_df = merged.copy()
+        values_df = values_df.drop(columns=['cluster_filter'], inplace=True)
     else:
         values_df = merged.copy()
     
-    centers, inertia, merged = compute_clustering(values_df=values_df, merged=merged, k=k, seed=seed, cluster_filtering_percentage=cluster_filtering_percentage,**kmeans_params )
+    centers, inertia, merged = compute_clustering(merged=merged, k=k, seed=seed, cluster_filtering_percentage=cluster_filtering_percentage,**kmeans_params )
 
     if inertia == None: 
         metrics = get_metrics(merged = values_df, labels = merged['labels'], centers = centers)
@@ -79,15 +88,11 @@ def k_means_singlek_multiple_seeds(merged: pd.DataFrame, k:int, seeds: List[int]
     centers = {}
     inertias = {}
     
-    if 'cluster_filter' in merged.columns:
-        values_df = merged.drop(columns=['cluster_filter'])
-    else:
-        values_df = merged.copy()
     
     for seed in seeds:
-        seed_centers, inertia, merged = compute_clustering(values_df=values_df, merged=merged, k=k, seed=seed, cluster_filtering_percentage=cluster_filtering_percentage,**kmeans_params )
+        seed_centers, inertia, merged = compute_clustering( merged=merged, k=k, seed=seed, cluster_filtering_percentage=cluster_filtering_percentage,**kmeans_params )
 
-        if merged['labels'].hasnans:
+        if seed_centers != None:
             centers[seed] = seed_centers
         else:
             inertias[seed] = inertia
@@ -98,9 +103,9 @@ def k_means_singlek_multiple_seeds(merged: pd.DataFrame, k:int, seeds: List[int]
     best_seed_dict = compute_robustness_analysis(res_dict)
     best_seed =  best_seed_dict['seed']
     if best_seed in centers.keys():
-        metrics = get_metrics(merged = values_df, labels = merged['labels'], centers = centers[best_seed])
+        metrics = get_metrics(merged = merged, centers = centers[best_seed])
     elif best_seed in inertias.keys():
-        metrics = get_metrics(merged = values_df, labels = merged['labels'], inertia = inertias[best_seed])
+        metrics = get_metrics(merged = merged, inertia = inertias[best_seed])
     
     best_seed_dict['metrics']['inertia'] = metrics['inertia']
     best_seed_dict['metrics']['silhouette_score'] = metrics['silhouette_score']
@@ -162,17 +167,11 @@ def save_kmeans_multik(ad_dict: Dict[str, AnnData], k_dict: Dict[int, Dict[str, 
     
     if select_k:
         for k_value in k_dict.keys():
-            # the cells assigned to a cluster that got filtered out are assigned to cluster -1.0 
-            # this will allow to distinguish those cells from those that have been filtered out due to too low numer of clusters (they will have NaN assigned)
-            k_dict[k_value]['labels'] = k_dict[k_value]['selected'].fillna(-1.0)  
             if k_dict[k_value]['selected'] == True:
                 obs_add = k_dict[k_value]['labels']
     else:
         obs_add_dict = {}
-        for k_value in k_dict.keys():
-            # the cells assigned to a cluster that got filtered out are assigned to cluster -1.0 
-            # this will allow to distinguish those cells from those that have been filtered out due to too low numer of clusters (they will have NaN assigned)
-            k_dict[k_value]['labels'] = k_dict[k_value]['selected'].fillna(-1.0)  
+        for k_value in k_dict.keys(): 
             obs_add_dict[f'k_{k_value}_{clustering_key}'] = k_dict[k_value]['labels']
         obs_add = pd.DataFrame(obs_add_dict)
     
@@ -211,9 +210,6 @@ def save_kmeans_singlek(ad_dict: Dict[str, AnnData], k_dict: Dict[int, Dict[str,
         no return if inplace
         new ad_dict if not inplace
     '''
-    # the cells assigned to a cluster that got filtered out are assigned to cluster -1.0 
-    # this will allow to distinguish those cells from those that have been filtered out due to too low numer of clusters (they will have NaN assigned)
-    k_dict['labels'] = k_dict['selected'].fillna(-1.0)  
     obs_add = k_dict['labels']
     k = k_dict['k']
 

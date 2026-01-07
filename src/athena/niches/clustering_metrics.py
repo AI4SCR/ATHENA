@@ -15,17 +15,25 @@ def filtered_inertia(filtered_merged: pd.DataFrame, filtered_labels: pd.Series, 
 
 
 
-def get_metrics(merged: pd.DataFrame,  labels: pd.Series, centers: np.ndarray = None, inertia: float = None):
+def get_metrics(merged: pd.DataFrame,  centers: np.ndarray = None, inertia: float = None):
     assert (type(inertia) == float) or (type(centers) == np.ndarray), "Either inertia or centers must be provided to compute metrics."
-    tot_cells = len(merged.index)
+
+    labels = merged['labels']
+    if 'cluster_filter' in merged.columns:
+        values_df = merged.copy()
+        values_df = values_df.drop(columns=['cluster_filter'], inplace=True)
+    else:
+        values_df = merged.copy()
+
+    tot_cells = len(values_df.index)
     if type(inertia) == float:
-        silhouette = silhouette_score(merged.values, labels,sample_size=tot_cells//3)
+        silhouette = silhouette_score(values_df.values, labels,sample_size=tot_cells//3)
         metrics = {'inertia': inertia, 'silhouette_score': silhouette}
         return metrics
     elif type(centers) == np.ndarray:
-        filtered_labels = labels.dropna()
+        filtered_labels = labels[labels>0] # clusters labels that 'passed' the filtering step
         filtered_labels = filtered_labels.astype(int)
-        filtered_merged = merged.loc[filtered_labels.index]
+        filtered_merged = values_df.loc[filtered_labels.index]
         inertia = filtered_inertia(filtered_merged, filtered_labels, centers)
         silhouette = silhouette_score(filtered_merged.values, filtered_labels,sample_size=tot_cells//3)
         metrics = {'inertia': inertia, 'silhouette_score': silhouette}
