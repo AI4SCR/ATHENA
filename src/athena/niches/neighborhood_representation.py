@@ -5,6 +5,7 @@ from athena.utils.general import get_nx_graph_from_anndata
 import networkx as nx
 from collections import defaultdict, Counter
 from typing import Dict, Union, List
+import copy
 
 #%%
 def get_neighborhoods(ad: AnnData, graph_key: str = 'radius_80', inplace: bool = True):
@@ -16,7 +17,7 @@ def get_neighborhoods(ad: AnnData, graph_key: str = 'radius_80', inplace: bool =
 
     Returns: 
         add to .obs for each cell (key in the neighbors dict) a list of its direct neighbors (value in the neighbors dict) in the column neighbors_graph_key.
-
+        return a new anndata object if inplace is False
     """
     if f'neighbors_{graph_key}' in ad.obs.columns:
         return
@@ -28,13 +29,16 @@ def get_neighborhoods(ad: AnnData, graph_key: str = 'radius_80', inplace: bool =
         neigh[u].append(v)
         neigh[v].append(u)  
     
+    if inplace == False:
+        ad_copy = ad.copy()
+        ad_copy.obs[f'neighbors_{graph_key}'] = neigh
+        return ad_copy
     ad.obs[f'neighbors_{graph_key}'] = neigh
-    if not inplace:
-        return neigh
+    
     return
 
 
-def compute_neighborhood_representations(ad: AnnData, attr: str, mode: str = 'proportion', graph_key: str = 'radius_80', min_neighbors: int = 5, inplace: bool=True):
+def compute_neighborhood_representations(ad: AnnData, attr: str, mode: str = 'proportion', graph_key: str = 'radius_80', min_neighbors: int = 5):
     """Compute count and proportions of label_type for each cell in the AnnData object based on the specified topology.
 
     Args:
@@ -43,16 +47,12 @@ def compute_neighborhood_representations(ad: AnnData, attr: str, mode: str = 'pr
         mode: 'proportion' or 'counts' to specify the type of neighborhood representation to compute.
         graph_key: Specifies the graph representation to use in ad.obsp.
         min_neighbors: Minimum number of neighbors required to compute the neighborhood representation.
-        inplace: Whether to add the metric to the current AnnData instance or to return a new one.
 
     Returns: 
-        if not inplace -> pd.DataFrame of neighborhood representations 
-        if inplace -> None
-            ad.obsm[f'neighborhood_representation_{attr}_{mode}_{graph_key}']: np.ndarray of shape (n_cells, n_unique_attr) 
-                    0 or 0.0 in all attr if cell has less than min_neighbors neighbors.
-            ad.uns[f'neighborhood_representation_{attr}_{mode}_{graph_key}_columns']: List of attribute categories corresponding to the columns in the obsm matrix.
-        
-        
+        pandas.Dataframe with 
+            - rows cells and columns attribute  
+            - each row contains the proportion/counts of each attr (col) in the cell (row) neighbors 
+                -> if the cell (row) has not enough neighbors its row will be filled with zeros
 
     """
     assert attr in ad.obs.columns, f'Attribute {attr} not found in ad.obs.'
@@ -144,7 +144,7 @@ def neighborhood_representations_ad_dict(ad_dict: Dict[str, AnnData], attr: str,
         return
     
     else:
-        ad_dict_copy = ad_dict.copy()
+        ad_dict_copy = copy.deepcopy(ad_dict)
         for ad in ad_dict_copy.values():
             if f'neighborhood_representation_{attr}_{mode}_{graph_key}' not in ad.obsm.keys() or f'neighborhood_representation_{attr}_{mode}_{graph_key}_columns' not in ad.uns.keys():
                 neighborhood_representations = compute_neighborhood_representations(ad=ad, attr=attr, mode=mode, graph_key=graph_key, min_neighbors=min_neighbors)
@@ -166,7 +166,7 @@ def retrieve_neighborhood_representations(ad: AnnData, attr: str, mode: str = 'p
         filtered: Whether to filter out rows with all zeros.
     
     Returns:   
-        filtered pd.DataFrame of neighborhood representations
+        filtered (without rows filled with zeros = cells with too few neighbors) pd.DataFrame of neighborhood representations
     '''
     assert f'neighborhood_representation_{attr}_{mode}_{graph_key}' in ad.obsm.keys() or f'neighborhood_representation_{attr}_{mode}_{graph_key}_columns' in ad.uns.keys(), f'Neighborhood representations for attr {attr}, mode {mode}, graph_key {graph_key} not found in ad.obsm and ad.uns. Please compute them first using neighborhood_representations_ad().'
     

@@ -5,6 +5,7 @@ import pandas as pd
 from anndata import AnnData
 from typing import Dict, Union, List
 from sklearn.cluster import KMeans
+import copy
 from athena.niches.neighborhood_representation import retrieve_merged_neighborhood_representations
 from athena.niches.cluster_filtering import cluster_filter_to_merge, perform_cluster_filtering
 from athena.niches.robustness_analysis import compute_robustness_analysis
@@ -88,25 +89,27 @@ def k_means_singlek_multiple_seeds(merged: pd.DataFrame, k:int, seeds: List[int]
     
     
     for seed in seeds:
-        seed_centers, inertia, merged = compute_clustering( merged=merged, k=k, seed=seed, cluster_filtering_percentage=cluster_filtering_percentage,**kmeans_params )
+        merged_copy = merged.copy()
+        seed_centers, inertia, merged_copy = compute_clustering( merged=merged_copy, k=k, seed=seed, cluster_filtering_percentage=cluster_filtering_percentage,**kmeans_params )
 
         if inertia == None:
             centers[seed] = seed_centers
         else:
             inertias[seed] = inertia
             
-        if 'labels_raw' in merged.columns: 
-            seed_dict = {'labels': merged[f'labels'], 'labels_raw':merged['labels_raw'], 'seed': seed, 'k': k}
+        if 'labels_raw' in merged_copy.columns: 
+            seed_dict = {'labels': merged_copy['labels'], 'labels_raw':merged_copy['labels_raw'], 'seed': seed, 'k': k}
         else:
-            seed_dict = {'labels': merged[f'labels'], 'seed': seed, 'k': k}
+            seed_dict = {'labels': merged_copy['labels'], 'seed': seed, 'k': k}
         res_dict[seed] = seed_dict    
     
     best_seed_dict = compute_robustness_analysis(res_dict)
     best_seed =  best_seed_dict['seed']
+    
     if best_seed in centers.keys():
-        metrics = get_metrics(merged = merged, centers = centers[best_seed])
+        metrics = get_metrics(merged = merged, labels = best_seed_dict['labels'], centers = centers[best_seed])
     elif best_seed in inertias.keys():
-        metrics = get_metrics(merged = merged, inertia = inertias[best_seed])
+        metrics = get_metrics(merged = merged, labels = best_seed_dict['labels'], inertia = inertias[best_seed])
     
     best_seed_dict['metrics']['inertia'] = metrics['inertia']
     best_seed_dict['metrics']['silhouette_score'] = metrics['silhouette_score']
@@ -153,8 +156,7 @@ def k_means_clustering_multik_multiple_seeds(merged: pd.DataFrame, k:list, seeds
 
 
 def obs_add_multi_k(k_dict: Dict[int, Dict[str, Union[pd.Series, int, Dict[str, float]]]], clustering_key:str, select_k: bool):
-
-    if select_k:
+    if select_k == True:
         obs_add_dict = {}
         for k_value in k_dict.keys():
             if k_dict[k_value]['selected'] == True:
@@ -162,6 +164,7 @@ def obs_add_multi_k(k_dict: Dict[int, Dict[str, Union[pd.Series, int, Dict[str, 
                     if 'labels_raw' in  k_dict[k_value].keys():
                         obs_add_dict[f'selected_k_{clustering_key}_raw'] =  k_dict[k_value]['labels_raw'] 
         obs_add = pd.DataFrame(obs_add_dict)
+        
 
     else:
         obs_add_dict = {}
@@ -182,8 +185,18 @@ def obs_add_singlek(k_dict: Dict[int, Dict[str, Union[pd.Series, int, Dict[str, 
     obs_add = pd.DataFrame(obs_add_dict)
     return obs_add
 
+def match_index_to_ad_obs(ad: AnnData, obs_add_sample: Union[pd.Series, pd.DataFrame], index_not_in_cluster:list ):
+    complete_index = ad.obs.index.to_list()
+    obs_add_sample = obs_add_sample.reindex(complete_index)
+    if type(obs_add_sample) == pd.Series:
+        assert obs_add_sample.loc[index_not_in_cluster].isna().all(), 'Reindexed rows that were not in clusters are not all NaN.'
+    else:
+        assert obs_add_sample.loc[index_not_in_cluster].isna().all().all(), 'Reindexed rows that were not in clusters are not all NaN.'           
 
-def save_kmeans_multik(ad_dict: Dict[str, AnnData], k_dict: Dict[int, Dict[str, Union[pd.Series, int, Dict[str, float]]]], clustering_key:str, select_k: bool = False, inplace:bool = True):
+    return obs_add_sample
+
+
+def save_kmeans_multik(ad_dict: Dict[str, AnnData], k_dict: Dict[int, Dict[str, Union[pd.Series, int, Dict[str, float]]]], clustering_key:str, select_k: bool, inplace:bool):
     '''Addition of clustering results to original (inplace) or new(not inplace) AnnData objects in ad_dict.
     Args:
         ad_dict: Dictionary of AnnData instances with keys as sample names.
@@ -195,27 +208,18 @@ def save_kmeans_multik(ad_dict: Dict[str, AnnData], k_dict: Dict[int, Dict[str, 
         no return if inplace
         new ad_dict if not inplace
     '''
-    
     obs_add = obs_add_multi_k(k_dict=k_dict, clustering_key=clustering_key, select_k=select_k)
     
-    if not inplace:
-        ad_dict = ad_dict.copy()
-
     for sample_id, ad in ad_dict.items():
         obs_add_sample = obs_add.xs(sample_id, level='sample_id')
         not_in_clusters= ad.obs.index.difference(obs_add_sample.index).tolist() # check because of previous filtering steps
         if len(not_in_clusters) > 0:
-            complete_index = ad.obs.index.to_list()
-            obs_add_sample = obs_add_sample.reindex(complete_index)
-            if type(obs_add_sample) == pd.Series:
-                assert obs_add_sample.loc[not_in_clusters].isna().all(), 'Reindexed rows that were not in clusters are not all NaN.'
-            else:
-                assert obs_add_sample.loc[not_in_clusters].isna().all().all(), 'Reindexed rows that were not in clusters are not all NaN.'           
+            obs_add_sample = match_index_to_ad_obs(ad=ad, obs_add_sample=obs_add_sample, index_not_in_cluster=not_in_clusters)         
         assert obs_add_sample.index.equals(ad.obs.index), 'Indices of obs_add_sample and ad.obs do not match.'
-        
+
         ad.obs = ad.obs.join(obs_add_sample)
         ad.uns[f'{clustering_key}_metrics'] = k_dict
-    if not inplace:
+    if inplace == False:
         return ad_dict
     return    
         
@@ -233,24 +237,16 @@ def save_kmeans_singlek(ad_dict: Dict[str, AnnData], k_dict: Dict[int, Dict[str,
     '''
     obs_add = obs_add_singlek(k_dict=k_dict, clustering_key=clustering_key)
 
-    if not inplace:
-        ad_dict = ad_dict.copy()
-
     for sample_id, ad in ad_dict.items():
         obs_add_sample = obs_add.xs(sample_id, level='sample_id')
         not_in_clusters= ad.obs.index.difference(obs_add_sample.index).tolist()#check because of previous filtering steps
         if len(not_in_clusters) > 0:
-            complete_index = ad.obs.index.to_list()
-            obs_add_sample = obs_add_sample.reindex(complete_index)
-            if type(obs_add_sample) == pd.Series:
-                assert obs_add_sample.loc[not_in_clusters].isna().all(), 'Reindexed rows that were not in clusters are not all NaN.'
-            else:
-                assert obs_add_sample.loc[not_in_clusters].isna().all().all(), 'Reindexed rows that were not in clusters are not all NaN.'        
+            obs_add_sample = match_index_to_ad_obs(ad=ad, obs_add_sample=obs_add_sample, index_not_in_cluster=not_in_clusters)        
         assert obs_add_sample.index.equals(ad.obs.index), 'Indices of obs_add_sample and ad.obs do not match.'
         ad.obs = ad.obs.join(obs_add_sample)  
         ad.uns[f'{clustering_key}_metrics'] = k_dict
            
-    if not inplace:
+    if inplace == False:
         return ad_dict
     
     return   
@@ -269,11 +265,12 @@ def k_means_multik(ad_dict: Dict[str, AnnData], merged:pd.DataFrame, k: Union[in
     for k_value in k_dict.keys():
         k_dict[k_value]['clustering_key'] = clustering_key 
     
-    if not inplace:
-        ad_dict_new = save_kmeans_multik(ad_dict=ad_dict, k_dict=k_dict, clustering_key=clustering_key, select_k=select_k, inplace=inplace)
+    if inplace == False:
+        ad_dict_copy = copy.deepcopy(ad_dict)
+        ad_dict_new = save_kmeans_multik(ad_dict=ad_dict_copy, k_dict=k_dict, clustering_key=clustering_key, select_k=select_k, inplace=inplace)
         return ad_dict_new
-    
-    save_kmeans_multik(ad_dict=ad_dict, k_dict=k_dict, clustering_key=clustering_key, select_k=select_k, inplace=inplace)
+    else:
+        save_kmeans_multik(ad_dict=ad_dict, k_dict=k_dict, clustering_key=clustering_key, select_k=select_k, inplace=inplace)
     return
 
 def k_means_singlek(ad_dict: Dict[str, AnnData], merged:pd.DataFrame, k: Union[int, List[int]], random_seeds: int, clustering_key:str, cluster_filtering_percentage:int =None, inplace:bool = True, **kmeans_params):    
@@ -285,11 +282,13 @@ def k_means_singlek(ad_dict: Dict[str, AnnData], merged:pd.DataFrame, k: Union[i
         k_dict = k_means_singlek_multiple_seeds(merged=merged, k=k, seeds=seeds, cluster_filtering_percentage=cluster_filtering_percentage, **kmeans_params)
     k_dict['clustering_key'] = clustering_key
 
-    if not inplace:
-        ad_dict_new = save_kmeans_singlek(ad_dict=ad_dict, k_dict=k_dict, clustering_key=clustering_key, inplace=inplace)
+    if inplace == False:
+        ad_dict_copy = copy.deepcopy(ad_dict)
+        ad_dict_new = save_kmeans_singlek(ad_dict=ad_dict_copy, k_dict=k_dict, clustering_key=clustering_key, inplace=inplace)
         return ad_dict_new
     
-    save_kmeans_singlek(ad_dict=ad_dict, k_dict=k_dict, clustering_key=clustering_key, inplace=inplace)
+    else:
+        save_kmeans_singlek(ad_dict=ad_dict, k_dict=k_dict, clustering_key=clustering_key, inplace=inplace)
     return
     
 
@@ -322,12 +321,14 @@ def k_means_clustering(ad_dict: Dict[str, AnnData], attr: str, graph_key: str = 
     assert mode in ['proportion', 'counts'], f'Mode {mode} not recognized. Use "proportion" or "counts".'
     if clustering_key == None:
         clustering_key = f'k_{k}_{graph_key}_{mode}_{random_seeds}seed'
+    assert f'{clustering_key}_metrics' not in ad_dict[list(ad_dict.keys())[0]].uns.keys(), f'{clustering_key} already present, provide a new clustering_key'
+    
     
     if type(k) == list:
         assert len(k) > 1, 'If k is a list it must contain more than one value.' 
         
     if merged is None:
-        merged = retrieve_merged_neighborhood_representations(ad_dict, attr=attr, graph_key=graph_key, mode=mode, filtered=True)
+        merged = retrieve_merged_neighborhood_representations(ad_dict=ad_dict, attr=attr, graph_key=graph_key, mode=mode, filtered=True)
     if mode == 'proportion':
         assert not (merged == 0.0).all(axis=1).any(), 'Merged DataFrame is not filtered. Please check the neighborhood representations.'
     elif mode == 'counts':
@@ -340,10 +341,16 @@ def k_means_clustering(ad_dict: Dict[str, AnnData], attr: str, graph_key: str = 
     
     # one k 
     if type(k) == int:
+        if inplace == False:
+            ad_dict_new = k_means_singlek(ad_dict=ad_dict, k=k, merged=merged_copy, random_seeds=random_seeds, clustering_key=clustering_key, cluster_filtering_percentage=cluster_filtering_percentage, inplace=inplace, **kmeans_params)
+            return ad_dict_new
         k_means_singlek(ad_dict=ad_dict, k=k, merged=merged_copy, random_seeds=random_seeds, clustering_key=clustering_key, cluster_filtering_percentage=cluster_filtering_percentage, inplace=inplace, **kmeans_params)
              
     # multiple ks 
-    if type(k) == list:
+    elif type(k) == list:
+        if inplace == False:
+            ad_dict_new = k_means_multik(ad_dict=ad_dict, k=k, merged=merged_copy, random_seeds=random_seeds, clustering_key=clustering_key, cluster_filtering_percentage=cluster_filtering_percentage, select_k=select_k, select_k_metric=select_k_metric, inplace=inplace, **kmeans_params)
+            return ad_dict_new
         k_means_multik(ad_dict=ad_dict, k=k, merged=merged_copy, random_seeds=random_seeds, clustering_key=clustering_key, cluster_filtering_percentage=cluster_filtering_percentage, select_k=select_k, select_k_metric=select_k_metric, inplace=inplace, **kmeans_params)
 
     return 

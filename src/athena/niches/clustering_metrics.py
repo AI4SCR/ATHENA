@@ -15,16 +15,14 @@ def filtered_inertia(filtered_merged: pd.DataFrame, filtered_labels: pd.Series, 
 
 
 
-def get_metrics(merged: pd.DataFrame,  centers: np.ndarray = None, inertia: float = None):
+def get_metrics(merged: pd.DataFrame, labels = pd.Series, centers: np.ndarray = None, inertia: float = None):
     assert (type(inertia) == float) or (type(centers) == np.ndarray), "Either inertia or centers must be provided to compute metrics."
 
-    labels = merged['labels']
     if 'cluster_filter' in merged.columns:
         values_df = merged.copy()
-        values_df = values_df.drop(columns=['cluster_filter', 'labels_raw','labels'])
+        values_df = values_df.drop(columns=['cluster_filter'])
     else:
         values_df = merged.copy()
-        values_df = values_df.drop(columns=['labels'])
 
     tot_cells = len(values_df.index)
     if type(inertia) == float:

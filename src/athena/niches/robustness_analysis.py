@@ -30,9 +30,19 @@ def calculate_ari_vs_reference(df, reference_col_name):
     return aris
 
 def compute_avg_ARI(labels_df: Dict[int, Dict[str, Union[pd.Series, int, Dict[str, float]]]])-> float:
+    '''Compute average ARI per clustering run (seed)
+
+    Arguments
+        labels_df = pd.DataFrame with 
+            - cell_id and sample_id as row indexes
+            - seeds as column names and  clustering run labels assignment as values in each column 
+    
+    Return
+        dictionary with average ARI (value) for each seed (key)
+    '''
     avg_ARI = {}
     labels_df_copy = labels_df.copy()
-    labels_df_copy.dropna(inplace=True)
+    labels_df_copy.dropna(inplace=True) # drop all rows that have at least one nan due to cluster filtering
     for seed in labels_df.columns:
         aris = calculate_ari_vs_reference(labels_df_copy, reference_col_name=seed)
         avg_ARI[seed] = np.mean(list(aris.values()))
@@ -41,6 +51,14 @@ def compute_avg_ARI(labels_df: Dict[int, Dict[str, Union[pd.Series, int, Dict[st
 
 def assert_index_series(labels_dict: Dict[int, pd.Series]) -> bool:
     '''Check if all pd.Series in the labels_dict have the same index.
+
+    Arguments
+        labels_dict = dict with 
+            - seeds as keys 
+            - pd.Series with clustering run labels as values and cell_id and sample_id as row indexes
+    
+    Return
+        bool: True if the indexes of the pd.Series are the same
     '''
     indices = [labels_dict[seed].index for seed in labels_dict.keys()]
     first_index = indices[0]
@@ -51,6 +69,12 @@ def assert_index_series(labels_dict: Dict[int, pd.Series]) -> bool:
 
 def compute_robustness_analysis(multiple_seeds_dict: Dict[int, Dict[str, Union[pd.Series, int, Dict[str, float]]]])-> dict:
     '''Select the best seed based on average ARI with other seeds.
+
+    Args:
+        multiple_seeds_dict: dict with seeds as keys and seed dictionaries as values
+    
+    Return
+        seed dictionary of the best seed (with highest average ARI)
     '''
     
     labels = {}

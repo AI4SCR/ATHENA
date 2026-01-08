@@ -23,10 +23,9 @@ def get_cluster_filter_column(ad_dict, merged, cluster_filtering_entity: str):
     else: 
         cluster_filtering_column = list()
         for sample_id, ad in ad_dict.items():
-        
-            cluster_filtering = ad.obs[f'{cluster_filtering_entity}']
+            cluster_filtering = ad.obs[cluster_filtering_entity].copy()
             cluster_filtering.index = pd.MultiIndex.from_product([[sample_id], cluster_filtering.index], names=['sample_id', 'cell_id'])
-            assert cluster_filtering.index.get_level_values('cell_id').equals(ad.obs_names), 'cell_id level of MultiIndex does not match ad.obs_names.'
+            assert cluster_filtering.index.get_level_values('cell_id').equals(ad.obs_names), f'cell_id level of {sample_id} MultiIndex does not match ad.obs_names.'
             cluster_filtering_column.append(cluster_filtering)
         final_cluster_filtering_column = pd.concat(cluster_filtering_column, axis=0)
     return final_cluster_filtering_column
@@ -42,9 +41,9 @@ def cluster_filter_to_merge(ad_dict, merged, cluster_filtering_entity: str):
         merged DataFrame with cluster filtering column added.
         '''
     cluster_filtering_column = get_cluster_filter_column(ad_dict, merged, cluster_filtering_entity)
-    only_in_merged = merged.index.difference(cluster_filtering_column.index).tolist() #check because of previous filtering steps
-    if len(only_in_merged) > 0:
-        cluster_filtering_column = cluster_filtering_column.drop(index=only_in_merged)
+    only_in_cluster_filtering_column = cluster_filtering_column.index.difference(merged.index).tolist() #check because of previous filtering steps
+    if len(only_in_cluster_filtering_column) > 0:
+        cluster_filtering_column = cluster_filtering_column.drop(index=only_in_cluster_filtering_column)
     assert merged.index.equals(cluster_filtering_column.index), 'Indices of merged DataFrame and cluster filter column do not match.'      
     merged['cluster_filter'] = cluster_filtering_column
     return merged
@@ -63,7 +62,6 @@ def perform_cluster_filtering(merged: pd.DataFrame, cluster_filtering_percentage
     index_to_filter = cluster_filter_counts[cluster_filter_counts < threshold].index.tolist()
     # change the labels (cluster) that have to be filtered out to nan values
     merged.loc[merged['labels'].isin(index_to_filter),'labels'] = pd.NA
-    print(merged['labels'].hasnans)
 
 
     assert merged_initial_index.equals(merged.index), 'Indices of merged DataFrame have changed after cluster filtering.'
