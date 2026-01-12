@@ -160,7 +160,11 @@ def aggregate_neigh_rep(ad_dict: Dict[str,AnnData], neigh_rep_key: str = None, a
         aggr_neigh_rep_list.append(neigh_rep_sample)
     
     aggr_neigh_rep = pd.concat(aggr_neigh_rep_list, axis=0)    
+    # fill NaNs with 0 because some samples do not have all attrs
+    aggr_neigh_rep = aggr_neigh_rep.fillna(0) 
+    # drops all rows that consist entirely of zeros = rows of observations that have been filtered out due to low number of neighbors
     aggr_neigh_rep = aggr_neigh_rep[~(aggr_neigh_rep == 0).all(axis=1)]
+    
 
     return aggr_neigh_rep
     
