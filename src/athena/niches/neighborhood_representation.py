@@ -123,16 +123,18 @@ def neigh_rep_ad_dict(ad_dict: Dict[str,AnnData], attr_rep: str, mode_rep: str =
     
     return
 
-def aggregate_neigh_rep(ad_dict: Dict[str,AnnData], neigh_rep_key: str = None, attr_rep: str = None, mode_rep: str = None, graph_key: str = None, key_added: str = None, neigh_filtering: bool = False, min_neigh: int = 0, inplace: bool=True):
+def aggregate_neigh_rep(ad_dict: Dict[str,AnnData], n_rep_key: str = None, attr_rep: str = None, mode_rep: str = None, graph_key: str = None, key_added: str = None, neigh_filtering: bool = False, min_neigh: int = 0, inplace: bool=True):
     """Compute count or proportions of attr for each cell (with at least min_neighbors neighbors) in the AnnData object based on the specified topology.
 
     Args:
         ad_dict: Dictionary of AnnData instances with keys as sample names.
-        neigh_rep_key: Specifies the neighborhood representation to use in ad.uns.
+        n_rep_key: Specifies the neighborhood representation to use in ad.obsm.
         attr_rep: Categorical feature in ad.obs to use for the neighborhood representation. 
         mode_rep: 'proportion' or 'counts' to specify the type of neighborhood representation to compute.
         graph_key: Specifies the graph representation to use in ad.obsp.
-        key_added: Key added to ad.uns with the neighborhood representation.
+        key_added: Key added to ad.obsm with the neighborhood representation.
+        neigh_filtering: whether to filter out cells with less than min_neigh neighbors.
+        min_neigh: if neigh_filtering is True -> cells with less than min_neigh neighbors are filtered out of the neighborhood representation
         inplace: Whether to add the metric to the current AnnData instance or to return a new one.
 
     Returns: 
@@ -140,7 +142,7 @@ def aggregate_neigh_rep(ad_dict: Dict[str,AnnData], neigh_rep_key: str = None, a
             - aggregated neighborhood representations from all samples
             - multiindex 'sample_id' and 'observation_id'
     """
-    if neigh_rep_key is None:
+    if n_rep_key is None:
         assert (attr_rep and mode_rep and graph_key is not None), f"Missing required components: attr={attr_rep}, mode={mode_rep}, key={graph_key}"
         assert (neigh_filtering==True and min_neigh>0) or (neigh_filtering==False and min_neigh==0), 'if neigh_filtering is True, min_neigh has to be provided and has to be set to an int >0. if neigh_filtering is False, min_neigh has to be set to 0'
         # generate a copy if necessary
@@ -149,13 +151,13 @@ def aggregate_neigh_rep(ad_dict: Dict[str,AnnData], neigh_rep_key: str = None, a
             key_added = f'neigh_rep_{attr_rep}_{mode_rep}_{graph_key}'
         neigh_rep_ad_dict(ad_dict=ad_dict, attr_rep=attr_rep, mode_rep=mode_rep, graph_key=graph_key, key_added=key_added, neigh_filtering=neigh_filtering, min_neigh=min_neigh)
         if neigh_filtering is None:
-            neigh_rep_key = key_added
+            n_rep_key = key_added
         else:
-            neigh_rep_key = f'{key_added}_filter_{min_neigh}'
+            n_rep_key = f'{key_added}_filter_{min_neigh}'
     
     aggr_neigh_rep_list = list()
     for sample_id, ad in ad_dict.items():
-        neigh_rep_sample = ad.obsm[neigh_rep_key].copy()
+        neigh_rep_sample = ad.obsm[n_rep_key].copy()
         neigh_rep_sample.index = pd.MultiIndex.from_product([[sample_id], neigh_rep_sample.index], names=['sample_id', 'observation_id'])
         aggr_neigh_rep_list.append(neigh_rep_sample)
     

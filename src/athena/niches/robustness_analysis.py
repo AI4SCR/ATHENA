@@ -67,7 +67,7 @@ def assert_index_series(labels_dict: Dict[int, pd.Series]) -> bool:
             return False
     return True
 
-def compute_robustness_analysis(multiple_seeds_dict: Dict[int, Dict[str, Union[pd.Series, int, Dict[str, float]]]])-> dict:
+def cl_robustness(multiple_seeds_dict: Dict[int, Dict[str, Union[pd.Series, int, Dict[str, float]]]])-> dict:
     '''Select the best seed based on average ARI with other seeds.
 
     Args:
