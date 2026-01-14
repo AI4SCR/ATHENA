@@ -39,9 +39,9 @@ def compute_ARIs(labels_df: Dict[int, Dict[str, Union[pd.Series, int, Dict[str, 
             - seeds as column names and  clustering run labels assignment as values in each column 
     
     Return
-        dictionary with
-        - reference seeds as keys
-        - dictionary with  ARIs (values) for each other seed (keys)
+        pd.Dataframe with
+        - reference seeds as columns
+        - ARIs for each other seed 
     '''
     seeds_ARIs = {}
 
@@ -51,6 +51,8 @@ def compute_ARIs(labels_df: Dict[int, Dict[str, Union[pd.Series, int, Dict[str, 
     for seed in labels_df.columns:
         aris = calculate_ari_vs_reference(labels_df_filtered, reference_col_name=seed)
         seeds_ARIs[seed] = aris
+    
+    seeds_ARIs = pd.DataFrame(seeds_ARIs)
         
     return seeds_ARIs
 
@@ -100,12 +102,8 @@ def cl_robustness(multiple_seeds_dict: Dict[int, Dict[str, Union[pd.Series, int,
     aris = compute_ARIs(labels_df)
 
     # compute avg ari for each seed
-    avg_aris = {}
-    for seed in aris.keys():
-        avg_aris[seed] = np.mean(aris[seed])
-    
-    # best seed = seed with max avg ari
-    best_seed = max(avg_aris, key=avg_aris.get)   
+    avg_aris = aris.mean()
+    best_seed = avg_aris.idxmax() 
 
     # add avg ari of the best seed to its dict metrics
     selected_seed_dict = multiple_seeds_dict[best_seed]

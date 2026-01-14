@@ -6,7 +6,7 @@ from anndata import AnnData
 from typing import Dict, Union, List
 from sklearn.cluster import KMeans
 import copy
-from athena.niches.neighborhood_representation import aggregate_neigh_rep
+from athena.niches.neighborhood_representation import aggregate_n_rep
 from athena.niches.cluster_filtering import cl_filtering
 from athena.niches.robustness_analysis import cl_robustness
 from athena.niches.clustering_metrics import get_metrics
@@ -20,12 +20,12 @@ def n_slection(res_dict: Dict[str,Dict[str, str]], sel_n_metric: str ):
         
     Return
         res_dict with added 'selected' key (True if selected / False if not)'''
-    
+    assert sel_n_metric in ['inertia', 'silhouette_score', 'avg_ari' ]
     metrics = pd.Series()
     for n in res_dict.keys():
         res_dict[n]['selected'] = False
-        k_dict = res_dict[n]
-        metrics[n] = k_dict['metrics'][sel_n_metric]
+        n_dict = res_dict[n]
+        metrics[n] = n_dict['metrics'][sel_n_metric]
     if sel_n_metric == 'inertia':
         best_n = metrics.idxmin()
     else:
@@ -139,11 +139,11 @@ def cluster_singleseed(ad_dict: Dict[str, AnnData], n_rep: pd.DataFrame, cl_n:in
     metrics = get_metrics(values_df=values_df, labels=n_rep['labels'], centers=centers, inertia=inertia)
     
     if 'labels_raw' in n_rep.columns: 
-        k_dict = {'labels': n_rep['labels'], 'labels_raw':n_rep['labels_raw'], seed: seed, 'n_clusters': cl_n, 'metrics': metrics}
+        res_dict = {'labels': n_rep['labels'], 'labels_raw':n_rep['labels_raw'], 'seed': seed, 'n_clusters': cl_n, 'metrics': metrics}
     else:
-        k_dict = {'labels': n_rep['labels'], seed: seed, 'n_clusters': cl_n, 'metrics': metrics}
+        res_dict = {'labels': n_rep['labels'], 'seed': seed, 'n_clusters': cl_n, 'metrics': metrics}
 
-    return k_dict
+    return res_dict
 
 def multiseed_dicts(ad_dict: Dict[str, AnnData], n_rep: pd.DataFrame, cl_n:int, seeds: List[int], cl_modality: str, cl_filter:bool, cl_filtering_perc: int, cl_filtering_ent:str, **cl_params ):
     '''clustering and metrics one n and one seed
@@ -300,7 +300,7 @@ def clustering_add(ad_dict: Dict[str, AnnData], res_dict: dict, key_added:str, s
     '''Addition of clustering results to original (inplace) or new(not inplace) AnnData objects in ad_dict.
     Args:
         ad_dict: Dictionary of AnnData instances with keys as sample names.
-        k_dict: Dictionary containing clustering results.
+        res_dict: Dictionary containing clustering results.
         clustering_key: str.
         inplace: Whether to add the clustering results to the current AnnData instances or to return a new one.
     Return
@@ -421,7 +421,7 @@ def cluster_multin(ad_dict: Dict[str, AnnData], n_rep: pd.DataFrame, cl_n:int, r
     
     return res_dict
 
-def clustering(ad_dict: Dict[str,AnnData], n_rep_key: str = None, attr_rep: str = None, mode_rep: str = None, graph_key: str = None, neigh_filtering: bool = False, min_neigh: int = 0,
+def clustering(ad_dict: Dict[str,AnnData], n_rep_key: str = None, attr_rep: str = None, mode_rep: str = None, graph_key: str = None, n_filtering: bool = False, min_neigh: int = 0,
                 cl_modality: str = 'kmeans', cl_n: Union[int, List[int]] = 4, random_seeds: int= 1, random_state: int = 42, key_added: str = None, cl_filter: bool = False, cl_filtering_perc: int = 0, cl_filtering_ent: str = 'sample_id', sel_n:bool = False, sel_n_metric: str = 'silhouette_score', inplace:bool=True, **cl_params):
     
     """K-means clustering of the merged (all samples together) local neighborhood representation of cells.
@@ -434,8 +434,8 @@ def clustering(ad_dict: Dict[str,AnnData], n_rep_key: str = None, attr_rep: str 
         attr_rep: Categorical feature in ad.obs to use for the neighborhood representation. 
         mode_rep: 'proportion' or 'counts' to specify the type of neighborhood representation to compute.
         graph_key: Specifies the graph representation to use in ad.obsp.
-        neigh_filtering: whether to filter out cells with less than min_neigh neighbors.
-        min_neigh: if neigh_filtering is True -> cells with less than min_neigh neighbors are filtered out of the neighborhood representation
+        n_filtering: whether to filter out cells with less than min_neigh neighbors.
+        min_neigh: if n_filtering is True -> cells with less than min_neigh neighbors are filtered out of the neighborhood representation
         cl_modality = clustering modality.
         cl_n: number of clusters or list of number of clusters.
         random_seeds: number of seeds with which compute the clustering.
@@ -458,7 +458,7 @@ def clustering(ad_dict: Dict[str,AnnData], n_rep_key: str = None, attr_rep: str 
     ad_dict = ad_dict if inplace else copy.deepcopy(ad_dict)
     
     # get aggregated neighbor representation
-    n_rep = aggregate_neigh_rep(ad_dict=ad_dict, n_rep_key=n_rep_key, attr_rep=attr_rep, mode_rep=mode_rep, graph_key=graph_key, neigh_filtering=neigh_filtering, min_neigh=min_neigh)
+    n_rep = aggregate_n_rep(ad_dict=ad_dict, n_rep_key=n_rep_key, attr_rep=attr_rep, mode_rep=mode_rep, graph_key=graph_key, n_filtering=n_filtering, min_neigh=min_neigh)
 
     # one cluster number
     if type(cl_n) == int:
