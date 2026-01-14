@@ -1,5 +1,5 @@
-from clustering import z_scores, label_type_proportions
-from interactions import aggregate_interactions, above_median_fraction
+from athena.niches.cluster_analysis import z_scores, attr_proportions
+from athena.niches.interactions import aggregate_interactions, above_median_fraction
 from matplotlib import pyplot as plt
 import seaborn as sns
 from typing import Dict, Union, List
@@ -8,34 +8,85 @@ import pandas as pd
 from anndata import AnnData
 from matplotlib import cm
 import matplotlib.colors as colors
+import matplotlib.patches as mpatches
 
 #%%
 
-def plot_z_scores_heatmap(ad_dict: Dict[str, AnnData], clustering_key: str, label_type: str, z_score: pd.DataFrame = None, save_path: str = None):
+def plot_ARIs(aris_df, plot_name: str = None, save_path: str = None, best_avg: bool = False):
+    assert (save_path is None)==(plot_name is None), 'provide none or both save_path and plot_name'
+    fig, ax = plt.subplots(figsize=(10, 6), facecolor='white')
+
+    means = aris_df.mean()
+    max_idx = means.argmax()
+
+    # 3. Set default colors and highlight the max
+    if best_avg:
+        bp = aris_df.boxplot(grid=False, ax=ax, patch_artist=True, return_type='dict')
+        for i, box in enumerate(bp['boxes']):
+            box.set_edgecolor('black')
+            if i == max_idx:
+                box.set_facecolor('yellow')  # Highlight the best seed
+            else:
+                box.set_facecolor('white') # Default color for others
+        yellow_patch = mpatches.Patch(color='yellow', label='Highest Mean ARI')
+    else:
+        aris_df.boxplot(grid=False, ax=ax)
+
+    ax.plot(range(1, len(means) + 1), means, 
+        color='red',           
+        linestyle='-',    
+        linewidth=1,
+        label='Mean ARI')      # For a legend if you want on
+    
+    if best_avg:
+        ax.legend(handles=[plt.Line2D([0], [0], color='red', label='Mean ARI'), yellow_patch])
+    else:
+        ax.legend(handles=[plt.Line2D([0], [0], color='red', label='Mean ARI')])
+
+    ax.set_facecolor('white')
+    ax.set_ylim(0, 1)
+    ax.set_title('ARI Distribution per Seed')
+    ax.set_ylabel('Adjusted Rand Index')
+    ax.set_xticklabels(labels=aris_df.columns, rotation=45, ha='right', fontsize=10)
+    
+    plt.tight_layout()
+    plt.show()
+
+    if save_path:
+        save_name = save_path + plot_name +'.png'
+        fig.savefig(save_name, dpi=300, bbox_inches="tight")
+
+
+
+def plot_z_scores_heatmap(ad_dict: Union[Dict[str, AnnData], None]=None, group_key: str=None, attr: str = None, zscores: pd.DataFrame = None, plot_name: str = None, save_path: str = None):
     '''
-    Plot important heatmap of z-scores of label_type enrichment in each cluster.
+    Plot important heatmap of z-scores of attr enrichment in each cluster.
 
     Args:
         ad_dict: Dictionary of AnnData instances with keys as sample names.
-        clustering_key (str): Key in AnnData.obs representing the clustering.
-        label_type (str): Key in AnnData.obs representing the labels to assess enrichment.
-        z_score (pd.DataFrame, optional): Precomputed z-scores DataFrame. If None, it will be computed.
+        group_key (str): Key in AnnData.obs representing the clustering.
+        attr (str): Key in AnnData.obs representing the labels to assess enrichment.
+        zscores (pd.DataFrame, optional): Precomputed z-scores DataFrame. If None, it will be computed.
     
     Returns:
         None: Displays a heatmap plot.
     '''
-    if z_score is None:
-        z_score = z_scores(ad_dict, clustering_key, label_type)
+    
+    assert (save_path is None)==(plot_name is None), 'provide none or both save_path and plot_name'
+    assert (ad_dict is None) != (zscores is None), 'either provide zscores or ad_dict'
+    
+    if zscores is None:
+        zscores = z_scores(ad_dict=ad_dict, attr=attr, group_key=group_key)
     
     fig, ax = plt.subplots(figsize=(10,6))
-    sns.heatmap(z_score, annot=True, cmap='vlag', center=0, ax=ax)
-    ax.set_title(f'Z-scores of Cell Type Enrichment in {clustering_key} Niches')
-    ax.set_xlabel('Cell Type')
-    ax.set_ylabel('Niche Cluster')
+    sns.heatmap(zscores, annot=True, cmap='vlag', center=0, ax=ax)
+    ax.set_title(f'Z-scores of {attr} Enrichment in {group_key} groups')
+    ax.set_xlabel(f'{attr}')
+    ax.set_ylabel('Group')
     fig.show()
     if save_path:
-        dot_plot_name = save_path + f'z_scores_{clustering_key}_{label_type}.png'
-        fig.savefig(dot_plot_name, dpi=300, bbox_inches="tight")
+        save_name = save_path + plot_name +'.png'
+        fig.savefig(save_name, dpi=300, bbox_inches="tight")
 
 def get_color_map(labels: List[str]) -> Dict[str, str]:
     cmap = cm.get_cmap('tab10')
@@ -43,19 +94,19 @@ def get_color_map(labels: List[str]) -> Dict[str, str]:
     color_map = {ct: cmap(color_indices[ct]) for ct in labels}
     return color_map
 
-def stacked_bar_plots(ad_dict: Dict[str, AnnData], label_type:str, clustering_key: str, color_map: Dict[str,str] = None, save_path: str = None):
+def stacked_bar_plots(ad_dict: Dict[str, AnnData], attr:str, group_key: str, color_map: Dict[str,str] = None, save_path: str = None):
     '''
     Create stacked bar plots for cell type proportions in each niche cluster.
     Args:
         ad_dict: Dictionary of AnnData instances with keys as sample names.
-        label_type (str): Key in AnnData.obs representing the labels to assess proportions.
-        clustering_key (str): Key in AnnData.obs representing the clustering.
+        attr (str): Key in AnnData.obs representing the labels to assess proportions.
+        group_key (str): Key in AnnData.obs representing the clustering.
         color_map (Dict[str,str], optional): Color map for cell types. If None, a default will be generated.
         save_path (str, optional): Path to save the plot.png if desired
     Returns:
         None: Displays stacked bar plots.
     '''
-    proportions = label_type_proportions(ad_dict, label_type, group='per_group', obs_key=clustering_key)
+    proportions = attr_proportions(ad_dict, attr, group='per_group', obs_key=group_key)
     if color_map is None:
         labels = sorted(list(set(proportions.index.unique()))) 
         color_map= get_color_map(labels, )
@@ -83,7 +134,7 @@ def stacked_bar_plots(ad_dict: Dict[str, AnnData], label_type:str, clustering_ke
     fig.suptitle("Stacked Bar Charts of Cell Type Proportions in Niches", fontsize=16, weight='bold')
     fig.show()
     if save_path:
-        dot_plot_name = save_path + f'stacked_bar_plots_{label_type}_{clustering_key}.png'
+        dot_plot_name = save_path + f'stacked_bar_plots_{attr}_{group_key}.png'
         fig.savefig(dot_plot_name, dpi=300, bbox_inches="tight")
 
 def dot_plots(ad_dict: Dict[str,AnnData], interaction_key_group:str, aggregator: str = 'mean', save_path: str = None):
