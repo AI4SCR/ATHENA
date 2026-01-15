@@ -25,6 +25,7 @@ def n_slection(res_dict: Dict[str,Dict[str, str]], sel_n_metric: str ):
     for n in res_dict.keys():
         res_dict[n]['selected'] = False
         n_dict = res_dict[n]
+        print(n_dict)
         metrics[n] = n_dict['metrics'][sel_n_metric]
     if sel_n_metric == 'inertia':
         best_n = metrics.idxmin()

@@ -9,13 +9,26 @@ from anndata import AnnData
 from matplotlib import cm
 import matplotlib.colors as colors
 import matplotlib.patches as mpatches
+from athena.plotting.utils import savefig, dpi, label_fontdict, title_fontdict
 
 #%%
 
-def plot_ARIs(aris_df, plot_name: str = None, save_path: str = None, best_avg: bool = False):
-    assert (save_path is None)==(plot_name is None), 'provide none or both save_path and plot_name'
-    fig, ax = plt.subplots(figsize=(10, 6), facecolor='white')
-
+def plot_ARIs(aris_df:pd.DataFrame, best_avg: bool = False, title: str = None, save: str = None, ax: int = None, tight_layout: bool = False, show: bool = True):
+    '''
+    Args:
+        ax: axes object in which to plot
+        title: title of plot
+        show: whether to show the plot or not
+        save: path to the file in which the plot is saved
+    
+    '''
+    if ax:
+        fig = ax.get_figure()
+        show = False # do not automatically show plot if we provide axes
+    else:
+        fig, ax = plt.subplots(dpi=dpi)
+        ax.set_aspect('equal')
+    
     means = aris_df.mean()
     max_idx = means.argmax()
 
@@ -45,20 +58,24 @@ def plot_ARIs(aris_df, plot_name: str = None, save_path: str = None, best_avg: b
 
     ax.set_facecolor('white')
     ax.set_ylim(0, 1)
-    ax.set_title('ARI Distribution per Seed')
-    ax.set_ylabel('Adjusted Rand Index')
-    ax.set_xticklabels(labels=aris_df.columns, rotation=45, ha='right', fontsize=10)
-    
-    plt.tight_layout()
-    plt.show()
+    ax.set_ylabel('Adjusted Rand Index', label_fontdict)
+    ax.set_xticklabels(labels=aris_df.columns, rotation=45, ha='right', fontsize= label_fontdict['size'])
+    if title is not None:
+        ax.set_title(title, title_fontdict)
 
-    if save_path:
-        save_name = save_path + plot_name +'.png'
-        fig.savefig(save_name, dpi=300, bbox_inches="tight")
+    if tight_layout:
+        fig.tight_layout()
+
+    if show:
+        fig.show()
+
+    if save:
+        savefig(fig, save)
+
+    return ax
 
 
-
-def plot_z_scores_heatmap(ad_dict: Union[Dict[str, AnnData], None]=None, group_key: str=None, attr: str = None, zscores: pd.DataFrame = None, plot_name: str = None, save_path: str = None):
+def plot_z_scores_heatmap(ad_dict: Union[Dict[str, AnnData], None]=None, group_key: str=None, attr: str = None, zscores: pd.DataFrame = None, title: str = None, save: str = None, tight_layout: bool = False, show: bool = True, ax = None):
     '''
     Plot important heatmap of z-scores of attr enrichment in each cluster.
 
@@ -67,34 +84,52 @@ def plot_z_scores_heatmap(ad_dict: Union[Dict[str, AnnData], None]=None, group_k
         group_key (str): Key in AnnData.obs representing the clustering.
         attr (str): Key in AnnData.obs representing the labels to assess enrichment.
         zscores (pd.DataFrame, optional): Precomputed z-scores DataFrame. If None, it will be computed.
+        ax: axes object in which to plot
+        title: title of plot
+        show: whether to show the plot or not
+        save: path to the file in which the plot is saved
     
     Returns:
         None: Displays a heatmap plot.
     '''
-    
-    assert (save_path is None)==(plot_name is None), 'provide none or both save_path and plot_name'
     assert (ad_dict is None) != (zscores is None), 'either provide zscores or ad_dict'
     
+    if ax:
+        fig = ax.get_figure()
+        show = False # do not automatically show plot if we provide axes
+    else:
+        fig, ax = plt.subplots(dpi=dpi)
+        ax.set_aspect('equal')
     if zscores is None:
         zscores = z_scores(ad_dict=ad_dict, attr=attr, group_key=group_key)
     
-    fig, ax = plt.subplots(figsize=(10,6))
     sns.heatmap(zscores, annot=True, cmap='vlag', center=0, ax=ax)
-    ax.set_title(f'Z-scores of {attr} Enrichment in {group_key} groups')
-    ax.set_xlabel(f'{attr}')
-    ax.set_ylabel('Group')
-    fig.show()
-    if save_path:
-        save_name = save_path + plot_name +'.png'
-        fig.savefig(save_name, dpi=300, bbox_inches="tight")
+    ax.set_xlabel(attr, label_fontdict)
+    ax.set_ylabel('Group', label_fontdict)
+    
+    if title is not None:
+        ax.set_title(title, title_fontdict)
+
+    
+    if tight_layout:
+        fig.tight_layout()
+
+    if show:
+        fig.show()
+
+    if save:
+        savefig(fig, save)
+    
+    return ax
 
 def get_color_map(labels: List[str]) -> Dict[str, str]:
-    cmap = cm.get_cmap('tab10')
-    color_indices = {label: i for i, label in enumerate(labels)}
-    color_map = {ct: cmap(color_indices[ct]) for ct in labels}
+    cmap = plt.get_cmap('tab20') 
+
+    # 3. Build the dict using a loop (dictionary comprehension)
+    color_map = {name: cmap(i) for i, name in enumerate(labels)}
     return color_map
 
-def stacked_bar_plots(ad_dict: Dict[str, AnnData], attr:str, group_key: str, color_map: Dict[str,str] = None, save_path: str = None):
+def stacked_bar_plots(ad_dict: Dict[str, AnnData], attr:str, group_key: str, color_map: Dict[str,str] = None, save: str = None, tight_layout: bool = False, show: bool = True, title: str = None):
     '''
     Create stacked bar plots for cell type proportions in each niche cluster.
     Args:
@@ -102,28 +137,28 @@ def stacked_bar_plots(ad_dict: Dict[str, AnnData], attr:str, group_key: str, col
         attr (str): Key in AnnData.obs representing the labels to assess proportions.
         group_key (str): Key in AnnData.obs representing the clustering.
         color_map (Dict[str,str], optional): Color map for cell types. If None, a default will be generated.
-        save_path (str, optional): Path to save the plot.png if desired
+        save (str, optional): Path to save the plot.png if desired
     Returns:
         None: Displays stacked bar plots.
     '''
-    proportions = attr_proportions(ad_dict, attr, group='per_group', obs_key=group_key)
+    proportions = attr_proportions(ad_dict=ad_dict, attr=attr, group_key=group_key)
     if color_map is None:
-        labels = sorted(list(set(proportions.index.unique()))) 
-        color_map= get_color_map(labels, )
+        labels = list(proportions.columns)
+        color_map= get_color_map(labels)
     
-    number_of_groups = len(proportions.columns)   
+    number_of_groups = len(proportions.index)   
     fig, axes = plt.subplots(1, number_of_groups, figsize=(20, 10), sharey=True)
     
-    for ax, (title, df_series) in zip(axes, proportions.items()):
+    for ax, (i, (row_name, row_series)) in zip(axes, enumerate(proportions.iterrows())):
     
         bottom = 0  # bottom of the stack
     
-        for ct, prop in df_series.items():
+        for ct, prop in row_series.items():
         
             ax.bar(0, prop, bottom=bottom, color=color_map[ct], edgecolor='black', width=0.6, label=ct)
             bottom += prop
         
-        ax.set_title(title)
+        ax.set_title(row_name)
         ax.set_xticks([])  # remove x tick for single bar
         ax.set_ylim(0, 1)  # since proportions
 
@@ -131,13 +166,22 @@ def stacked_bar_plots(ad_dict: Dict[str, AnnData], attr:str, group_key: str, col
     handles = [plt.Rectangle((0, 0), 1, 1, color=color_map[ct]) for ct in labels]
     fig.legend(handles, labels, loc='right', title='Cell Type')
     axes[0].set_ylabel("Proportion")
-    fig.suptitle("Stacked Bar Charts of Cell Type Proportions in Niches", fontsize=16, weight='bold')
-    fig.show()
-    if save_path:
-        dot_plot_name = save_path + f'stacked_bar_plots_{attr}_{group_key}.png'
-        fig.savefig(dot_plot_name, dpi=300, bbox_inches="tight")
+    if title:
+        fig.suptitle(title, fontsize=16, weight='bold')
+    
+    if tight_layout:
+        fig.tight_layout()
 
-def dot_plots(ad_dict: Dict[str,AnnData], interaction_key_group:str, aggregator: str = 'mean', save_path: str = None):
+    if show:
+        fig.show()
+
+    if save:
+        savefig(fig, save)
+    
+    return axes
+    
+
+def dot_plots(ad_dict: Dict[str,AnnData], interaction_key_group:str, aggregator: str = 'mean', save: str = None):
     '''
     Create dot plots for aggregated interactions across samples.
 
@@ -189,9 +233,11 @@ def dot_plots(ad_dict: Dict[str,AnnData], interaction_key_group:str, aggregator:
     # --- Grid and layout ---
     ax.grid(True, linestyle='--', alpha=0.3)
     fig.show()
-    if save_path:
-        dot_plot_name = save_path + f'dot_plot_interactions_{interaction_key_group}_{aggregator}.png'
-        fig.savefig(dot_plot_name, dpi=300, bbox_inches="tight")
+    if save:
+        dot_title = save + f'dot_plot_interactions_{interaction_key_group}_{aggregator}.png'
+        fig.savefig(dot_title, dpi=300, bbox_inches="tight")
+
+
 
 def data_for_circos_plot(color_df: pd.DataFrame, width_df: pd.DataFrame, c):
     '''
@@ -223,7 +269,7 @@ def data_for_circos_plot(color_df: pd.DataFrame, width_df: pd.DataFrame, c):
 
     return {'color_dict': color_dict, 'width_dict': width_dict, 'sectors_df': sectors_df}
 
-def interactions_circos_plots(ad_dict: Dict[str,AnnData], interaction_key_group:str, aggregator: str = 'mean', color = 'interaction_values', color_map: Dict[str,str] = None, save_path: str = None):
+def interactions_circos_plots(ad_dict: Dict[str,AnnData], interaction_key_group:str, aggregator: str = 'mean', color = 'interaction_values', color_map: Dict[str,str] = None, save: str = None):
     '''
     Create circos plots for aggregated interactions across samples.
 
@@ -232,7 +278,7 @@ def interactions_circos_plots(ad_dict: Dict[str,AnnData], interaction_key_group:
         interaction_key: Key or list of keys in ad.uns where the interactions DataFrame is stored
         aggregator: Aggregation method - 'mean' or 'median'
         color: String indicating which color values to use 'interaction_values' or 'above_median_fraction'
-        save_path: Path to save the plot.png if desired
+        save: Path to save the plot.png if desired
 
     Returns:
         None: Displays dot plot.
@@ -331,12 +377,12 @@ def interactions_circos_plots(ad_dict: Dict[str,AnnData], interaction_key_group:
     cbar.ax.tick_params(labelsize=12)
     fig.show()    
 
-    if save_path:
-        dot_plot_name = save_path + f'circos_plot_interactions_{interaction_key_group}_{aggregator}_color_{color}.png'
-        fig.savefig(dot_plot_name, dpi=300, bbox_inches="tight")
+    if save:
+        dot_title = save + f'circos_plot_interactions_{interaction_key_group}_{aggregator}_color_{color}.png'
+        fig.savefig(dot_title, dpi=300, bbox_inches="tight")
 
 
-def interaction_heatmaps(ad_dict: Dict[str,AnnData], interaction_key_group:str, aggregator: str = 'mean', save_path: str = None):
+def interaction_heatmaps(ad_dict: Dict[str,AnnData], interaction_key_group:str, aggregator: str = 'mean', save: str = None):
     '''
     Create heatmaps for aggregated interactions across samples.
     Args:
@@ -359,9 +405,9 @@ def interaction_heatmaps(ad_dict: Dict[str,AnnData], interaction_key_group:str, 
     ax.set_title(f'Heatmap of {aggregator} Interactions in Niche {k}')
     fig.show()
 
-    if save_path:
-        dot_plot_name = save_path + f'heatmap_interactions_{interaction_key_group}_{aggregator}.png'
-        fig.savefig(dot_plot_name, dpi=300, bbox_inches="tight")
+    if save:
+        dot_title = save + f'heatmap_interactions_{interaction_key_group}_{aggregator}.png'
+        fig.savefig(dot_title, dpi=300, bbox_inches="tight")
 
 
 
