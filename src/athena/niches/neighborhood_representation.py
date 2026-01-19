@@ -41,6 +41,8 @@ def n_rep_filtering(ad: AnnData, graph_key: str, n_rep_key: str, min_neigh:int, 
         if n < min_neigh:
             n_rep_filt.loc[observation_id] *= 0
     
+    if key_added in ad.obsm.keys():
+        del ad.obsm[key_added] 
     ad.obsm[key_added] = n_rep_filt
         
     if not inplace:

@@ -98,7 +98,7 @@ def plot_z_scores_heatmap(ad_dict: Union[Dict[str, AnnData], None]=None, group_k
         fig = ax.get_figure()
         show = False # do not automatically show plot if we provide axes
     else:
-        fig, ax = plt.subplots(dpi=dpi)
+        fig, ax = plt.subplots(figsize=(15, 8))
         ax.set_aspect('equal')
     if zscores is None:
         zscores = z_scores(ad_dict=ad_dict, attr=attr, group_key=group_key)
@@ -180,6 +180,31 @@ def stacked_bar_plots(ad_dict: Dict[str, AnnData], attr:str, group_key: str, col
     
     return axes
     
+def plot_stacked_bars_on_ax(ad_dict, attr: str, group_key: str, ax, color_map: Dict[str, str] = None, title: str = None):
+    '''
+    Modular version: Plots stacked bars for all clusters onto a single provided Axes object.
+    '''
+    
+    proportions = attr_proportions(ad_dict=ad_dict, attr=attr, group_key=group_key)
+    labels = list(proportions.columns)
+    
+    if color_map is None:
+        color_map = get_color_map(labels)
+
+    # Plotting using pandas logic on the specific ax
+    # This plots all clusters side-by-side on the same axis
+    proportions.plot(kind='bar', stacked=True, ax=ax, color=[color_map[c] for c in labels], 
+                     edgecolor='black', width=0.8, legend=False)
+
+    if title:
+        ax.set_title(title, fontsize=12, weight='bold')
+    
+    ax.set_ylim(0, 1)
+    ax.set_ylabel("Proportion")
+    ax.set_xticklabels(ax.get_xticklabels(), rotation=45, ha='right')
+
+    return labels # Return labels for the legend
+
 
 def dot_plots(ad_dict: Dict[str,AnnData], interaction_key_group:str, aggregator: str = 'mean', save: str = None):
     '''

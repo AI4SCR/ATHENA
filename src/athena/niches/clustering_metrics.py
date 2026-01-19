@@ -24,6 +24,23 @@ def compute_inertia(filtered_n_rep: pd.DataFrame, filtered_labels: pd.Series, ce
     inertia = np.sum(squared_distances)
     return inertia
 
+def stratified_sampling(values_df: pd.DataFrame, labels: pd.Series):
+    '''Subsample 10% of total observations for silhouette score taking into account cluster labels frequency. 
+    Args:
+        values_df: DataFrame of neighborhood representations onto which the clustering has been done.
+        labels: Series with clustering labels.
+    
+    Return
+        sampled_values and sampled_labels
+    '''
+    assert labels.index.equals(values_df.index)
+    df = values_df.copy()
+    df['labels'] = labels
+    sampled_df = df.groupby('labels', group_keys=False).apply(lambda x: x.sample(frac=0.1, random_state=42))
+    sampled_labels = sampled_df['labels']
+    sampled_values = sampled_df.drop(columns=['labels'])
+    return sampled_values, sampled_labels
+
 
 
 def get_metrics(values_df: pd.DataFrame, labels: pd.Series, centers: Union[np.ndarray, None] = None, inertia: Union[float, None] = None):
@@ -40,12 +57,10 @@ def get_metrics(values_df: pd.DataFrame, labels: pd.Series, centers: Union[np.nd
     '''
     assert (type(inertia) == float) or (type(centers) == np.ndarray), "Either inertia or centers must be provided to compute metrics."
 
-
-    tot_cells = len(values_df.index)
-
     # if there has not have been cluster filtering, inertia does not have to be computed -> onòy compute the silhouette score
     if type(inertia) == float:
-        silhouette = silhouette_score(values_df.values, labels,sample_size=tot_cells//3)
+        samples_values, sampled_labels = stratified_sampling(values_df, labels)
+        silhouette = silhouette_score(samples_values.values, sampled_labels)
         metrics = {'inertia': inertia, 'silhouette_score': silhouette}
         return metrics
     
@@ -55,7 +70,8 @@ def get_metrics(values_df: pd.DataFrame, labels: pd.Series, centers: Union[np.nd
         filtered_labels = filtered_labels.astype(int)
         filtered_n_rep = values_df.loc[filtered_labels.index]
         inertia = compute_inertia(filtered_n_rep, filtered_labels, centers)
-        silhouette = silhouette_score(filtered_n_rep.values, filtered_labels,sample_size=tot_cells//3)
+        samples_values, sampled_labels = stratified_sampling(filtered_n_rep, filtered_labels)
+        silhouette = silhouette_score(samples_values.values, sampled_labels)
         metrics = {'inertia': inertia, 'silhouette_score': silhouette}
     
         return metrics

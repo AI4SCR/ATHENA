@@ -7,7 +7,7 @@ from typing import Dict, Union, List
 from sklearn.cluster import KMeans
 import copy
 from athena.niches.neighborhood_representation import aggregate_n_rep
-from athena.niches.cluster_filtering import cl_filtering
+from athena.niches.cluster_filtering import cl_filtering, cl_filtering_filt_attr
 from athena.niches.robustness_analysis import cl_robustness
 from athena.niches.clustering_metrics import get_metrics
 #%%
@@ -25,7 +25,6 @@ def n_slection(res_dict: Dict[str,Dict[str, str]], sel_n_metric: str ):
     for n in res_dict.keys():
         res_dict[n]['selected'] = False
         n_dict = res_dict[n]
-        print(n_dict)
         metrics[n] = n_dict['metrics'][sel_n_metric]
     if sel_n_metric == 'inertia':
         best_n = metrics.idxmin()
@@ -62,7 +61,7 @@ def k_means(n_rep: pd.DataFrame, cl_n:int, seed: int, **cl_params):
     return n_rep, centers, inertia
 
 
-def cluster(ad_dict: Dict[str, AnnData], n_rep: pd.DataFrame, cl_n:int, seed: int, cl_modality: str, cl_filter:bool, cl_filtering_perc: int, cl_filtering_ent:str, **cl_params ):
+def cluster(ad_dict: Dict[str, AnnData], n_rep: pd.DataFrame, cl_n:int, seed: int, cl_modality: str, cl_filter:bool, cl_filtering_perc: int, cl_filtering_ent:str,  filter_attr:str = None,**cl_params ):
     '''clustering and filtering
     Args:
         ad_dict: Dictionary of AnnData instances with keys as sample names.
@@ -95,7 +94,10 @@ def cluster(ad_dict: Dict[str, AnnData], n_rep: pd.DataFrame, cl_n:int, seed: in
 
     # filter labels if necessary
     if cl_filter:
-        n_rep = cl_filtering(ad_dict=ad_dict, res_df= n_rep, cl_filtering_perc=cl_filtering_perc, cl_filtering_ent=cl_filtering_ent)
+        if filter_attr: 
+            n_rep = cl_filtering_filt_attr(ad_dict=ad_dict, res_df= n_rep, cl_filtering_perc=cl_filtering_perc, cl_filtering_ent=cl_filtering_ent, filt_attr=filter_attr)
+        else:
+            n_rep = cl_filtering(ad_dict=ad_dict, res_df= n_rep, cl_filtering_perc=cl_filtering_perc, cl_filtering_ent=cl_filtering_ent)
         n_rep['labels_raw'] = n_rep['labels_raw'].astype('Int64')
     
     n_rep['labels'] = n_rep['labels'].astype('Int64')
@@ -109,7 +111,7 @@ def cluster(ad_dict: Dict[str, AnnData], n_rep: pd.DataFrame, cl_n:int, seed: in
     
     return n_rep, centers, inertia
 
-def cluster_singleseed(ad_dict: Dict[str, AnnData], n_rep: pd.DataFrame, cl_n:int, seed: int, cl_modality: str, cl_filter:bool, cl_filtering_perc: int, cl_filtering_ent:str, **cl_params ):
+def cluster_singleseed(ad_dict: Dict[str, AnnData], n_rep: pd.DataFrame, cl_n:int, seed: int, cl_modality: str, cl_filter:bool, cl_filtering_perc: int, cl_filtering_ent:str, filter_attr:str = None, **cl_params ):
     '''clustering and metrics one n and one seed
     Args:
         ad_dict: Dictionary of AnnData instances with keys as sample names.
@@ -133,7 +135,7 @@ def cluster_singleseed(ad_dict: Dict[str, AnnData], n_rep: pd.DataFrame, cl_n:in
             -'n_clusters' = number of clusters
 
     '''
-    n_rep, centers, inertia = cluster(ad_dict=ad_dict, n_rep=n_rep, cl_n=cl_n, seed=seed, cl_modality=cl_modality, cl_filter=cl_filter, cl_filtering_ent=cl_filtering_ent, cl_filtering_perc=cl_filtering_perc, **cl_params)
+    n_rep, centers, inertia = cluster(ad_dict=ad_dict, n_rep=n_rep, cl_n=cl_n, seed=seed, cl_modality=cl_modality, cl_filter=cl_filter, cl_filtering_ent=cl_filtering_ent, cl_filtering_perc=cl_filtering_perc, filter_attr=filter_attr, **cl_params)
 
     columns=['labels', 'labels_raw'] if 'labels_raw' in n_rep.columns else ['labels']
     values_df = n_rep.drop(columns=columns)
@@ -146,7 +148,7 @@ def cluster_singleseed(ad_dict: Dict[str, AnnData], n_rep: pd.DataFrame, cl_n:in
 
     return res_dict
 
-def multiseed_dicts(ad_dict: Dict[str, AnnData], n_rep: pd.DataFrame, cl_n:int, seeds: List[int], cl_modality: str, cl_filter:bool, cl_filtering_perc: int, cl_filtering_ent:str, **cl_params ):
+def multiseed_dicts(ad_dict: Dict[str, AnnData], n_rep: pd.DataFrame, cl_n:int, seeds: List[int], cl_modality: str, cl_filter:bool, cl_filtering_perc: int, cl_filtering_ent:str, filter_attr:str=None, **cl_params ):
     '''clustering and metrics one n and one seed
     Args:
         ad_dict: Dictionary of AnnData instances with keys as sample names.
@@ -180,7 +182,7 @@ def multiseed_dicts(ad_dict: Dict[str, AnnData], n_rep: pd.DataFrame, cl_n:int, 
     
     for seed in seeds:
         n_rep_copy = n_rep.copy()
-        n_rep_copy, seed_centers, seed_inertia = cluster(ad_dict=ad_dict, n_rep=n_rep_copy, cl_n=cl_n, seed=seed, cl_modality=cl_modality, cl_filter=cl_filter, cl_filtering_ent=cl_filtering_ent, cl_filtering_perc=cl_filtering_perc, **cl_params)
+        n_rep_copy, seed_centers, seed_inertia = cluster(ad_dict=ad_dict, n_rep=n_rep_copy, cl_n=cl_n, seed=seed, cl_modality=cl_modality, cl_filter=cl_filter, cl_filtering_ent=cl_filtering_ent, cl_filtering_perc=cl_filtering_perc, filter_attr=filter_attr, **cl_params)
 
         centers[seed] = seed_centers
         inertias[seed] = seed_inertia
@@ -194,7 +196,7 @@ def multiseed_dicts(ad_dict: Dict[str, AnnData], n_rep: pd.DataFrame, cl_n:int, 
     return res_dict, centers, inertias   
     
 
-def cluster_multiseed(ad_dict: Dict[str, AnnData], n_rep: pd.DataFrame, cl_n:int, seeds: List[int], cl_modality: str, cl_filter:bool=False, cl_filtering_perc: int=0, cl_filtering_ent:str='sample_id', **cl_params ):
+def cluster_multiseed(ad_dict: Dict[str, AnnData], n_rep: pd.DataFrame, cl_n:int, seeds: List[int], cl_modality: str, cl_filter:bool=False, cl_filtering_perc: int=0, cl_filtering_ent:str='sample_id', filter_attr:str=None, **cl_params ):
     '''clustering and metrics one n and one seed
     Args:
         ad_dict: Dictionary of AnnData instances with keys as sample names.
@@ -222,7 +224,7 @@ def cluster_multiseed(ad_dict: Dict[str, AnnData], n_rep: pd.DataFrame, cl_n:int
     centers = {}
     inertias = {}
     
-    res_dict, centers, inertias = multiseed_dicts(ad_dict=ad_dict, n_rep=n_rep, cl_n=cl_n, seeds=seeds, cl_modality=cl_modality, cl_filter=cl_filter, cl_filtering_perc=cl_filtering_perc, cl_filtering_ent=cl_filtering_ent, **cl_params )
+    res_dict, centers, inertias = multiseed_dicts(ad_dict=ad_dict, n_rep=n_rep, cl_n=cl_n, seeds=seeds, cl_modality=cl_modality, cl_filter=cl_filter, cl_filtering_perc=cl_filtering_perc, cl_filtering_ent=cl_filtering_ent, filter_attr=filter_attr, **cl_params )
 
     best_seed_dict = cl_robustness(res_dict)
     best_seed =  best_seed_dict['seed']
@@ -322,14 +324,22 @@ def clustering_add(ad_dict: Dict[str, AnnData], res_dict: dict, key_added:str, s
         obs_add_sample = obs_add_sample.astype('Int64')       
         assert obs_add_sample.index.equals(ad.obs.index), 'Indices of obs_add_sample and ad.obs do not match.'
         
-
-        ad.obs = ad.obs.join(obs_add_sample)  
+        if type(obs_add_sample)==pd.Series:
+            if key_added in ad.obs:  # drop previous computation of metric
+                ad.obs.drop(key_added, axis=1, inplace=True)
+            ad.obs[key_added] = obs_add_sample
+        else:
+            if obs_add_sample.columns.isin(set(ad.obs.columns)).any():
+                ad.obs.drop(columns=set(obs_add_sample.columns).intersection(ad.obs.columns), inplace=True)
+            ad.obs = ad.obs.join(obs_add_sample)  
+        if f'{key_added}_metrics' in ad.uns.keys():
+            del ad.uns[f'{key_added}_metrics'] 
         ad.uns[f'{key_added}_metrics'] = res_dict
     
     return   
 
 
-def cluster_singlen(ad_dict: Dict[str, AnnData], n_rep: pd.DataFrame, cl_n:int, random_seeds: int, cl_modality: str, cl_filter:bool, cl_filtering_perc: int, cl_filtering_ent:str, random_state: int = 42, **cl_params ):
+def cluster_singlen(ad_dict: Dict[str, AnnData], n_rep: pd.DataFrame, cl_n:int, random_seeds: int, cl_modality: str, cl_filter:bool, cl_filtering_perc: int, cl_filtering_ent:str, random_state: int = 42, filter_attr:str = None, **cl_params ):
     '''clustering and metrics one n and one seed
     Args:
         ad_dict: Dictionary of AnnData instances with keys as sample names.
@@ -362,15 +372,15 @@ def cluster_singlen(ad_dict: Dict[str, AnnData], n_rep: pd.DataFrame, cl_n:int, 
 
     if random_seeds == 1:
         seed = np.random.randint(0, 2**32, dtype='uint64') 
-        res_dict = cluster_singleseed(ad_dict=ad_dict, n_rep=n_rep, cl_n=cl_n, seed=seed, cl_modality=cl_modality, cl_filter=cl_filter, cl_filtering_perc=cl_filtering_perc, cl_filtering_ent=cl_filtering_ent, **cl_params )
+        res_dict = cluster_singleseed(ad_dict=ad_dict, n_rep=n_rep, cl_n=cl_n, seed=seed, cl_modality=cl_modality, cl_filter=cl_filter, cl_filtering_perc=cl_filtering_perc, cl_filtering_ent=cl_filtering_ent, filter_attr=filter_attr, **cl_params )
     
     else:
         seeds = np.random.randint(0, 2**32, size=random_seeds, dtype='uint64').tolist()
-        res_dict = cluster_multiseed(ad_dict=ad_dict, n_rep=n_rep, cl_n=cl_n, seeds=seeds, cl_modality=cl_modality, cl_filter=cl_filter, cl_filtering_perc=cl_filtering_perc, cl_filtering_ent=cl_filtering_ent, **cl_params )
+        res_dict = cluster_multiseed(ad_dict=ad_dict, n_rep=n_rep, cl_n=cl_n, seeds=seeds, cl_modality=cl_modality, cl_filter=cl_filter, cl_filtering_perc=cl_filtering_perc, cl_filtering_ent=cl_filtering_ent, filter_attr=filter_attr, **cl_params )
 
     return res_dict
 
-def cluster_multin(ad_dict: Dict[str, AnnData], n_rep: pd.DataFrame, cl_n:int, random_seeds: int, cl_modality: str, cl_filter:bool, cl_filtering_perc: int, cl_filtering_ent:str, sel_n: bool, sel_n_metric: str, random_state: int = 42, **cl_params):
+def cluster_multin(ad_dict: Dict[str, AnnData], n_rep: pd.DataFrame, cl_n:int, random_seeds: int, cl_modality: str, cl_filter:bool, cl_filtering_perc: int, cl_filtering_ent:str, sel_n: bool, sel_n_metric: str, random_state: int = 42,  filter_attr:str = None,**cl_params):
     '''clustering and metrics one n and one seed
     Args:
         ad_dict: Dictionary of AnnData instances with keys as sample names.
@@ -410,10 +420,10 @@ def cluster_multin(ad_dict: Dict[str, AnnData], n_rep: pd.DataFrame, cl_n:int, r
         n_rep_copy = n_rep.copy()
         if random_seeds == 1:
             seed = np.random.randint(0, 2**32, dtype='uint64') 
-            n_dict = cluster_singleseed(ad_dict=ad_dict, n_rep=n_rep_copy, cl_n=i, seed=seed, cl_modality=cl_modality, cl_filter=cl_filter, cl_filtering_perc=cl_filtering_perc, cl_filtering_ent=cl_filtering_ent, **cl_params )    
+            n_dict = cluster_singleseed(ad_dict=ad_dict, n_rep=n_rep_copy, cl_n=i, seed=seed, cl_modality=cl_modality, cl_filter=cl_filter, cl_filtering_perc=cl_filtering_perc, cl_filtering_ent=cl_filtering_ent, filter_attr=filter_attr, **cl_params )    
         else:
             seeds = np.random.randint(0, 2**32, size=random_seeds, dtype='uint64').tolist()
-            n_dict = cluster_multiseed(ad_dict=ad_dict, n_rep=n_rep_copy, cl_n=i, seeds=seeds, cl_modality=cl_modality, cl_filter=cl_filter, cl_filtering_perc=cl_filtering_perc, cl_filtering_ent=cl_filtering_ent, **cl_params )
+            n_dict = cluster_multiseed(ad_dict=ad_dict, n_rep=n_rep_copy, cl_n=i, seeds=seeds, cl_modality=cl_modality, cl_filter=cl_filter, cl_filtering_perc=cl_filtering_perc, cl_filtering_ent=cl_filtering_ent, filter_attr=filter_attr, **cl_params )
         res_dict[i] = n_dict
     
     if sel_n:
@@ -423,7 +433,7 @@ def cluster_multin(ad_dict: Dict[str, AnnData], n_rep: pd.DataFrame, cl_n:int, r
     return res_dict
 
 def clustering(ad_dict: Dict[str,AnnData], n_rep_key: str = None, attr_rep: str = None, mode_rep: str = None, graph_key: str = None, n_filtering: bool = False, min_neigh: int = 0,
-                cl_modality: str = 'kmeans', cl_n: Union[int, List[int]] = 4, random_seeds: int= 1, random_state: int = 42, key_added: str = None, cl_filter: bool = False, cl_filtering_perc: int = 0, cl_filtering_ent: str = 'sample_id', sel_n:bool = False, sel_n_metric: str = 'silhouette_score', inplace:bool=True, **cl_params):
+                cl_modality: str = 'kmeans', cl_n: Union[int, List[int]] = 4, random_seeds: int= 1, random_state: int = 42, key_added: str = None, cl_filter: bool = False, cl_filtering_perc: int = 0, cl_filtering_ent: str = 'sample_id', filter_attr: str = None, sel_n:bool = False, sel_n_metric: str = 'silhouette_score', inplace:bool=True, **cl_params):
     
     """K-means clustering of the merged (all samples together) local neighborhood representation of cells.
 
@@ -445,6 +455,7 @@ def clustering(ad_dict: Dict[str,AnnData], n_rep_key: str = None, attr_rep: str 
         cl_filter: whether to filter clusters based on the cluster_filtering_entity.
         cl_filtering_perc: percentage of clusters to keep based on the cluster_filtering_entity.
         cl_filtering_ent: entity to use for clusters filtering. Options are 'sample_id' or any categorical column in ad.obs.
+        filter_attr: whether to filter cluster considering entities containing at least 13 of observations with filter_attr
         sel_n: whether to select the best cluster number based on the sel_n_metric. 
         sel_n_metric: metric to use for selecting the best k. Options are 'silhouette_score' or 'inertia' or 'average_ARI'.
                     it cannot be avg_ari if random_seeds == 1 is False.
@@ -463,12 +474,12 @@ def clustering(ad_dict: Dict[str,AnnData], n_rep_key: str = None, attr_rep: str 
 
     # one cluster number
     if type(cl_n) == int:
-        res_dict = cluster_singlen(ad_dict=ad_dict, n_rep=n_rep, cl_n=cl_n, random_seeds=random_seeds, cl_modality=cl_modality, cl_filter=cl_filter, cl_filtering_perc=cl_filtering_perc, cl_filtering_ent=cl_filtering_ent, random_state=random_state, **cl_params)
+        res_dict = cluster_singlen(ad_dict=ad_dict, n_rep=n_rep, cl_n=cl_n, random_seeds=random_seeds, cl_modality=cl_modality, cl_filter=cl_filter, cl_filtering_perc=cl_filtering_perc, cl_filtering_ent=cl_filtering_ent, random_state=random_state, filter_attr=filter_attr, **cl_params)
     
     # multiple cluster numbers 
     elif type(cl_n) == list:
         assert len(cl_n) > 1, 'If k is a list it must contain more than one value.' 
-        res_dict = cluster_multin(ad_dict=ad_dict, n_rep=n_rep, cl_n=cl_n, random_seeds=random_seeds, cl_modality=cl_modality, cl_filter=cl_filter, cl_filtering_perc=cl_filtering_perc, cl_filtering_ent=cl_filtering_ent, sel_n=sel_n, sel_n_metric=sel_n_metric, random_state=random_state, **cl_params)
+        res_dict = cluster_multin(ad_dict=ad_dict, n_rep=n_rep, cl_n=cl_n, random_seeds=random_seeds, cl_modality=cl_modality, cl_filter=cl_filter, cl_filtering_perc=cl_filtering_perc, cl_filtering_ent=cl_filtering_ent, sel_n=sel_n, sel_n_metric=sel_n_metric, random_state=random_state, filter_attr=filter_attr, **cl_params)
     
     # add clusterign results in ad_dict
     clustering_add(ad_dict=ad_dict, res_dict=res_dict, key_added=key_added, sel_n=sel_n)
