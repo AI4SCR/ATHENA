@@ -1,7 +1,7 @@
 import pandas as pd
 from anndata import AnnData
 from typing import Dict, Union, List
-from athena.niches.cluster_analysis import aggregate_attr, freq_attr
+from athena.niches.clustering.cluster_analysis import aggregate_attr, freq_attr
 #%%
 
 def cl_ent(ad_dict: Dict[str, AnnData] , res_df: pd.DataFrame, cl_filtering_ent: str, filt_attr: str=None):

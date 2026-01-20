@@ -6,10 +6,10 @@ from anndata import AnnData
 from typing import Dict, Union, List
 from sklearn.cluster import KMeans
 import copy
-from athena.niches.neighborhood_representation import aggregate_n_rep
-from athena.niches.cluster_filtering import cl_filtering, cl_filtering_filt_attr
-from athena.niches.robustness_analysis import cl_robustness
-from athena.niches.clustering_metrics import get_metrics
+from athena.niches.neighborhood_representation.neigh_repr import aggregate_n_rep
+from athena.niches.clustering.cluster_filtering import cl_filtering, cl_filtering_filt_attr
+from athena.niches.clustering.robustness_analysis import cl_robustness
+from athena.niches.clustering.clustering_metrics import get_metrics
 #%%
 
 def n_slection(res_dict: Dict[str,Dict[str, str]], sel_n_metric: str ):

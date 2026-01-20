@@ -1,5 +1,5 @@
-from athena.niches.cluster_analysis import z_scores, attr_proportions
-from athena.niches.interactions import aggregate_interactions, above_median_fraction
+from athena.niches.clustering.cluster_analysis import z_scores, attr_proportions
+from athena.niches.interactions.interactions import aggregate_interactions, above_median_fraction
 from matplotlib import pyplot as plt
 import seaborn as sns
 from typing import Dict, Union, List
