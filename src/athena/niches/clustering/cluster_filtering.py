@@ -72,14 +72,15 @@ def cl_filter_add(ad_dict: Dict[str, AnnData], res_df: pd.DataFrame, cl_filterin
 
 
 
-def cl_filtering(ad_dict: Dict[str, AnnData], res_df: pd.DataFrame, cl_filtering_perc: int, cl_filtering_ent: str):
+def cl_filtering(ad_dict: Dict[str, AnnData], res_df: pd.DataFrame, cl_filtering_prop: float , cl_filtering_ent: str, min_obs: int = 0):
     """Filtering of clusters that are present in less than cluster_filtering_perc of the cluster_filtering_ent
     Args:
         ad_dict: Dictionary of AnnData instances with keys as sample names.
         res_df:  DataFrame of aggregated neighborhood representations of all the samples and 'labels' column with cluster assignments
         cl_filtering: whether to filter clusters based on the cluster_filtering_entity.
-        cl_filtering_perc: percentage of clusters to keep based on the cluster_filtering_entity.
+        cl_filtering_prop: propotion of clusters to keep based on the cluster_filtering_entity.
         cl_filtering_ent: entity to use for clusters filtering. Options are 'sample_id' or any categorical column in ad.obs.
+        min_obs: minimum number of obs of a sample assigned to a cluster to consider the cluster present in the sample when filtering.
 
     Returns: 
         modified res_df:
@@ -87,7 +88,7 @@ def cl_filtering(ad_dict: Dict[str, AnnData], res_df: pd.DataFrame, cl_filtering
             - 'labels' = filtered labels, with Na instead of filtered labels
         
     """
-    assert (1 <= cl_filtering_perc <= 100), "cluster_filtering_percentage must be between 1 and 100"
+    assert (0.0 <= cl_filtering_prop <= 1), "cluster_filtering_propotion must be between 1 and 100"
 
     # add column with filtering entity to the aggregated neighborhood representation
     res_df = cl_filter_add(ad_dict=ad_dict, res_df=res_df, cl_filtering_ent=cl_filtering_ent)
@@ -96,9 +97,9 @@ def cl_filtering(ad_dict: Dict[str, AnnData], res_df: pd.DataFrame, cl_filtering
 
     # calculate the threshold 
     total_filter_entities = res_df['cl_filter'].nunique() # number of unique cluster filtering entities  
-    threshold = (cl_filtering_perc / 100) * total_filter_entities # threshold = number of cluster filtering entities representing the cluster filtering percentage
-    # count unique entities per label
-    cl_filter_counts = res_df.groupby('labels')['cl_filter'].nunique() 
+    threshold = cl_filtering_prop * total_filter_entities # threshold = number of cluster filtering entities representing the cluster filtering propotion
+    # count how many entities per label have more than min_obs observations
+    cl_filter_counts = res_df.groupby('labels')['cl_filter'].apply(lambda x: (x.value_counts() >= min_obs).sum())
     # identify labels (clusters) that fall below the thereshold = that are present in less than the threshold number of cluster filtering entities
     index_to_filter = cl_filter_counts[cl_filter_counts < threshold].index.tolist()
     # change the labels (cluster) that have to be filtered out to nan values
@@ -110,13 +111,13 @@ def cl_filtering(ad_dict: Dict[str, AnnData], res_df: pd.DataFrame, cl_filtering
     return  res_df
 
 
-def cl_filtering_filt_attr(ad_dict: Dict[str, AnnData], filt_attr: str, res_df: pd.DataFrame, cl_filtering_perc: int, cl_filtering_ent: str):
+def cl_filtering_filt_attr(ad_dict: Dict[str, AnnData], filt_attr: str, res_df: pd.DataFrame, cl_filtering_prop: float , cl_filtering_ent: str):
     """Filtering of clusters that are present in less than cluster_filtering_perc of the cluster_filtering_ent
     Args:
         ad_dict: Dictionary of AnnData instances with keys as sample names.
         res_df:  DataFrame of aggregated neighborhood representations of all the samples and 'labels' column with cluster assignments
         cl_filtering: whether to filter clusters based on the cluster_filtering_entity.
-        cl_filtering_perc: percentage of clusters to keep based on the cluster_filtering_entity.
+        cl_filtering_prop: propotion of clusters to keep based on the cluster_filtering_entity.
         cl_filtering_ent: entity to use for clusters filtering. Options are 'sample_id' or any categorical column in ad.obs.
 
     Returns: 
@@ -125,7 +126,7 @@ def cl_filtering_filt_attr(ad_dict: Dict[str, AnnData], filt_attr: str, res_df: 
             - 'labels' = filtered labels, with Na instead of filtered labels
         
     """
-    assert (1 <= cl_filtering_perc <= 100), "cluster_filtering_percentage must be between 1 and 100"
+    assert (1 <= cl_filtering_prop <= 100), "cluster_filtering_propotion must be between 1 and 100"
 
     # add column with filtering entity to the aggregated neighborhood representation
     res_df = cl_filter_add(ad_dict=ad_dict, res_df=res_df, cl_filtering_ent=cl_filtering_ent, filt_attr=filt_attr)
@@ -160,9 +161,9 @@ def cl_filtering_filt_attr(ad_dict: Dict[str, AnnData], filt_attr: str, res_df: 
         # check if the cluster is each cl_filter category of the filtered_df
         cl_pres = filtered_df.groupby('cl_filter')['labels'].apply(lambda x: (x == label).any())
 
-        # percentage of True values (True = 1 and False = 0 => the mean is the percentage)
-        percentage = cl_pres.mean()*100
-        if percentage < cl_filtering_perc:
+        # propotion of True values (True = 1 and False = 0 => the mean is the propotion)
+        propotion = cl_pres.mean()*100
+        if propotion < cl_filtering_prop:
             labels_to_filter.append(label)
     # make a copy of the original labels
     res_df['labels_raw'] = res_df['labels'].copy()

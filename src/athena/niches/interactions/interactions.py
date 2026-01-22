@@ -11,7 +11,7 @@ import copy
 
 #%%
 
-def compute_interactions(ad: AnnData, graph_key: str, attr: str, mode: str = 'proportion') -> Dict[tuple, int]:
+def compute_int(ad: AnnData, graph_key: str, attr: str, mode: str = 'proportion') -> Dict[tuple, int]:
     '''
     Compute the proportion of interactions between attr types based on edges of graph g.
 
@@ -21,7 +21,9 @@ def compute_interactions(ad: AnnData, graph_key: str, attr: str, mode: str = 'pr
         attr: The obs column in adata.obs that contains the attr types among which count interactions 
     
     Returns:
-        interactions_df: DataFrame with columns ['cell_type_1', 'cell_type_2', 'interaction_proportion']
+        interactions_df: pd.Series with 
+            - multiindex ('attr_1', 'attr_2')
+            - columns 'score'
     '''
     assert graph_key in ad.obsp, f'Graph key {graph_key} not found in ad.obsp.' 
     assert attr in ad.obs.columns, 'attr is not in ad.obs.column'
@@ -44,15 +46,15 @@ def compute_interactions(ad: AnnData, graph_key: str, attr: str, mode: str = 'pr
     
     if mode == 'counts':
         interactions_df = pd.DataFrame.from_dict(interactions, orient='index', columns=['interaction_counts'])
-        interactions_df.index = pd.MultiIndex.from_tuples(interactions_df.index).set_names(['cell_type_1', 'cell_type_2'])
-        interactions_df.columns = ['interaction_counts']
+        interactions_df.index = pd.MultiIndex.from_tuples(interactions_df.index).set_names(['attr_1', 'attr_2'])
+        interactions_df.columns = ['score']
 
     else:    
         total = sum(interactions.values())
         interactions_proportions = {pair: count/total for pair, count in interactions.items()}
         interactions_df = pd.DataFrame.from_dict(interactions_proportions, orient='index', columns=['interaction_proportion'])
-        interactions_df.index = pd.MultiIndex.from_tuples(interactions_df.index).set_names(['cell_type_1', 'cell_type_2'])
-        interactions_df.columns = ['interaction_proportion']
+        interactions_df.index = pd.MultiIndex.from_tuples(interactions_df.index).set_names(['attr_1', 'attr_2'])
+        interactions_df.columns = ['score']
 
     return interactions_df
     
@@ -73,7 +75,9 @@ def attr_interactions_ad(ad:AnnData,  attr: str, graph_key: str = 'radius_80', g
         inplace: whether to add the interaction computation to the provided ad or to a copy of ad
     
     Returns:
-        Adds to ad.uns: DataFrame with columns ['cell_type_1', 'cell_type_2', 'interaction_proportion'] for each group
+        Adds to ad.uns: interactions_df: pd.Series for each group with 
+            - multiindex ('attr_1', 'attr_2')
+            - columns 'score'
 
     '''
     assert group_key is not None or overall, 'Must provide group_key or set overall=True'
@@ -86,23 +90,23 @@ def attr_interactions_ad(ad:AnnData,  attr: str, graph_key: str = 'radius_80', g
     ad = ad if inplace else ad.copy()
 
     if key_added is None:
-        key_added = f'{attr}_interactions'
+        key_added = ''
 
     if overall: 
-        interactions_df = compute_interactions(ad=ad, graph_key=graph_key, attr=attr, mode=mode)
+        interactions_df = compute_int(ad=ad, graph_key=graph_key, attr=attr, mode=mode)
         if f'{key_added}_overall' in ad.uns.keys():
-            del ad.uns[f'{attr}_overall']
-        ad.uns[f'{attr}_overall'] = interactions_df
+            del ad.uns[f'{key_added}_overall']
+        ad.uns[f'{key_added}_overall'] = interactions_df
 
     if group_key:
         groups = ad.obs[group_key].dropna().unique().tolist()
         for group in groups: 
             ad_group = ad[ad.obs.index[ad.obs[group_key] == group], :]
             if ad_group.n_obs > min_obs:  
-                interactions_df = compute_interactions(ad= ad_group, graph_key=graph_key, attr=attr, mode=mode)
+                interactions_df = compute_int(ad= ad_group, graph_key=graph_key, attr=attr, mode=mode)
                 if f'{key_added}_{group}' in ad.uns.keys():
-                    del ad.uns[f'{key_added}_{group}']
-                ad.uns[f'{key_added}_{group}'] = interactions_df
+                    del ad.uns[f'{key_added}_group_{group}']
+                ad.uns[f'{key_added}_group_{group}'] = interactions_df
 
     return
 
@@ -166,6 +170,7 @@ def aggregate_interactions(ad_dict: Dict[str,AnnData], interaction_key:Union[str
     for key, dfs in collection.items():
         agg_df = pd.concat(dfs, axis=1).fillna(0)
         results[key] = agg_df.agg(aggregator, axis=1)
+        results[key] = results[key].rename('score')
 
     return results
 
@@ -181,7 +186,7 @@ def above_median_fraction(ad_dict: Dict[str,AnnData], interaction_key_group:str,
     Returns:
         pd.Series with fraction of samples above median interaction proportion for each pair of cell types
     '''
-    median_interaction_overall = aggregate_interactions(ad_dict, interaction_key_overall, aggregator = 'median')[interaction_key_overall]
+    median_interaction_overall = aggregate_interactions(ad_dict=ad_dict, interaction_key=interaction_key_overall, aggregator = 'median')[interaction_key_overall]
     above_median_count = pd.Series(0, index=median_interaction_overall.index, name='above_median_count')
     samples_with_group = 0
     for ad in ad_dict.values():
@@ -196,7 +201,7 @@ def above_median_fraction(ad_dict: Dict[str,AnnData], interaction_key_group:str,
         raise ValueError(f"{interaction_key_group} is not in any AnnData object in ad_dict.")
     
     above_median_fraction = above_median_count / samples_with_group
-    above_median_fraction.columns = ['above_median_fraction']
+    above_median_fraction = above_median_fraction.rename('score')
     return above_median_fraction
 
 

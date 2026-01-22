@@ -6,10 +6,11 @@ import networkx as nx
 from collections import defaultdict, Counter
 from typing import Dict, Union, List
 import copy
+import numpy as np
 
 #%%
 def n_rep_filtering(ad: AnnData, graph_key: str, n_rep_key: str, min_neigh:int, key_added:str = None, inplace:bool = True):
-    '''filter n_rep based on min_neigh
+    '''filter n_rep based on min_neigh -> fill row with NaNs
     Args:
         ad: AnnData instance.
         graph_key: Specifies the graph representation to use in ad.obsp.
@@ -39,7 +40,7 @@ def n_rep_filtering(ad: AnnData, graph_key: str, n_rep_key: str, min_neigh:int, 
     for observation_id in observation_ids:
         n = g.degree(observation_id)
         if n < min_neigh:
-            n_rep_filt.loc[observation_id] *= 0
+            n_rep_filt.loc[observation_id] = np.nan
     
     if key_added in ad.obsm.keys():
         del ad.obsm[key_added] 

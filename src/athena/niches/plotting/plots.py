@@ -10,7 +10,7 @@ from matplotlib import cm
 import matplotlib.colors as colors
 import matplotlib.patches as mpatches
 from athena.plotting.utils import savefig, dpi, label_fontdict, title_fontdict
-
+from athena.niches.plotting.utils import get_color_map, data_for_circos_plot
 #%%
 
 def plot_ARIs(aris_df:pd.DataFrame, best_avg: bool = False, title: str = None, save: str = None, ax: int = None, tight_layout: bool = False, show: bool = True):
@@ -75,7 +75,7 @@ def plot_ARIs(aris_df:pd.DataFrame, best_avg: bool = False, title: str = None, s
     return ax
 
 
-def plot_z_scores_heatmap(ad_dict: Union[Dict[str, AnnData], None]=None, group_key: str=None, attr: str = None, zscores: pd.DataFrame = None, title: str = None, save: str = None, tight_layout: bool = False, show: bool = True, ax = None):
+def plot_z_scores_heatmap(ad_dict: Union[Dict[str, AnnData], None]=None, group_key: str=None, attr: str = None, zscores: pd.DataFrame = None, title: str = None, save: str = None, tight_layout: bool = False, show: bool = True, ax = None, val_min:int = None, val_max:int=None, colormap = None):
     '''
     Plot important heatmap of z-scores of attr enrichment in each cluster.
 
@@ -103,7 +103,15 @@ def plot_z_scores_heatmap(ad_dict: Union[Dict[str, AnnData], None]=None, group_k
     if zscores is None:
         zscores = z_scores(ad_dict=ad_dict, attr=attr, group_key=group_key)
     
-    sns.heatmap(zscores, annot=True, cmap='vlag', center=0, ax=ax)
+    if val_min is None:
+        val_min = zscores.values.min()
+    if val_max is None:
+        val_max = zscores.values.max()
+    
+    if colormap is None:
+        colormap = 'vlag'
+    
+    sns.heatmap(zscores, annot=True, cmap=colormap, center=0, ax=ax, vmax=val_max, vmin=val_min)
     ax.set_xlabel(attr, label_fontdict)
     ax.set_ylabel('Group', label_fontdict)
     
@@ -121,13 +129,6 @@ def plot_z_scores_heatmap(ad_dict: Union[Dict[str, AnnData], None]=None, group_k
         savefig(fig, save)
     
     return ax
-
-def get_color_map(labels: List[str]) -> Dict[str, str]:
-    cmap = plt.get_cmap('tab20') 
-
-    # 3. Build the dict using a loop (dictionary comprehension)
-    color_map = {name: cmap(i) for i, name in enumerate(labels)}
-    return color_map
 
 def stacked_bar_plots(ad_dict: Dict[str, AnnData], attr:str, group_key: str, color_map: Dict[str,str] = None, save: str = None, tight_layout: bool = False, show: bool = True, title: str = None):
     '''
@@ -206,7 +207,7 @@ def plot_stacked_bars_on_ax(ad_dict, attr: str, group_key: str, ax, color_map: D
     return labels # Return labels for the legend
 
 
-def dot_plots(ad_dict: Dict[str,AnnData], interaction_key_group:str, aggregator: str = 'mean', save: str = None):
+def dot_plots(ad_dict: Dict[str,AnnData], interaction_key_group:str,interaction_key_overall:str, aggregator: str = 'mean', color: str = 'interaction_values',color_map: Dict[str,str] = None, title: str = None, save: str = None, ax: int = None, tight_layout: bool = False, show: bool = True, val_min: int=None, val_max:int = None, return_data: bool = False):
     '''
     Create dot plots for aggregated interactions across samples.
 
@@ -219,37 +220,67 @@ def dot_plots(ad_dict: Dict[str,AnnData], interaction_key_group:str, aggregator:
         None: Displays dot plot.
     '''
     assert aggregator in ['mean', 'median'], "aggregator must be either 'mean' or 'median'"
+    assert color in ['interaction_values', 'above_median_fraction'], "color must be either 'interaction_values' or 'above_median_fraction'"
 
-    merged_group = aggregate_interactions(ad_dict, interaction_key_group, aggregator)
-    above_median_fr = above_median_fraction(ad_dict, interaction_key_group)
-
-    fig, ax = plt.subplots(figsize=(15, 12))
+    merged_group = aggregate_interactions(ad_dict, interaction_key_group, aggregator)[interaction_key_group]
+    above_median_fr = above_median_fraction(ad_dict, interaction_key_group=interaction_key_group, interaction_key_overall=interaction_key_overall)
+    if color == 'interaction_values':
+        color_df = merged_group.copy().reset_index()
+        width_df = above_median_fr.copy().reset_index()
+    else: 
+        width_df = merged_group.copy().reset_index()
+        color_df = above_median_fr.copy().reset_index()
+    
+    if ax:
+        fig = ax.get_figure()
+        show = False # do not automatically show plot if we provide axes
+        return_data = False
+    else:
+        fig, ax = plt.subplots(figsize=(15, 12))
+        ax.set_aspect('equal')
+    
+    if color == 'interaction_values':
+        col = f'{aggregator}_{color}'
+        cw_legend = f'Color = {aggregator}_{color}, Line Width = above_median_fraction'
+    else:
+        col = color
+        cw_legend = f'Color = {color}, Line_Width = {aggregator}_interaction_value'
+    
+    if color_map is None:
+        color_map = 'Reds'
+    
+    if val_min is None:
+        val_min = color_df['score'].min()
+    if val_max is None:
+        val_max= color_df['score'].max()
 
     scatter = ax.scatter(
-    x=merged_group['Cell_Type_2'],
-    y=merged_group['Cell_Type_1'],
-    c=merged_group[f'{aggregator}_interaction'],        # color by aggregated interaction value 
-    s=above_median_fr['above_median_fraction'] *1000,   # dot size by fraction above median value
-    cmap='Reds', #'YlGn'
+    x=color_df['attr_1'],
+    y=color_df['attr_2'],
+    c=color_df['score'],        
+    s=width_df['score'] *1000,   
+    cmap=color_map, #'YlGn'
     alpha=0.8,
-    edgecolor='k'
+    edgecolor='k',
+    vmin=val_min,    # Set your minimum value here
+    vmax=val_max     # Set your maximum value here
     )
     # --- Colorbar ---
     cbar = plt.colorbar(scatter, ax=ax, fraction=0.046, pad=0.04)
-    cbar.set_label(f'{aggregator} interaction value', fontsize=12)
-
-    k = interaction_key_group[interaction_key_group.find('interactions_') + len('interactions_') + 1:] # remove cell_type_interactions_ to get the niche name
+    cbar.set_label(col, fontsize=12)
 
     # --- Titles and labels ---
+    if title is None:
+        title = ''
     ax.set_title(
-        f'Dot Plot of Interactions in {k}\n'
-        f'(Size = above median fraction, Color = {aggregator} interaction)',
+        f'{title} \n'
+        f'{cw_legend}',
         fontsize=16,
         pad=20,
         weight='bold'
     )
-    ax.set_xlabel('Cell type', fontsize=13, labelpad=10)
-    ax.set_ylabel('Cell type', fontsize=13, labelpad=10)
+    ax.set_xlabel('attr', fontsize=13, labelpad=10)
+    ax.set_ylabel('attr', fontsize=13, labelpad=10)
 
     # --- Ticks ---
     ax.tick_params(axis='x', rotation=45)
@@ -257,44 +288,24 @@ def dot_plots(ad_dict: Dict[str,AnnData], interaction_key_group:str, aggregator:
 
     # --- Grid and layout ---
     ax.grid(True, linestyle='--', alpha=0.3)
-    fig.show()
+    
+    if tight_layout:
+        fig.tight_layout()
+
+    if show:
+        fig.show()
+
     if save:
-        dot_title = save + f'dot_plot_interactions_{interaction_key_group}_{aggregator}.png'
-        fig.savefig(dot_title, dpi=300, bbox_inches="tight")
+        savefig(fig, save)
+    
+    if return_data:
+        return {'width': width_df, 'color': color_df}
+    
+    return ax
 
 
 
-def data_for_circos_plot(color_df: pd.DataFrame, width_df: pd.DataFrame, c):
-    '''
-    Create color and width dictionaries for circos plot links and pd.DataFrame for sectors.
-    Args:
-        color_df (pd.DataFrame): DataFrame with color values for interactions.
-        width_df (pd.DataFrame): DataFrame with width values for interactions.
-    Returns:
-        Dict[str, Dict[Tuple[str, str], float]] and Dict[str, pd.DataFrame]: Dictionary with 'color_dict' and 'width_dict' and 'sectors_df'.
-    '''
-    #WIDTH
-    width_df.reset_index(inplace=True)
-    width_df.columns = ['from', 'to', 'Value']
-    width_df = width_df.dropna(subset=['Value'])
-    width_dict = {(row['from'], row['to']): row['Value'] for _, row in width_df.iterrows()}
-    #width_dict = {k: v for k, v in width_dict.items()}
-
-    # COLOR
-    color_df.reset_index(inplace=True)
-    color_df.columns = ['from', 'to', 'Value']
-    color_df = color_df.dropna(subset=['Value'])
-    color_dict = {(row['from'], row['to']): row['Value'] for _, row in color_df.iterrows()}
-
-    #SECTORS 
-    sectors_df = width_df.copy()
-    sectors_df.columns = ['width']
-    sectors_df = width_df.pivot(index='cell_type_1', columns='cell_type_2', values='above_median_fraction')
-    sectors_df = sectors_df.fillna(0)
-
-    return {'color_dict': color_dict, 'width_dict': width_dict, 'sectors_df': sectors_df}
-
-def interactions_circos_plots(ad_dict: Dict[str,AnnData], interaction_key_group:str, aggregator: str = 'mean', color = 'interaction_values', color_map: Dict[str,str] = None, save: str = None):
+def interactions_circos_plots(ad_dict: Dict[str,AnnData], interaction_key_group:str, interaction_key_overall:str, aggregator: str = 'mean', color: str = 'interaction_values', color_map: Dict[str,str] = None, title: str = None, save: str = None, ax: int = None, tight_layout: bool = False, show: bool = True, val_min: int=None, val_max:int = None, return_data: bool = False):
     '''
     Create circos plots for aggregated interactions across samples.
 
@@ -312,8 +323,8 @@ def interactions_circos_plots(ad_dict: Dict[str,AnnData], interaction_key_group:
     assert color in ['interaction_values', 'above_median_fraction'], "color must be either 'interaction_values' or 'above_median_fraction'"
     
     from pycirclize import Circos
-    merged_group = aggregate_interactions(ad_dict, interaction_key_group, aggregator)
-    above_median_fr = above_median_fraction(ad_dict, interaction_key_group)
+    merged_group = aggregate_interactions(ad_dict, interaction_key= interaction_key_group, aggregator=aggregator)[interaction_key_group]
+    above_median_fr = above_median_fraction(ad_dict, interaction_key_group=interaction_key_group, interaction_key_overall=interaction_key_overall)
 
     if color == 'interaction_values':
         dicts = data_for_circos_plot(color_df=merged_group, width_df=above_median_fr)
@@ -323,9 +334,14 @@ def interactions_circos_plots(ad_dict: Dict[str,AnnData], interaction_key_group:
     color_dict = dicts['color_dict']
     width_dict = dicts['width_dict']
     sectors_df = dicts['sectors_df']
+
+    if val_min is None:
+        val_min = min(color_dict.values())
+    if val_max is None:
+        val_max = max(color_dict.values())
     
     if color_map is None:
-        labels = sorted(list(set(sectors_df.index['cell_type_1'].unique()).union(set(sectors_df.index['cell_type_2'].unique())))) 
+        labels = sorted(list(set(sectors_df.index.unique()).union(set(sectors_df.columns.unique())))) 
         cell_color_map= get_color_map(labels)
 
     def link_handler(from_label, to_label):
@@ -339,19 +355,17 @@ def interactions_circos_plots(ad_dict: Dict[str,AnnData], interaction_key_group:
             filt = lw
         
         if filt <= 0.001:
-            color = 'none'
+            link_color = 'none'
             lw = 0
         else:    
             # Map value to a color using a colormap
             cmap = cm.get_cmap("Reds")  # or "Reds", "coolwarm", etc.
-            val_min = min(color_dict.values())
-            val_max = max(color_dict.values())
             norm = colors.Normalize(vmin=val_min, vmax=val_max)
             sm = cm.ScalarMappable(cmap=cmap, norm=norm)
-            color = sm.to_rgba(val)  # val should be in 0-1
+            link_color = sm.to_rgba(val)  # val should be in 0-1
 
         # Return styling dictionary
-        return dict(ec='none', lw=lw, fc=color, alpha=0.7)   
+        return dict(ec='none', lw=lw, fc=link_color, alpha=0.7)   
     
     circos = Circos.chord_diagram(
         sectors_df,
@@ -366,31 +380,39 @@ def interactions_circos_plots(ad_dict: Dict[str,AnnData], interaction_key_group:
         link_kws_handler=link_handler
         )
     
-    fig = circos.plotfig(figsize=(20, 15))
-    ax = fig.axes[0]
+    if ax:
+        fig = ax.get_figure()
+        show = False # do not automatically show plot if we provide axes
+        return_data = False
+    else:
+        fig, ax = plt.subplots(
+        figsize=(20, 15), 
+        dpi=dpi, 
+        subplot_kw={'projection': 'polar'})
+        #ax.set_aspect('equal')
 
-    # Adjust spacing to make room for title and colorbar
-    plt.subplots_adjust(top=3, right=3)  # leave margin on top and right
 
-    k = interaction_key_group[interaction_key_group.find('interactions_') + len('interactions_') + 1:] # remove cell_type_interactions_ to get the niche name
+    circos.plotfig(ax=ax) # Plot directly on the handle
+
+    #k = interaction_key_group[interaction_key_group.find('interactions_') + len('interactions_') + 1:] # remove cell_type_interactions_ to get the niche name
 
     if color == 'interaction_values':
-        col = f'{aggregator} interaction value'
-        wid = 'above median fraction'
+        col = f'{aggregator}_{color}'
+        cw_legend = f'Color = {aggregator}_{color}, Line Width = above_median_fraction'
     else:
-        col = 'above median fraction'
-        wid = f'{aggregator} interaction value'
+        col = color
+        cw_legend = f'Color = {color}, Line_Width = {aggregator}_interaction_value'
     
+    if title is None:
+        title = 'Circos plot'
     fig.suptitle(
-        f"Circos Plot of Interactions in Niche {k}\nColor = {col}, Line Width = {wid}",
+        f"{title} \n {cw_legend}",
         fontsize=16,
         fontweight="bold",
         y=0.99  # vertical position: 1.0 is top of figure
     )
 
     # Add colorbar legend
-    val_min = min(color_dict.values())
-    val_max = max(color_dict.values())
     norm = colors.Normalize(vmin=val_min, vmax=val_max)
     cmap = cm.get_cmap("Reds")
     sm = cm.ScalarMappable(cmap=cmap, norm=norm)
@@ -400,14 +422,22 @@ def interactions_circos_plots(ad_dict: Dict[str,AnnData], interaction_key_group:
     cbar = fig.colorbar(sm, cax=cbar_ax, orientation='vertical', label=col)
     cbar.set_label(col, fontsize=14)
     cbar.ax.tick_params(labelsize=12)
-    fig.show()    
+    
+    if tight_layout:
+        fig.tight_layout()
+
+    if show:
+        fig.show()
 
     if save:
-        dot_title = save + f'circos_plot_interactions_{interaction_key_group}_{aggregator}_color_{color}.png'
-        fig.savefig(dot_title, dpi=300, bbox_inches="tight")
+        savefig(fig, save)
+    
+    if return_data: 
+        return dicts
+    
+    return ax
 
-
-def interaction_heatmaps(ad_dict: Dict[str,AnnData], interaction_key_group:str, aggregator: str = 'mean', save: str = None):
+def interaction_heatmaps(ad_dict: Dict[str,AnnData], interaction_key_group:str, aggregator: str = 'mean',color_map: Dict[str,str] = None, title: str = None, save: str = None, ax: int = None, tight_layout: bool = False, show: bool = True, val_min: int=None, val_max:int = None, return_data: bool = False):
     '''
     Create heatmaps for aggregated interactions across samples.
     Args:
@@ -418,22 +448,45 @@ def interaction_heatmaps(ad_dict: Dict[str,AnnData], interaction_key_group:str, 
         None: Displays heatmap plot.
     '''
     assert aggregator in ['mean', 'median'], "aggregator must be either 'mean' or 'median'"
-    merged_group = aggregate_interactions(ad_dict, interaction_key_group, aggregator)
-    df = merged_group.pivot(index='cell_type_1', columns='cell_type_2', values=f'{aggregator}_interaction')
+    merged_group = aggregate_interactions(ad_dict, interaction_key_group, aggregator)[interaction_key_group]
+    df = merged_group.reset_index().pivot(index='attr_1', columns='attr_2', values=f'score')
     df = df.fillna(0)
 
-    fig, ax = plt.subplots(figsize=(10,8))
+    if ax:
+        fig = ax.get_figure()
+        show = False # do not automatically show plot if we provide axes
+        return_data = False
+    else:
+        fig, ax = plt.subplots(figsize=(10, 8))
+        ax.set_aspect('equal')
 
-    sns.heatmap(df, annot=True, cmap='Reds', ax=ax)
+    if color_map is None:
+        color_map = 'Reds'
+
+    if val_max is None:
+        val_max = df.values.max()
+    if val_min is None:
+        val_min = df.values.min()
+
+    sns.heatmap(df, annot=True, cmap=color_map, ax=ax, vmax=val_max, vmin=val_min)
     
-    k = interaction_key_group[interaction_key_group.find('interactions_') + len('interactions_') + 1:] # remove cell_type_interactions_ to get the niche name
-    ax.set_title(f'Heatmap of {aggregator} Interactions in Niche {k}')
+    if title: 
+        ax.set_title(title)
     fig.show()
 
-    if save:
-        dot_title = save + f'heatmap_interactions_{interaction_key_group}_{aggregator}.png'
-        fig.savefig(dot_title, dpi=300, bbox_inches="tight")
+    if tight_layout:
+        fig.tight_layout()
 
+    if show:
+        fig.show()
+
+    if save:
+        savefig(fig, save)
+
+    if return_data:
+        return df
+
+    return ax
 
 
 def radar_plots():
