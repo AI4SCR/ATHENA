@@ -126,13 +126,14 @@ def z_scores(ad_dict: Dict[str, AnnData], attr: str, group_key:str, aggregator: 
 def freq_attr(aggr: pd.DataFrame, attr: str, group_key: str):
     '''compute mean and standard deviation of the frequency of each attribute in each niche and overall
     Args:
-        ad_dict: Dictionary of AnnData instances with keys as sample names.
+        aggr: pd.Dataframe with attr and group_key as columns
         attr: .obs column to compute the z scores
         group_key: .obs_column with cluster labels
     Returns:
         freq_mean = pd.DataFrame with mean frequency of attributes (columns) overall and in each niche (row names) 
         freq_std = pd.DataFrame with standard deviation of frequency of attributes (columns) overall and in each niche (row names) 
     '''
+    
     clusters = np.unique(aggr[group_key])
 
     counts = aggr.groupby(['sample_id', 'label_name']).size().unstack(fill_value=0).sum()
