@@ -287,18 +287,18 @@ def plot_interactions_dot_plots(ad_dict: Dict[str,AnnData], interaction_key_grou
     
     if color == 'interaction_values':
         col = f'{aggregator}_{color}'
-        cw_legend = f'Color = {aggregator}_{color}, Line Width = above_median_fraction'
+        cw_legend = f'Color = {aggregator}_{color}\nLine Width = above_median_fraction'
     else:
         col = color
-        cw_legend = f'Color = {color}, Line_Width = {aggregator}_interaction_value'
+        cw_legend = f'Color = {color}\nLine_Width = {aggregator}_interaction_value'
     
     if color_map is None:
         color_map = 'Reds'
     
     if val_min is None:
-        val_min = color_df['score'].min()
+        val_min = color_df['color'].min()
     if val_max is None:
-        val_max= color_df['score'].max()
+        val_max= color_df['color'].max()
 
     scatter = ax.scatter(
     x=combined_df['attr_1'],
@@ -316,25 +316,72 @@ def plot_interactions_dot_plots(ad_dict: Dict[str,AnnData], interaction_key_grou
     cbar.set_label(col, fontsize=12)
 
     # --- Titles and labels ---
-    if title is None:
-        title = ''
-    ax.set_title(
-        f'{title} \n'
-        f'{cw_legend}',
-        fontsize=16,
-        pad=20,
-        weight='bold'
-    )
+    if title:
+        ax.set_title(
+            title,
+            fontsize=16,
+            pad=20,
+            weight='bold'
+        )
+    
+    # Add text box at the top right
+    ax.text(1.75, 1.10, 
+        cw_legend, 
+        transform=ax.transAxes, 
+        fontsize=14,
+        verticalalignment='top', 
+        horizontalalignment='right', 
+        bbox=dict(boxstyle='round,pad=0.5', facecolor='white', alpha=0.8, edgecolor='gray'))
+
+    # IMPORTANT: Shrink the main plot area to make room for the box on the right/top
+    #plt.subplots_adjust(right=0.8, top=0.8)
     ax.set_xlabel('attr', fontsize=13, labelpad=10)
     ax.set_ylabel('attr', fontsize=13, labelpad=10)
 
     # --- Ticks ---
-    ax.tick_params(axis='x', rotation=45)
+    ax.set_xticklabels(ax.get_xticklabels(), rotation=45, ha='right', rotation_mode='anchor')
     ax.tick_params(axis='both', labelsize=11)
 
     # --- Grid and layout ---
     ax.grid(True, linestyle='--', alpha=0.3)
+
+    # --- Dot Size Legend (Bigger & More Steps) ---
+    from matplotlib.lines import Line2D
+
+    # 1. Define 5 steps from the min to max of your width data
+    w_min, w_max = combined_df['width'].min(), combined_df['width'].max()
+    sample_widths = np.linspace(w_min, w_max, 5) 
     
+    # 2. Create the "handles"
+    size_handles = [
+        Line2D([0], [0], 
+               marker='o', 
+               color='w', 
+               label=f'{round(w, 2)}',
+               markerfacecolor='gray', 
+               markersize=np.sqrt(w * 1000), 
+               alpha=0.8) 
+        for w in sample_widths
+    ]
+
+    # 3. Increase the x-coordinate (1.45) to move it past the colorbar
+    size_legend = ax.legend(
+        handles=size_handles, 
+        title="Width Value", 
+        loc='upper left',          # Changed to upper left for easier anchoring
+        bbox_to_anchor=(1.35, 0.9), # Move further right and slightly down
+        frameon=True,
+        fontsize=12,         
+        title_fontsize=14,   
+        labelspacing=1.8,    # Even more space for a "bigger" feel
+        borderpad=1.5,       
+        handletextpad=1.5    
+    )
+    
+    ax.add_artist(size_legend)
+
+    plt.subplots_adjust(right=0.65) # Shrink the plot more to make room on the right
+
     if tight_layout:
         fig.tight_layout()
 
@@ -448,23 +495,29 @@ def plot_interactions_circos_plots(ad_dict: Dict[str,AnnData], interaction_key_g
 
     circos.plotfig(ax=ax) # Plot directly on the handle
 
-    #k = interaction_key_group[interaction_key_group.find('interactions_') + len('interactions_') + 1:] # remove cell_type_interactions_ to get the niche name
-
     if color == 'interaction_values':
         col = f'{aggregator}_{color}'
-        cw_legend = f'Color = {aggregator}_{color}, Line Width = above_median_fraction'
+        cw_legend = f'Color = {aggregator}_{color} \nLine Width = above_median_fraction'
     else:
         col = color
-        cw_legend = f'Color = {color}, Line_Width = {aggregator}_interaction_value'
+        cw_legend = f'Color = {color} \nLine_Width = {aggregator}_interaction_value'
     
-    if title is None:
-        title = 'Circos plot'
-    fig.suptitle(
-        f"{title} \n {cw_legend}",
-        fontsize=16,
-        fontweight="bold",
-        y=0.99  # vertical position: 1.0 is top of figure
-    )
+    # Add this to your code to create a clean legend box in the corner
+    ax.text(1.05, 1.0, 
+        cw_legend, 
+        transform=ax.transAxes, 
+        fontsize=14,
+        verticalalignment='top', 
+        horizontalalignment='left', # 'left' anchors it to the right of the plot
+        bbox=dict(boxstyle='round,pad=0.5', facecolor='white', alpha=0.8, edgecolor='gray'))
+    
+    if title:    
+        fig.suptitle(
+            title,
+            fontsize=16,
+            fontweight="bold",
+            y=0.99  # vertical position: 1.0 is top of figure
+        )
 
     # Add colorbar legend
     norm = colors.Normalize(vmin=val_min, vmax=val_max)
@@ -476,6 +529,8 @@ def plot_interactions_circos_plots(ad_dict: Dict[str,AnnData], interaction_key_g
     cbar = fig.colorbar(sm, cax=cbar_ax, orientation='vertical', label=col)
     cbar.set_label(col, fontsize=14)
     cbar.ax.tick_params(labelsize=12)
+
+    
     
     if tight_layout:
         fig.tight_layout()
