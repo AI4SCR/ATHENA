@@ -16,10 +16,16 @@ from athena.niches.plotting.utils import get_color_map, data_for_circos_plot
 def plot_ARIs(aris_df:pd.DataFrame, best_avg: bool = False, title: str = None, save: str = None, ax: int = None, tight_layout: bool = False, show: bool = True):
     '''
     Args:
+        aris_df: Dataframe with ARIs for each column (Seed)
         ax: axes object in which to plot
         title: title of plot
-        show: whether to show the plot or not
-        save: path to the file in which the plot is saved
+        show: whether to show the picture or not
+        save: Path to save the plot.png if desired
+        tight_layout
+    
+    Return:
+        ax
+    
     
     '''
     if ax:
@@ -75,7 +81,7 @@ def plot_ARIs(aris_df:pd.DataFrame, best_avg: bool = False, title: str = None, s
     return ax
 
 
-def plot_z_scores_heatmap(ad_dict: Union[Dict[str, AnnData], None]=None, group_key: str=None, attr: str = None, zscores: pd.DataFrame = None, title: str = None, save: str = None, tight_layout: bool = False, show: bool = True, ax = None, val_min:int = None, val_max:int=None, colormap = None):
+def plot_zscores_heatmap(ad_dict: Union[Dict[str, AnnData], None]=None, group_key: str=None, attr: str = None, zscores: pd.DataFrame = None, title: str = None, save: str = None, tight_layout: bool = False, show: bool = True, ax = None, val_min:int = None, val_max:int=None, colormap = None, return_data:bool = False):
     '''
     Plot important heatmap of z-scores of attr enrichment in each cluster.
 
@@ -85,12 +91,15 @@ def plot_z_scores_heatmap(ad_dict: Union[Dict[str, AnnData], None]=None, group_k
         attr (str): Key in AnnData.obs representing the labels to assess enrichment.
         zscores (pd.DataFrame, optional): Precomputed z-scores DataFrame. If None, it will be computed.
         ax: axes object in which to plot
-        title: title of plot
-        show: whether to show the plot or not
-        save: path to the file in which the plot is saved
+        title: title of the plot
+        tight_layout
+        show: whether to show the picture or not
+        val_min, val_max: minimum and maximum values of the color scale
+        return_data: whether to return the data used to make the plot
+        save: Path to save the plot.png if desired
     
     Returns:
-        None: Displays a heatmap plot.
+        ax or data if return_data
     '''
     assert (ad_dict is None) != (zscores is None), 'either provide zscores or ad_dict'
     
@@ -128,19 +137,28 @@ def plot_z_scores_heatmap(ad_dict: Union[Dict[str, AnnData], None]=None, group_k
     if save:
         savefig(fig, save)
     
+    if return_data:
+        return zscores
+    
     return ax
 
-def stacked_bar_plots(ad_dict: Dict[str, AnnData], attr:str, group_key: str, color_map: Dict[str,str] = None, save: str = None, tight_layout: bool = False, show: bool = True, title: str = None):
+def plot_stacked_bars(ad_dict: Dict[str, AnnData], attr:str, group_key: str, color_map: Dict[str,str] = None, save: str = None, tight_layout: bool = False, show: bool = True, title: str = None, return_data:bool = False):
     '''
     Create stacked bar plots for cell type proportions in each niche cluster.
     Args:
         ad_dict: Dictionary of AnnData instances with keys as sample names.
         attr (str): Key in AnnData.obs representing the labels to assess proportions.
-        group_key (str): Key in AnnData.obs representing the clustering.
-        color_map (Dict[str,str], optional): Color map for cell types. If None, a default will be generated.
-        save (str, optional): Path to save the plot.png if desired
+        group_key: Key in AnnData.obs representing the clustering.
+        color_map: color map for cell types. If None, a default will be generated.
+        save: path to save the plot
+        title: title of the plot
+        tight_layout
+        show: whether to show the picture or not
+        return_data: whether to return the data used to make the plot
+        save: Path to save the plot.png if desired
+
     Returns:
-        None: Displays stacked bar plots.
+        ax or data if return_data
     '''
     proportions = attr_proportions(ad_dict=ad_dict, attr=attr, group_key=group_key)
     if color_map is None:
@@ -179,11 +197,25 @@ def stacked_bar_plots(ad_dict: Dict[str, AnnData], attr:str, group_key: str, col
     if save:
         savefig(fig, save)
     
+    if return_data:
+        return proportions
+    
     return axes
     
-def plot_stacked_bars_on_ax(ad_dict, attr: str, group_key: str, ax, color_map: Dict[str, str] = None, title: str = None):
+def plot_stacked_bars_on_ax(ad_dict: Dict[str, AnnData], attr:str, group_key: str, ax, color_map: Dict[str,str] = None, title: str = None):
     '''
     Modular version: Plots stacked bars for all clusters onto a single provided Axes object.
+    
+    Args:
+        ad_dict: Dictionary of AnnData instances with keys as sample names.
+        attr (str): Key in AnnData.obs representing the labels to assess proportions.
+        group_key: Key in AnnData.obs representing the clustering.
+        ax: axes object in which to plot
+        color_map: color map for cell types. If None, a default will be generated.
+        title: title of the plot
+
+    Returns:
+        labels for the legend
     '''
     
     proportions = attr_proportions(ad_dict=ad_dict, attr=attr, group_key=group_key)
@@ -207,17 +239,27 @@ def plot_stacked_bars_on_ax(ad_dict, attr: str, group_key: str, ax, color_map: D
     return labels # Return labels for the legend
 
 
-def dot_plots(ad_dict: Dict[str,AnnData], interaction_key_group:str,interaction_key_overall:str, aggregator: str = 'mean', color: str = 'interaction_values',color_map: Dict[str,str] = None, title: str = None, save: str = None, ax: int = None, tight_layout: bool = False, show: bool = True, val_min: int=None, val_max:int = None, return_data: bool = False):
+def plot_interactions_dot_plots(ad_dict: Dict[str,AnnData], interaction_key_group:str,interaction_key_overall:str, aggregator: str = 'mean', color: str = 'interaction_values',color_map: Dict[str,str] = None, title: str = None, save: str = None, ax: int = None, tight_layout: bool = False, show: bool = True, val_min: int=None, val_max:int = None, return_data: bool = False):
     '''
     Create dot plots for aggregated interactions across samples.
 
     Args:
         ad_dict: Dictionary of AnnData instances with keys as sample names.
-        interaction_key: Key or list of keys in ad.uns where the interactions DataFrame is stored
-        aggregator: Aggregation method - 'mean' or 'median'
-    
+        interaction_key_group: Key in ad.uns where the interactions DataFrame of the group/niche is stored
+        interaction_key_overall: Key in ad.uns where the overall interactions DataFrame is stored
+        aggregator: Aggregation method for the ineteractions in different samples -'mean' or 'median'
+        color: String indicating which color values to use 'interaction_values' or 'above_median_fraction'
+        title: title of the plot
+        save: path to save the plot
+        ax: axes object in which to plot
+        tight_layout
+        show: whether to show the picture or not
+        val_min, val_max: minimum and maximum values of the color scale
+        return_data: whether to return the data used to make the plot
+        save: Path to save the plot.png if desired
+
     Returns:
-        None: Displays dot plot.
+        ax or data if return_data
     '''
     assert aggregator in ['mean', 'median'], "aggregator must be either 'mean' or 'median'"
     assert color in ['interaction_values', 'above_median_fraction'], "color must be either 'interaction_values' or 'above_median_fraction'"
@@ -231,6 +273,10 @@ def dot_plots(ad_dict: Dict[str,AnnData], interaction_key_group:str,interaction_
         width_df = merged_group.copy().reset_index()
         color_df = above_median_fr.copy().reset_index()
     
+    width_df.columns = ['attr_1', 'attr_2', 'width']
+    color_df.columns = ['attr_1', 'attr_2', 'color']
+    combined_df = color_df.merge(width_df)
+
     if ax:
         fig = ax.get_figure()
         show = False # do not automatically show plot if we provide axes
@@ -255,10 +301,10 @@ def dot_plots(ad_dict: Dict[str,AnnData], interaction_key_group:str,interaction_
         val_max= color_df['score'].max()
 
     scatter = ax.scatter(
-    x=color_df['attr_1'],
-    y=color_df['attr_2'],
-    c=color_df['score'],        
-    s=width_df['score'] *1000,   
+    x=combined_df['attr_1'],
+    y=combined_df['attr_2'],
+    c=combined_df['color'],        
+    s=combined_df['width'] *1000,   
     cmap=color_map, #'YlGn'
     alpha=0.8,
     edgecolor='k',
@@ -299,25 +345,33 @@ def dot_plots(ad_dict: Dict[str,AnnData], interaction_key_group:str,interaction_
         savefig(fig, save)
     
     if return_data:
-        return {'width': width_df, 'color': color_df}
+        return combined_df
     
     return ax
 
 
 
-def interactions_circos_plots(ad_dict: Dict[str,AnnData], interaction_key_group:str, interaction_key_overall:str, aggregator: str = 'mean', color: str = 'interaction_values', color_map: Dict[str,str] = None, title: str = None, save: str = None, ax: int = None, tight_layout: bool = False, show: bool = True, val_min: int=None, val_max:int = None, return_data: bool = False):
+def plot_interactions_circos_plots(ad_dict: Dict[str,AnnData], interaction_key_group:str, interaction_key_overall:str, aggregator: str = 'mean', color: str = 'interaction_values', color_map: Dict[str,str] = None, title: str = None, save: str = None, ax: int = None, tight_layout: bool = False, show: bool = True, val_min: int=None, val_max:int = None, return_data: bool = False):
     '''
     Create circos plots for aggregated interactions across samples.
 
     Args:
         ad_dict: Dictionary of AnnData instances with keys as sample names.
-        interaction_key: Key or list of keys in ad.uns where the interactions DataFrame is stored
-        aggregator: Aggregation method - 'mean' or 'median'
+        interaction_key_group: Key in ad.uns where the interactions DataFrame of the group/niche is stored
+        interaction_key_overall: Key in ad.uns where the overall interactions DataFrame is stored
+        aggregator: Aggregation method for the ineteractions in different samples -'mean' or 'median'
         color: String indicating which color values to use 'interaction_values' or 'above_median_fraction'
+        title: title of the plot
+        save: path to save the plot
+        ax: axes object in which to plot
+        tight_layout
+        show: whether to show the picture or not
+        val_min, val_max: minimum and maximum values of the color scale
+        return_data: whether to return the data used to make the plot
         save: Path to save the plot.png if desired
 
     Returns:
-        None: Displays dot plot.
+        ax or data if return_data
     '''
     assert aggregator in ['mean', 'median'], "aggregator must be either 'mean' or 'median'"
     assert color in ['interaction_values', 'above_median_fraction'], "color must be either 'interaction_values' or 'above_median_fraction'"
@@ -437,15 +491,26 @@ def interactions_circos_plots(ad_dict: Dict[str,AnnData], interaction_key_group:
     
     return ax
 
-def interaction_heatmaps(ad_dict: Dict[str,AnnData], interaction_key_group:str, aggregator: str = 'mean',color_map: Dict[str,str] = None, title: str = None, save: str = None, ax: int = None, tight_layout: bool = False, show: bool = True, val_min: int=None, val_max:int = None, return_data: bool = False):
+def plot_interaction_heatmaps(ad_dict: Dict[str,AnnData], interaction_key_group:str, aggregator: str = 'mean',color_map: Union[Dict[str,str], str] = None, title: str = None, save: str = None, ax: int = None, tight_layout: bool = False, show: bool = True, val_min: int=None, val_max:int = None, return_data: bool = False):
     '''
     Create heatmaps for aggregated interactions across samples.
+    
     Args:
         ad_dict: Dictionary of AnnData instances with keys as sample names.
-        interaction_key: Key or list of keys in ad.uns where the interactions DataFrame is stored
-        aggregator: Aggregation method - 'mean' or 'median'
+        interaction_key_group: Key in ad.uns where the interactions DataFrame of the group/niche is stored
+        aggregator: Aggregation method for the ineteractions in different samples -'mean' or 'median'
+        color_map: cmap for the plot
+        title: title of the plot
+        save: path to save the plot
+        ax: axes object in which to plot
+        tight_layout
+        show: whether to show the picture or not
+        val_min, val_max: minimum and maximum values of the color scale
+        return_data: whether to return the data used to make the plot
+        save: Path to save the plot.png if desired
+
     Returns:
-        None: Displays heatmap plot.
+        ax or data if return_data
     '''
     assert aggregator in ['mean', 'median'], "aggregator must be either 'mean' or 'median'"
     merged_group = aggregate_interactions(ad_dict, interaction_key_group, aggregator)[interaction_key_group]
