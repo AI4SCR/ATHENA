@@ -162,10 +162,12 @@ def aggregate_n_rep(ad_dict: Dict[str,AnnData], n_rep_key: str = None, attr_rep:
         aggr_n_rep_list.append(n_rep_sample)
     
     aggr_n_rep = pd.concat(aggr_n_rep_list, axis=0)    
+    # drop rows that have all rows == NaN (objects that are filtered out due to low number of neighbors)
+    aggr_n_rep = aggr_n_rep.dropna(how="all")
     # fill NaNs with 0 because some samples do not have all attrs
     aggr_n_rep = aggr_n_rep.fillna(0) 
-    # drops all rows that consist entirely of zeros = rows of observations that have been filtered out due to low number of neighbors
-    aggr_n_rep = aggr_n_rep[~(aggr_n_rep == 0).all(axis=1)]
+    '''# drops all rows that consist entirely of zeros = rows of observations that have been filtered out due to low number of neighbors
+    aggr_n_rep = aggr_n_rep[~(aggr_n_rep == 0).all(axis=1)]'''
     
 
     return aggr_n_rep

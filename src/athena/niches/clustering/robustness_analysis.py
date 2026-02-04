@@ -46,8 +46,10 @@ def compute_ARIs(labels_df: Dict[int, Dict[str, Union[pd.Series, int, Dict[str, 
     seeds_ARIs = {}
 
     # change all Nas to 'filtered_labels' to compare the filtered clusters in different runs
-    labels_df_filtered = labels_df.astype(str).replace('<NA>', 'filtered_labels') 
-
+    
+    #labels_df_filtered = labels_df.astype(str).replace('<NA>', 'filtered_labels') 
+    labels_df_filtered = labels_df.astype(str).fillna('filtered_labels') 
+    
     for seed in labels_df.columns:
         aris = calculate_ari_vs_reference(labels_df_filtered, reference_col_name=seed)
         seeds_ARIs[seed] = aris

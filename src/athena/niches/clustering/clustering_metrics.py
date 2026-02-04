@@ -36,7 +36,12 @@ def stratified_sampling(values_df: pd.DataFrame, labels: pd.Series):
     assert labels.index.equals(values_df.index)
     df = values_df.copy()
     df['labels'] = labels
-    sampled_df = df.groupby('labels', group_keys=False).apply(lambda x: x.sample(frac=0.1, random_state=42))
+
+    total_n = 15
+    fraction = total_n / len(df)
+    
+    #sampled_df = df.groupby('labels', group_keys=False).apply(lambda x: x.sample(frac=fraction, random_state=42))
+    sampled_df = df.groupby('labels', group_keys=False).sample(frac=fraction, random_state=42)
     sampled_labels = sampled_df['labels']
     sampled_values = sampled_df.drop(columns=['labels'])
     return sampled_values, sampled_labels

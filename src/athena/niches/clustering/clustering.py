@@ -136,7 +136,7 @@ def cluster_singleseed(ad_dict: Dict[str, AnnData], n_rep: pd.DataFrame, cl_n:in
             -'n_clusters' = number of clusters
 
     '''
-    n_rep, centers, inertia = cluster(ad_dict=ad_dict, n_rep=n_rep, cl_n=cl_n, seed=seed, cl_algorithm=cl_algorithm, cl_filter=cl_filter, cl_filtering_nent= cl_filtering_nent, cl_filtering_ent=cl_filtering_ent, cl_filtering_prop=cl_filtering_prop,  min_obs=min_obs **cl_params)
+    n_rep, centers, inertia = cluster(ad_dict=ad_dict, n_rep=n_rep, cl_n=cl_n, seed=seed, cl_algorithm=cl_algorithm, cl_filter=cl_filter, cl_filtering_nent= cl_filtering_nent, cl_filtering_ent=cl_filtering_ent, cl_filtering_prop=cl_filtering_prop,  min_obs=min_obs, **cl_params)
 
     columns=['labels', 'labels_raw'] if 'labels_raw' in n_rep.columns else ['labels']
     values_df = n_rep.drop(columns=columns)
@@ -283,6 +283,10 @@ def cluster_singlen(ad_dict: Dict[str, AnnData], n_rep: pd.DataFrame, cl_n:int, 
         seeds = np.random.randint(0, 2**32, size=random_seeds, dtype='uint64').tolist()
         res_dict = cluster_multiseed(ad_dict=ad_dict, n_rep=n_rep, cl_n=cl_n, seeds=seeds, cl_algorithm=cl_algorithm, cl_filter=cl_filter, cl_filtering_prop=cl_filtering_prop, cl_filtering_nent=cl_filtering_nent, cl_filtering_ent=cl_filtering_ent, min_obs=min_obs,  **cl_params )
 
+    res_dict['labels'] = res_dict['labels'].dropna().astype(int).map("niche_{}".format).reindex(res_dict['labels'].index).astype('category')
+    if 'labels_raw' in res_dict.keys():
+        res_dict['labels_raw'] = res_dict['labels_raw'].dropna().astype(int).map("niche_{}".format).reindex(res_dict['labels_raw'].index).astype('category')
+    
     return res_dict
 
 def cluster_multin(ad_dict: Dict[str, AnnData], n_rep: pd.DataFrame, cl_n:int, random_seeds: int, cl_algorithm: str, cl_filter:bool, cl_filtering_prop: float, cl_filtering_nent: int, cl_filtering_ent:str, min_obs: int, sel_n: bool, sel_n_metric: str, random_state: int = 42,  **cl_params):
@@ -337,6 +341,11 @@ def cluster_multin(ad_dict: Dict[str, AnnData], n_rep: pd.DataFrame, cl_n:int, r
         assert sel_n_metric in ['silhouette_score', 'inertia', 'avg_ari'], f'select_k_metric {sel_n_metric} not recognized. Use "silhouette_score" or "inertia" or "avg_ari".'
         res_dict = n_slection(res_dict=res_dict, sel_n_metric=sel_n_metric)
     
+    for n_dict in res_dict.values():
+        n_dict['labels'] = n_dict['labels'].dropna().astype(int).map("niche_{}".format).reindex(n_dict['labels'].index).astype('category')
+        if 'labels_raw' in n_dict.keys():
+            n_dict['labels_raw'] = n_dict['labels_raw'].dropna().astype(int).map("niche_{}".format).reindex(n_dict['labels_raw'].index).astype('category')
+
     return res_dict
 
 def clustering(ad_dict: Dict[str,AnnData], n_rep_key: str = None, attr_rep: str = None, mode_rep: str = None, graph_key: str = None, n_filtering: bool = False, min_neigh: int = 0,
@@ -475,15 +484,8 @@ def clustering_add(ad_dict: Dict[str, AnnData], res_dict: dict, key_added:str, s
         new ad_dict if not inplace
     '''
     if type(list(res_dict.keys())[0])==int:
-        for n_dict in res_dict.values():
-            n_dict['labels'] = n_dict['labels'].dropna().astype(int).map("niche_{}".format).reindex(n_dict['labels'].index).astype('category')
-            if 'labels_raw' in n_dict.keys():
-                n_dict['labels_raw'] = n_dict['labels_raw'].dropna().astype(int).map("niche_{}".format).reindex(n_dict['labels_raw'].index).astype('category')
         obs_add = obs_add_multin(res_dict=res_dict, key_added=key_added, sel_n=sel_n)    
     else:
-        res_dict['labels'] = res_dict['labels'].dropna().astype(int).map("niche_{}".format).reindex(res_dict['labels'].index).astype('category')
-        if 'labels_raw' in res_dict.keys():
-            res_dict['labels_raw'] = res_dict['labels_raw'].dropna().astype(int).map("niche_{}".format).reindex(res_dict['labels_raw'].index).astype('category')
         obs_add = obs_add_singlen(res_dict=res_dict, key_added=key_added)
     
     for sample_id, ad in ad_dict.items():
