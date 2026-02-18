@@ -51,7 +51,7 @@ def freq_for_z_scores(aggr: pd.DataFrame, attr: str, group_key: str, aggregator:
     assert aggregator in ['mean', 'median'], "aggregator has to be either 'mean' or 'median'"
     clusters = np.unique(aggr[group_key])
 
-    counts = aggr.groupby(['sample_id', 'label_name']).size().unstack(fill_value=0)
+    counts = aggr.groupby(['sample_id', attr]).size().unstack(fill_value=0)
     # divide counts of each sample by the total number of observations in the sample
     freq = counts.div(counts.sum(axis=1), axis=0)
     # mean the frequency of each attribute across samples 
@@ -64,7 +64,7 @@ def freq_for_z_scores(aggr: pd.DataFrame, attr: str, group_key: str, aggregator:
     freq_m.index = freq_std.index = ['overall']
     for cluster in clusters:
         aggr_cl =  aggr[aggr[group_key]==cluster]
-        counts = aggr_cl.groupby(['sample_id', 'label_name']).size().unstack(fill_value=0)
+        counts = aggr_cl.groupby(['sample_id', attr]).size().unstack(fill_value=0)
         if min_obs > 0:
             sample_counts = counts.sum(axis=1)
             counts = counts[sample_counts>=min_obs]
@@ -79,7 +79,7 @@ def freq_for_z_scores(aggr: pd.DataFrame, attr: str, group_key: str, aggregator:
     return freq_m, freq_std
 
 
-def z_scores(ad_dict: Dict[str, AnnData], attr: str, group_key:str, aggregator: str = 'mean', min_obs:int=0):
+def z_scores(ad_dict: Dict[str, AnnData]=None, aggr: pd.DataFrame=None, attr: str=None, group_key:str=None, aggregator: str = 'mean', min_obs:int=0):
     '''compute z scores for each cluster and attribute
             z score (group_i, attr_i)= ((mean frequency of attr_i in group_i)-(mean frequency of attr_i overall))/(standard deviation of frequency of attr_i overall)
     Args:
@@ -90,20 +90,22 @@ def z_scores(ad_dict: Dict[str, AnnData], attr: str, group_key:str, aggregator: 
         pd.DataFrame with z scores for each group
     '''
     assert aggregator in ['mean', 'median'], "aggregator has to be either 'mean' or 'median'"
-    
-    if f'{group_key}_raw' in ad_dict[list(ad_dict.keys())[0]].obs.keys():
-        aggr = aggregate_attr(ad_dict=ad_dict, attr=[attr, group_key, f'{group_key}_raw'])
-        # using the group_key_raw labels
-        # drop cells that are filtered out due to low number of neighbors
-        aggr = aggr.dropna(subset=[group_key, f'{group_key}_raw'], how='all')
-        aggr = aggr.drop(columns=[f'{group_key}_raw']) # don't need it anymore
-        # replace the filtered labels NaNs with filtered_labels category so that we can analyze their composition too
-        aggr[group_key] = aggr[group_key].cat.add_categories(['filtered_labels'])
-        aggr = aggr.fillna('filtered_labels') 
-    else: 
-        aggr = aggregate_attr(ad_dict=ad_dict, attr=[attr, group_key])
-        # drop cells that are filtered out due to low number of neighbors
-        aggr = aggr.dropna()
+    assert (aggr is None) or (ad_dict is None), "provide either ad_dict or aggr"
+    if ad_dict is not None:
+        assert attr is not None and group_key is not None, "if ad_dict is provided, attr and group_key cannot be None"
+        if f'{group_key}_raw' in ad_dict[list(ad_dict.keys())[0]].obs.keys():
+            aggr = aggregate_attr(ad_dict=ad_dict, attr=[attr, group_key, f'{group_key}_raw'])
+            # using the group_key_raw labels
+            # drop cells that are filtered out due to low number of neighbors
+            aggr = aggr.dropna(subset=[group_key, f'{group_key}_raw'], how='all')
+            aggr = aggr.drop(columns=[f'{group_key}_raw']) # don't need it anymore
+            # replace the filtered labels NaNs with filtered_labels category so that we can analyze their composition too
+            aggr[group_key] = aggr[group_key].cat.add_categories(['filtered_labels'])
+            aggr = aggr.fillna('filtered_labels') 
+        else: 
+            aggr = aggregate_attr(ad_dict=ad_dict, attr=[attr, group_key])
+            # drop cells that are filtered out due to low number of neighbors
+            aggr = aggr.dropna()
 
     # count how many observations for attribute in each sample
     freq_m, freq_std = freq_for_z_scores(aggr=aggr, attr=attr, group_key=group_key, aggregator=aggregator, min_obs=min_obs)
@@ -123,7 +125,7 @@ def z_scores(ad_dict: Dict[str, AnnData], attr: str, group_key:str, aggregator: 
     
     return zscores
 
-def freq_attr(aggr: pd.DataFrame, attr: str, group_key: str):
+def freq_attr(aggr: pd.DataFrame, group_key: str, attr:str, min_obs:int=0):
     '''compute mean and standard deviation of the frequency of each attribute in each niche and overall
     Args:
         aggr: pd.Dataframe with attr and group_key as columns
@@ -136,18 +138,22 @@ def freq_attr(aggr: pd.DataFrame, attr: str, group_key: str):
     
     clusters = np.unique(aggr[group_key])
 
-    counts = aggr.groupby(['sample_id', 'label_name']).size().unstack(fill_value=0).sum()
+    counts = aggr.groupby(['sample_id', attr]).size().unstack(fill_value=0)
     # divide counts of each sample by the total number of observations in the sample
-    freqs = (counts/sum(counts)).to_frame().T
+    freqs = (counts.div(counts.sum(axis=1), axis=0)).mean().to_frame().T
     freqs.index = ['overall']
 
     for cluster in clusters:
         aggr_cl =  aggr[aggr[group_key]==cluster]
-        counts = aggr_cl.groupby(['sample_id', 'label_name']).size().unstack(fill_value=0).sum()
-        freqs_group = (counts/sum(counts)).to_frame().T
+        counts = aggr_cl.groupby(['sample_id', attr]).size().unstack(fill_value=0)
+        if min_obs > 0:
+            sample_counts = counts.sum(axis=1)
+            counts = counts[sample_counts>=min_obs]
+        freqs_group = counts.div(counts.sum(axis=1), axis=0)
         indexes = freqs.index.tolist() + [cluster]
         freqs = pd.concat([freqs, freqs_group.mean().to_frame().T], axis=0).fillna(0)
         freqs.index =indexes
+
     return freqs
 
 

@@ -2,12 +2,16 @@
 from matplotlib import pyplot as plt
 from typing import Dict, Union, List
 import pandas as pd
+import numpy as np
 #%%
 def get_color_map(labels: List[str]) -> Dict[str, str]:
-    cmap = plt.get_cmap('tab20') 
-
-    # 3. Build the dict using a loop (dictionary comprehension)
-    color_map = {name: cmap(i) for i, name in enumerate(labels)}
+    cmap = plt.get_cmap('gist_ncar') 
+    
+    num_labels = len(labels)
+    # Generate colors by sampling the colormap at evenly spaced intervals
+    colors = [cmap(i) for i in np.linspace(0, 1, num_labels)]
+    
+    color_map = {name: color for name, color in zip(labels, colors)}
     return color_map
 
 def data_for_circos_plot(color_df: pd.DataFrame, width_df: pd.DataFrame):

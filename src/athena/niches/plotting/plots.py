@@ -32,8 +32,8 @@ def plot_ARIs(aris_df:pd.DataFrame, best_avg: bool = False, title: str = None, s
         fig = ax.get_figure()
         show = False # do not automatically show plot if we provide axes
     else:
-        fig, ax = plt.subplots(dpi=dpi)
-        ax.set_aspect('equal')
+        fig, ax = plt.subplots(figsize=(12, 8),dpi=dpi)
+        #sax.set_aspect('equal')
     
     means = aris_df.mean()
     max_idx = means.argmax()
@@ -58,9 +58,9 @@ def plot_ARIs(aris_df:pd.DataFrame, best_avg: bool = False, title: str = None, s
         label='Mean ARI')      # For a legend if you want on
     
     if best_avg:
-        ax.legend(handles=[plt.Line2D([0], [0], color='red', label='Mean ARI'), yellow_patch])
+        ax.legend(handles=[plt.Line2D([0], [0], color='red', label='Mean ARI'), yellow_patch], bbox_to_anchor=(1.0, 0.5))
     else:
-        ax.legend(handles=[plt.Line2D([0], [0], color='red', label='Mean ARI')])
+        ax.legend(handles=[plt.Line2D([0], [0], color='red', label='Mean ARI')], bbox_to_anchor=(1.0, 0.5))
 
     ax.set_facecolor('white')
     ax.set_ylim(0, 1)
@@ -72,11 +72,12 @@ def plot_ARIs(aris_df:pd.DataFrame, best_avg: bool = False, title: str = None, s
     if tight_layout:
         fig.tight_layout()
 
+    if save:
+            savefig(fig, save)
     if show:
         fig.show()
-
-    if save:
-        savefig(fig, save)
+    else:
+        plt.close(fig)
 
     return ax
 
@@ -103,20 +104,27 @@ def plot_zscores_heatmap(ad_dict: Union[Dict[str, AnnData], None]=None, group_ke
     '''
     assert (ad_dict is None) != (zscores is None), 'either provide zscores or ad_dict'
     
+    if zscores is None:
+        zscores = z_scores(ad_dict=ad_dict, attr=attr, group_key=group_key)
+    
     if ax:
         fig = ax.get_figure()
         show = False # do not automatically show plot if we provide axes
     else:
-        fig, ax = plt.subplots(figsize=(15, 8))
+        num_cols = len(zscores.columns)
+        num_rows = len(zscores.index)
+        # Logic: 1 unit of size for every X items, but never smaller than min_size
+        width = max(num_cols * 0.5, 5)
+        height = max(num_rows * 0.5, 5)
+        fig, ax = plt.subplots(figsize=(width, height))
         ax.set_aspect('equal')
-    if zscores is None:
-        zscores = z_scores(ad_dict=ad_dict, attr=attr, group_key=group_key)
     
-    if val_min is None:
-        val_min = zscores.values.min()
+    
     if val_max is None:
-        val_max = zscores.values.max()
-    
+        val_max = max([abs(zscores.values.min()),abs(zscores.values.max())])
+    if val_min is None:
+        val_min = -val_max
+
     if colormap is None:
         colormap = 'vlag'
     
@@ -131,18 +139,19 @@ def plot_zscores_heatmap(ad_dict: Union[Dict[str, AnnData], None]=None, group_ke
     if tight_layout:
         fig.tight_layout()
 
+    if save:
+            savefig(fig, save)
     if show:
         fig.show()
-
-    if save:
-        savefig(fig, save)
+    else:
+        plt.close(fig)
     
     if return_data:
         return zscores
     
     return ax
 
-def plot_stacked_bars(ad_dict: Dict[str, AnnData], attr:str, group_key: str, color_map: Dict[str,str] = None, save: str = None, tight_layout: bool = False, show: bool = True, title: str = None, return_data:bool = False):
+def plot_stacked_bars(ad_dict:Union[ Dict[str, AnnData], None]=None, proportions: Union[pd.DataFrame, None]=None, attr:str=None, group_key: str=None, color_map: Dict[str,str] = None, save: str = None, tight_layout: bool = False, show: bool = True, title: str = None, return_data:bool = False):
     '''
     Create stacked bar plots for cell type proportions in each niche cluster.
     Args:
@@ -160,13 +169,16 @@ def plot_stacked_bars(ad_dict: Dict[str, AnnData], attr:str, group_key: str, col
     Returns:
         ax or data if return_data
     '''
-    proportions = attr_proportions(ad_dict=ad_dict, attr=attr, group_key=group_key)
+    assert (ad_dict is None) != (proportions is None), 'either provide proportions or ad_dict'
+    if ad_dict is not None:
+        assert attr is not None and group_key is not None, 'if providing ad_dict, attr and group_key must be provided'
+        proportions = attr_proportions(ad_dict=ad_dict, attr=attr, group_key=group_key)
     if color_map is None:
         labels = list(proportions.columns)
         color_map= get_color_map(labels)
     
     number_of_groups = len(proportions.index)   
-    fig, axes = plt.subplots(1, number_of_groups, figsize=(20, 10), sharey=True)
+    fig, axes = plt.subplots(1, number_of_groups, figsize=(25, 10), sharey=True)
     
     for ax, (i, (row_name, row_series)) in zip(axes, enumerate(proportions.iterrows())):
     
@@ -191,11 +203,12 @@ def plot_stacked_bars(ad_dict: Dict[str, AnnData], attr:str, group_key: str, col
     if tight_layout:
         fig.tight_layout()
 
+    if save:
+            savefig(fig, save)
     if show:
         fig.show()
-
-    if save:
-        savefig(fig, save)
+    else:
+        plt.close(fig)
     
     if return_data:
         return proportions
@@ -239,7 +252,7 @@ def plot_stacked_bars_on_ax(ad_dict: Dict[str, AnnData], attr:str, group_key: st
     return labels # Return labels for the legend
 
 
-def plot_interactions_dot_plots(ad_dict: Dict[str,AnnData], interaction_key_group:str,interaction_key_overall:str, aggregator: str = 'mean', color: str = 'interaction_values',color_map: Dict[str,str] = None, title: str = None, save: str = None, ax: int = None, tight_layout: bool = False, show: bool = True, val_min: int=None, val_max:int = None, return_data: bool = False):
+def plot_interactions_dot_plots(ad_dict: Dict[str,AnnData]=None, interaction_key_group:str=None,interaction_key_overall:str=None, aggregator: str = 'mean', above_median_fr:pd.Series=None, merged_group:pd.Series=None, color: str = 'interaction_values',color_map: Dict[str,str] = None, title: str = None, save: str = None, ax: int = None, tight_layout: bool = False, show: bool = True, val_min: int=None, val_max:int = None, return_data: bool = False):
     '''
     Create dot plots for aggregated interactions across samples.
 
@@ -261,11 +274,17 @@ def plot_interactions_dot_plots(ad_dict: Dict[str,AnnData], interaction_key_grou
     Returns:
         ax or data if return_data
     '''
-    assert aggregator in ['mean', 'median'], "aggregator must be either 'mean' or 'median'"
     assert color in ['interaction_values', 'above_median_fraction'], "color must be either 'interaction_values' or 'above_median_fraction'"
 
-    merged_group = aggregate_interactions(ad_dict, interaction_key_group, aggregator)[interaction_key_group]
-    above_median_fr = above_median_fraction(ad_dict, interaction_key_group=interaction_key_group, interaction_key_overall=interaction_key_overall)
+    if merged_group is None or above_median_fr is None:
+        assert (ad_dict is not None) and (interaction_key_group is not None) and (interaction_key_overall is not None), 'you must provide either the merged_goup and above_median fraction, or either the ad_dict, interaction_key_group, interaction_key_overall'
+        assert aggregator in ['mean', 'median'], "aggregator must be either 'mean' or 'median'"
+        if merged_group is None:
+            merged_group = aggregate_interactions(ad_dict, interaction_key= interaction_key_group, aggregator=aggregator)[interaction_key_group]
+        if above_median_fr is None:
+            above_median_fr = above_median_fraction(ad_dict, interaction_key_group=interaction_key_group, interaction_key_overall=interaction_key_overall)
+
+
     if color == 'interaction_values':
         color_df = merged_group.copy().reset_index()
         width_df = above_median_fr.copy().reset_index()
@@ -385,11 +404,14 @@ def plot_interactions_dot_plots(ad_dict: Dict[str,AnnData], interaction_key_grou
     if tight_layout:
         fig.tight_layout()
 
+    if save:
+            savefig(fig, save)
     if show:
         fig.show()
+    else:
+        plt.close(fig)
 
-    if save:
-        savefig(fig, save)
+    
     
     if return_data:
         return combined_df
@@ -398,7 +420,7 @@ def plot_interactions_dot_plots(ad_dict: Dict[str,AnnData], interaction_key_grou
 
 
 
-def plot_interactions_circos_plots(ad_dict: Dict[str,AnnData], interaction_key_group:str, interaction_key_overall:str, aggregator: str = 'mean', color: str = 'interaction_values', color_map: Dict[str,str] = None, title: str = None, save: str = None, ax: int = None, tight_layout: bool = False, show: bool = True, val_min: int=None, val_max:int = None, return_data: bool = False):
+def plot_interactions_circos_plots(ad_dict: Dict[str,AnnData]=None, interaction_key_group:str=None, interaction_key_overall:str=None, aggregator: str = 'mean',merged_group:pd.Series=None,above_median_fr:pd.Series=None,  color: str = 'interaction_values', color_map: Dict[str,str] = None, title: str = None, save: str = None, ax: int = None, tight_layout: bool = False, show: bool = True, val_min: int=None, val_max:int = None, return_data: bool = False):
     '''
     Create circos plots for aggregated interactions across samples.
 
@@ -420,12 +442,17 @@ def plot_interactions_circos_plots(ad_dict: Dict[str,AnnData], interaction_key_g
     Returns:
         ax or data if return_data
     '''
-    assert aggregator in ['mean', 'median'], "aggregator must be either 'mean' or 'median'"
     assert color in ['interaction_values', 'above_median_fraction'], "color must be either 'interaction_values' or 'above_median_fraction'"
-    
     from pycirclize import Circos
-    merged_group = aggregate_interactions(ad_dict, interaction_key= interaction_key_group, aggregator=aggregator)[interaction_key_group]
-    above_median_fr = above_median_fraction(ad_dict, interaction_key_group=interaction_key_group, interaction_key_overall=interaction_key_overall)
+    
+    if merged_group is None or above_median_fr is None:
+        assert (ad_dict is not None) and (interaction_key_group is not None) and (interaction_key_overall is not None), 'you must provide either the merged_goup and above_median fraction, or either the ad_dict, interaction_key_group, interaction_key_overall'
+        assert aggregator in ['mean', 'median'], "aggregator must be either 'mean' or 'median'"
+        if merged_group is None:
+            merged_group = aggregate_interactions(ad_dict, interaction_key= interaction_key_group, aggregator=aggregator)[interaction_key_group]
+        if above_median_fr is None:
+            above_median_fr = above_median_fraction(ad_dict, interaction_key_group=interaction_key_group, interaction_key_overall=interaction_key_overall)
+
 
     if color == 'interaction_values':
         dicts = data_for_circos_plot(color_df=merged_group, width_df=above_median_fr)
@@ -535,18 +562,19 @@ def plot_interactions_circos_plots(ad_dict: Dict[str,AnnData], interaction_key_g
     if tight_layout:
         fig.tight_layout()
 
+    if save:
+            savefig(fig, save)
     if show:
         fig.show()
-
-    if save:
-        savefig(fig, save)
+    else:
+        plt.close(fig)
     
     if return_data: 
         return dicts
     
     return ax
 
-def plot_interaction_heatmaps(ad_dict: Dict[str,AnnData], interaction_key_group:str, aggregator: str = 'mean',color_map: Union[Dict[str,str], str] = None, title: str = None, save: str = None, ax: int = None, tight_layout: bool = False, show: bool = True, val_min: int=None, val_max:int = None, return_data: bool = False):
+def plot_interaction_heatmaps(ad_dict: Dict[str,AnnData]=None, interaction_key_group:str=None, aggregator: str = 'mean',  merged_group:pd.Series=None, color_map: Union[Dict[str,str], str] = None, title: str = None, save: str = None, ax: int = None, tight_layout: bool = False, show: bool = True, val_min: int=None, val_max:int = None, return_data: bool = False):
     '''
     Create heatmaps for aggregated interactions across samples.
     
@@ -567,8 +595,11 @@ def plot_interaction_heatmaps(ad_dict: Dict[str,AnnData], interaction_key_group:
     Returns:
         ax or data if return_data
     '''
-    assert aggregator in ['mean', 'median'], "aggregator must be either 'mean' or 'median'"
-    merged_group = aggregate_interactions(ad_dict, interaction_key_group, aggregator)[interaction_key_group]
+    if merged_group is None :
+        assert (ad_dict is not None) and (interaction_key_group is not None), 'you must provide either the merged_goup, or the ad_dict, interaction_key_group, interaction_key_overall'
+        assert aggregator in ['mean', 'median'], "aggregator must be either 'mean' or 'median'"
+        merged_group = aggregate_interactions(ad_dict, interaction_key= interaction_key_group, aggregator=aggregator)[interaction_key_group]
+       
     df = merged_group.reset_index().pivot(index='attr_1', columns='attr_2', values=f'score')
     df = df.fillna(0)
 
@@ -597,11 +628,12 @@ def plot_interaction_heatmaps(ad_dict: Dict[str,AnnData], interaction_key_group:
     if tight_layout:
         fig.tight_layout()
 
+    if save:
+            savefig(fig, save)
     if show:
         fig.show()
-
-    if save:
-        savefig(fig, save)
+    else:
+        plt.close(fig)
 
     if return_data:
         return df

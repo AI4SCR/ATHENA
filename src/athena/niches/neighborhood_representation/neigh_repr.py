@@ -58,7 +58,7 @@ def n_rep_ad(ad: AnnData, attr_rep: str, mode_rep: str = 'proportion', graph_key
     Args:
         ad: AnnData instance.
         attr_rep: Categorical feature in ad.obs to use for the neighborhood representation. 
-        mode_rep: 'proportion' or 'counts' to specify the type of neighborhood representation to compute.
+        mode_rep: 'proportion' or 'count' to specify the type of neighborhood representation to compute.
         graph_key: Specifies the graph representation to use in ad.obsp.
         key_added: Key added to ad.uns with the neighborhood representation.
         inplace: Whether to add the metric to the current AnnData instance or to return a new one.
@@ -71,7 +71,7 @@ def n_rep_ad(ad: AnnData, attr_rep: str, mode_rep: str = 'proportion', graph_key
     assert set(nx.nodes_with_selfloops(g)) == set(g.nodes()), 'the graph does not include self-loops'
 
     assert attr_rep in ad.obs.columns, f'Attribute {attr_rep} not found in ad.obs.'
-    assert mode_rep in ['proportion', 'counts'], f'Mode {mode_rep} not recognized. Use "proportion" or "counts".'
+    assert mode_rep in ['proportion', 'count'], f'Mode {mode_rep} not recognized. Use "proportion" or "count".'
     assert (n_filtering==True and min_neigh>0) or (n_filtering==False and min_neigh==0), 'if n_filtering is True, min_neigh has to be provided and has to be set to an int >0. if n_filtering is False, min_neigh has to be set to 0'
 
     if key_added is None:
@@ -97,7 +97,7 @@ def n_rep_ad_dict(ad_dict: Dict[str,AnnData], attr_rep: str, mode_rep: str = 'pr
     Args:
         ad_dict: Dictionary of AnnData instances with keys as sample names.
         attr_rep: Categorical feature in ad.obs to use for the neighborhood representation. 
-        mode_rep: 'proportion' or 'counts' to specify the type of neighborhood representation to compute.
+        mode_rep: 'proportion' or 'count' to specify the type of neighborhood representation to compute.
         graph_key: Specifies the graph representation to use in ad.obsp.
         key_added: Key added to ad.uns with the neighborhood representation.
         inplace: Whether to add the metric to the current AnnData instance or to return a new one.
@@ -130,7 +130,7 @@ def aggregate_n_rep(ad_dict: Dict[str,AnnData], n_rep_key: str = None, attr_rep:
         ad_dict: Dictionary of AnnData instances with keys as sample names.
         n_rep_key: Specifies the neighborhood representation to use in ad.obsm.
         attr_rep: Categorical feature in ad.obs to use for the neighborhood representation. 
-        mode_rep: 'proportion' or 'counts' to specify the type of neighborhood representation to compute.
+        mode_rep: 'proportion' or 'count' to specify the type of neighborhood representation to compute.
         graph_key: Specifies the graph representation to use in ad.obsp.
         key_added: Key added to ad.obsm with the neighborhood representation.
         n_filtering: whether to filter out cells with less than min_neigh neighbors.

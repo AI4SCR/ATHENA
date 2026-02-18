@@ -61,7 +61,7 @@ def k_means(n_rep: pd.DataFrame, cl_n:int, seed: int, **cl_params):
     return n_rep, centers, inertia
 
 
-def cluster(ad_dict: Dict[str, AnnData], n_rep: pd.DataFrame, cl_n:int, seed: int, cl_algorithm: str, cl_filter:bool, cl_filtering_prop: float , cl_filtering_nent: int, cl_filtering_ent:str,  min_obs: int, **cl_params ):
+def cluster(n_rep: pd.DataFrame, cl_n:int, seed: int, cl_algorithm: str, cl_filter:bool, cl_filtering_prop: float , cl_filtering_nent: int, cl_filtering_ent:str,  min_obs: int,ad_dict: Dict[str, AnnData] = None,  **cl_params ):
     '''clustering and filtering
     Args:
         ad_dict: Dictionary of AnnData instances with keys as sample names.
@@ -83,6 +83,9 @@ def cluster(ad_dict: Dict[str, AnnData], n_rep: pd.DataFrame, cl_n:int, seed: in
         - cluster centers
         - cluster intertia
     '''
+    if (cl_filter == True) and (cl_filtering_ent != 'sample_id'):
+        assert ad_dict != None, "if cl_filter and cl_filtering_en != 'sample_id, ad_dict has to be provided"
+    
     cl_algorithm_map = {
         'kmeans': k_means
     }
@@ -110,7 +113,7 @@ def cluster(ad_dict: Dict[str, AnnData], n_rep: pd.DataFrame, cl_n:int, seed: in
     
     return n_rep, centers, inertia
 
-def cluster_singleseed(ad_dict: Dict[str, AnnData], n_rep: pd.DataFrame, cl_n:int, seed: int, cl_algorithm: str, cl_filter:bool, cl_filtering_prop: float , cl_filtering_nent: int, cl_filtering_ent:str, min_obs: int,  **cl_params ):
+def cluster_singleseed( n_rep: pd.DataFrame, cl_n:int, seed: int, cl_algorithm: str, cl_filter:bool, cl_filtering_prop: float , cl_filtering_nent: int, cl_filtering_ent:str, min_obs: int,ad_dict: Dict[str, AnnData] = None,  **cl_params ):
     '''clustering and metrics one n and one seed
     Args:
         ad_dict: Dictionary of AnnData instances with keys as sample names.
@@ -136,6 +139,9 @@ def cluster_singleseed(ad_dict: Dict[str, AnnData], n_rep: pd.DataFrame, cl_n:in
             -'n_clusters' = number of clusters
 
     '''
+    if (cl_filter == True) and (cl_filtering_ent != 'sample_id'):
+        assert ad_dict != None, "if cl_filter and cl_filtering_en != 'sample_id, ad_dict has to be provided"
+    
     n_rep, centers, inertia = cluster(ad_dict=ad_dict, n_rep=n_rep, cl_n=cl_n, seed=seed, cl_algorithm=cl_algorithm, cl_filter=cl_filter, cl_filtering_nent= cl_filtering_nent, cl_filtering_ent=cl_filtering_ent, cl_filtering_prop=cl_filtering_prop,  min_obs=min_obs, **cl_params)
 
     columns=['labels', 'labels_raw'] if 'labels_raw' in n_rep.columns else ['labels']
@@ -149,7 +155,7 @@ def cluster_singleseed(ad_dict: Dict[str, AnnData], n_rep: pd.DataFrame, cl_n:in
 
     return res_dict
 
-def multiseed_dicts(ad_dict: Dict[str, AnnData], n_rep: pd.DataFrame, cl_n:int, seeds: List[int], cl_algorithm: str, cl_filter:bool, cl_filtering_prop: float , cl_filtering_nent: int, cl_filtering_ent:str, min_obs: int, filter_attr:str=None, **cl_params ):
+def multiseed_dicts( n_rep: pd.DataFrame, cl_n:int, seeds: List[int], cl_algorithm: str, cl_filter:bool, cl_filtering_prop: float , cl_filtering_nent: int, cl_filtering_ent:str, min_obs: int, ad_dict: Dict[str, AnnData] = None, **cl_params ):
     '''clustering and metrics one n and one seed
     Args:
         ad_dict: Dictionary of AnnData instances with keys as sample names.
@@ -179,6 +185,8 @@ def multiseed_dicts(ad_dict: Dict[str, AnnData], n_rep: pd.DataFrame, cl_n:int, 
             - cluster inertia or None (depending on cluster filtering) as values
         
     '''
+    if (cl_filter == True) and (cl_filtering_ent != 'sample_id'):
+        assert ad_dict != None, "if cl_filter and cl_filtering_en != 'sample_id, ad_dict has to be provided"
     res_dict = {}
     centers = {}
     inertias = {}
@@ -242,7 +250,7 @@ def cluster_multiseed(ad_dict: Dict[str, AnnData], n_rep: pd.DataFrame, cl_n:int
     return best_seed_dict
 
 
-def cluster_singlen(ad_dict: Dict[str, AnnData], n_rep: pd.DataFrame, cl_n:int, random_seeds: int, cl_algorithm: str, cl_filter:bool, cl_filtering_prop: float, cl_filtering_nent: int, cl_filtering_ent:str, min_obs: int, random_state: int = 42,  **cl_params ):
+def cluster_singlen( n_rep: pd.DataFrame, cl_n:int, random_seeds: int, cl_algorithm: str, cl_filter:bool, cl_filtering_prop: float, cl_filtering_nent: int, cl_filtering_ent:str, min_obs: int, ad_dict: Dict[str, AnnData] = None,random_state: int = 42,  **cl_params ):
     '''clustering and metrics one n and one seed
     Args:
         ad_dict: Dictionary of AnnData instances with keys as sample names.
@@ -272,6 +280,9 @@ def cluster_singlen(ad_dict: Dict[str, AnnData], n_rep: pd.DataFrame, cl_n:int, 
                     -'n_clusters' = number of clusters
 
     '''
+    if (cl_filter == True) and (cl_filtering_ent != 'sample_id'):
+        assert ad_dict != None, "if cl_filter and cl_filtering_en != 'sample_id, ad_dict has to be provided"
+    
     # set random state
     np.random.seed(random_state)
 
@@ -289,7 +300,7 @@ def cluster_singlen(ad_dict: Dict[str, AnnData], n_rep: pd.DataFrame, cl_n:int, 
     
     return res_dict
 
-def cluster_multin(ad_dict: Dict[str, AnnData], n_rep: pd.DataFrame, cl_n:int, random_seeds: int, cl_algorithm: str, cl_filter:bool, cl_filtering_prop: float, cl_filtering_nent: int, cl_filtering_ent:str, min_obs: int, sel_n: bool, sel_n_metric: str, random_state: int = 42,  **cl_params):
+def cluster_multin(n_rep: pd.DataFrame, cl_n:int, random_seeds: int, cl_algorithm: str, cl_filter:bool, cl_filtering_prop: float, cl_filtering_nent: int, cl_filtering_ent:str, min_obs: int, sel_n: bool, sel_n_metric: str,ad_dict: Dict[str, AnnData]=None, random_state: int = 42, **cl_params):
     '''clustering and metrics one n and one seed
     Args:
         ad_dict: Dictionary of AnnData instances with keys as sample names.
@@ -323,6 +334,9 @@ def cluster_multin(ad_dict: Dict[str, AnnData], n_rep: pd.DataFrame, cl_n:int, r
                     - 'selected' = True or False depending if it was the cluster number selected (if there has been a cluster number selection)
 
     '''
+    if (cl_filter == True) and (cl_filtering_ent != 'sample_id'):
+        assert ad_dict != None, "if cl_filter and cl_filtering_en != 'sample_id, ad_dict has to be provided"
+    
     # set random state
     np.random.seed(random_state)
 
@@ -359,7 +373,7 @@ def clustering(ad_dict: Dict[str,AnnData], n_rep_key: str = None, attr_rep: str 
         ad_dict: Dictionary of AnnData instances with keys as sample names.
         n_rep_key: Specifies the neighborhood representation to use in ad.obsm.
         attr_rep: Categorical feature in ad.obs to use for the neighborhood representation. 
-        mode_rep: 'proportion' or 'counts' to specify the type of neighborhood representation to compute.
+        mode_rep: 'proportion' or 'count' to specify the type of neighborhood representation to compute.
         graph_key: Specifies the graph representation to use in ad.obsp.
         n_filtering: whether to filter out cells with less than min_neigh neighbors.
         min_neigh: if n_filtering is True -> cells with less than min_neigh neighbors are filtered out of the neighborhood representation
@@ -506,6 +520,44 @@ def clustering_add(ad_dict: Dict[str, AnnData], res_dict: dict, key_added:str, s
         if f'{key_added}_metrics' in ad.uns.keys():
             del ad.uns[f'{key_added}_metrics'] 
         ad.uns[f'{key_added}_metrics'] = res_dict
+    
+    return   
+
+
+def clustering_add_ad(ad: AnnData, sample_id:str, res_dict: dict, key_added:str, sel_n:bool = None):
+    '''Addition of clustering results to original (inplace) or new(not inplace) AnnData objects in ad_dict.
+    Args:
+        ad: AnnData instance.
+        res_dict: Dictionary containing clustering results.
+        clustering_key: str.
+        inplace: Whether to add the clustering results to the current AnnData instances or to return a new one.
+    Return
+        no return if inplace
+        new ad_dict if not inplace
+    '''
+    if type(list(res_dict.keys())[0])==int:
+        obs_add = obs_add_multin(res_dict=res_dict, key_added=key_added, sel_n=sel_n)    
+    else:
+        obs_add = obs_add_singlen(res_dict=res_dict, key_added=key_added)
+    
+    
+    obs_add_sample = obs_add.xs(sample_id, level='sample_id')
+    not_in_clusters= ad.obs.index.difference(obs_add_sample.index).tolist()#check because of previous filtering steps
+    if len(not_in_clusters) > 0:
+        obs_add_sample = match_index_to_ad_obs(ad=ad, obs_add_sample=obs_add_sample, index_not_in_cluster=not_in_clusters)       
+    assert obs_add_sample.index.equals(ad.obs.index), 'Indices of obs_add_sample and ad.obs do not match.'
+    
+    if type(obs_add_sample)==pd.Series:
+        if key_added in ad.obs:  # drop previous computation of metric
+            ad.obs.drop(key_added, axis=1, inplace=True)
+        ad.obs[key_added] = obs_add_sample
+    else:
+        if obs_add_sample.columns.isin(set(ad.obs.columns)).any():
+            ad.obs.drop(columns=set(obs_add_sample.columns).intersection(ad.obs.columns), inplace=True)
+        ad.obs = ad.obs.join(obs_add_sample)  
+    if f'{key_added}_metrics' in ad.uns.keys():
+        del ad.uns[f'{key_added}_metrics'] 
+    ad.uns[f'{key_added}_metrics'] = res_dict
     
     return   
 

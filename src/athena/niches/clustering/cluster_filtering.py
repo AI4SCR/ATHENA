@@ -4,7 +4,7 @@ from typing import Dict, Union, List
 from athena.niches.clustering.cluster_analysis import aggregate_attr, freq_attr
 #%%
 
-def cl_ent(ad_dict: Dict[str, AnnData] , res_df: pd.DataFrame, cl_filtering_ent: str, filt_attr: str=None):
+def cl_ent(ad_dict: Dict[str, AnnData] , res_df: pd.DataFrame, cl_filtering_ent: str):
     ''' Get pd.Series containing the cluster filtering entity of each observation_id of each sample_id.
     Args:
         ad_dict: Dictionary of AnnData instances with keys as sample names.
@@ -14,6 +14,9 @@ def cl_ent(ad_dict: Dict[str, AnnData] , res_df: pd.DataFrame, cl_filtering_ent:
     Returns:
         pd.Series: Series containing the cluster filtering entity for each observation.
         '''
+    if cl_filtering_ent != 'sample_id':
+        assert ad_dict != None, "if cl_filtering_ent != 'sample_id, ad_dict has to be provided"
+
     # if cluster_filtering_ent == sample_id -> get it from the res_dfr MultiIndex
     if cl_filtering_ent == 'sample_id':
         cl_entities = pd.Series(
@@ -21,28 +24,25 @@ def cl_ent(ad_dict: Dict[str, AnnData] , res_df: pd.DataFrame, cl_filtering_ent:
         index=res_df.index, 
         name='sample_id'
         )
-        if filt_attr:
+        '''if filt_attr:
             cl_filt_attr = aggregate_attr(ad_dict=ad_dict, attr=filt_attr)
             only_cl_filt_attr = cl_filt_attr.index.difference(cl_entities.index).tolist() # observations not present in res_df 
             if len(only_cl_filt_attr) > 0:
                 cl_filt_attr = cl_filt_attr.drop(index=only_cl_filt_attr)
-            cl_entities = pd.concat({filt_attr: cl_filt_attr, 'cl_filter': cl_entities}, axis=1)
-
+            cl_entities = pd.concat({filt_attr: cl_filt_attr, 'cl_filter': cl_entities}, axis=1)'''
     
     # else, loop the ad_dict and get it from each anndata obs column
     else: 
-        if filt_attr is not None:
+        '''if filt_attr is not None:
             cl_entities = aggregate_attr(ad_dict=ad_dict, attr=[cl_filtering_ent,filt_attr])
-            cl_entities = cl_entities.rename(columns={cl_filtering_ent: 'cl_filter'})
-        else: 
-            cl_entities = aggregate_attr(ad_dict=ad_dict, attr=cl_filtering_ent)
+            cl_entities = cl_entities.rename(columns={cl_filtering_ent: 'cl_filter'})'''
+        cl_entities = aggregate_attr(ad_dict=ad_dict, attr=cl_filtering_ent)
         
-    
     return cl_entities
 
 
 
-def cl_filter_add(ad_dict: Dict[str, AnnData], res_df: pd.DataFrame, cl_filtering_ent: str, filt_attr: str = None):
+def cl_filter_add(res_df: pd.DataFrame, cl_filtering_ent: str, ad_dict: Dict[str, AnnData] = None):
     ''' Adds cluster filtering column to merged DataFrame.
     Args:
         ad_dict: Dictionary of AnnData instances with keys as sample names.
@@ -52,27 +52,25 @@ def cl_filter_add(ad_dict: Dict[str, AnnData], res_df: pd.DataFrame, cl_filterin
     Returns:
         merged DataFrame with 'cl-filter' column added.
         '''
-    cl_filter = cl_ent(ad_dict=ad_dict,res_df=res_df, cl_filtering_ent=cl_filtering_ent, filt_attr=filt_attr)
-    # check if there are some observations that have been filtered before (low number of neighbors)
-    only_in_cl_filter = cl_filter.index.difference(res_df.index).tolist() # observations not present in res_df 
-    if len(only_in_cl_filter) > 0:
-        cl_filter = cl_filter.drop(index=only_in_cl_filter) # if present, drop observations not present in res_df 
-
-    assert res_df.index.equals(cl_filter.index), 'Indices of merged DataFrame and cluster filter column do not match.'      
-
-        
-    if filt_attr:
-        res_df['cl_filter'] = cl_filter['cl_filter']
-        res_df[filt_attr] = cl_filter[filt_attr]
+    cl_filter = cl_ent(ad_dict=ad_dict,res_df=res_df, cl_filtering_ent=cl_filtering_ent)
     
-    else:
-        res_df['cl_filter'] = cl_filter
+    if cl_filtering_ent != 'sample_id':
+        assert ad_dict != None, "if cl_filtering_ent != 'sample_id, ad_dict has to be provided"
+    
+        # check if there are some observations that have been filtered before (low number of neighbors)
+        only_in_cl_filter = cl_filter.index.difference(res_df.index).tolist() # observations not present in res_df 
+        if len(only_in_cl_filter) > 0:
+            cl_filter = cl_filter.drop(index=only_in_cl_filter) # if present, drop observations not present in res_df 
+
+        assert res_df.index.equals(cl_filter.index), 'Indices of merged DataFrame and cluster filter column do not match.'      
+
+    res_df['cl_filter'] = cl_filter
 
     return res_df
 
 
 
-def cl_filtering(ad_dict: Dict[str, AnnData], res_df: pd.DataFrame, cl_filtering_prop: float , cl_filtering_nent: int, cl_filtering_ent: str, min_obs: int = 0):
+def cl_filtering( res_df: pd.DataFrame, cl_filtering_prop: float , cl_filtering_nent: int, cl_filtering_ent: str, ad_dict: Dict[str, AnnData]=None,min_obs: int = 0):
     """Filtering of clusters that are present in less than cluster_filtering_perc of the cluster_filtering_ent
     Args:
         ad_dict: Dictionary of AnnData instances with keys as sample names.
@@ -89,6 +87,9 @@ def cl_filtering(ad_dict: Dict[str, AnnData], res_df: pd.DataFrame, cl_filtering
             - 'labels' = filtered labels, with Na instead of filtered labels
         
     """
+    if cl_filtering_ent != 'sample_id':
+        assert ad_dict != None, "if cl_filtering_ent != 'sample_id, ad_dict has to be provided"
+    
     assert (cl_filtering_prop>0.0) != (cl_filtering_nent>0), 'provide either minimum proportion (cl_filtering_prop) or number (cl_filtering_nent) of entities that a cluster label has to be in to be kept'
     assert (0.0 <= cl_filtering_prop <= 1), "cluster_filtering_propotion must be between 1 and 100"
 
@@ -114,12 +115,11 @@ def cl_filtering(ad_dict: Dict[str, AnnData], res_df: pd.DataFrame, cl_filtering
     res_df.loc[res_df['labels'].isin(index_to_filter),'labels'] = pd.NA
     
     # drop cl_filter because it won't be needed
-    res_df = res_df.drop(columns=['cl_filter']
-)
+    res_df = res_df.drop(columns=['cl_filter'])
     return  res_df
 
 
-def cl_filtering_filt_attr(ad_dict: Dict[str, AnnData], filt_attr: str, res_df: pd.DataFrame, cl_filtering_prop: float , cl_filtering_ent: str):
+'''def cl_filtering_filt_attr(ad_dict: Dict[str, AnnData], filt_attr: str, res_df: pd.DataFrame, cl_filtering_prop: float , cl_filtering_ent: str):
     """Filtering of clusters that are present in less than cluster_filtering_perc of the cluster_filtering_ent
     Args:
         ad_dict: Dictionary of AnnData instances with keys as sample names.
@@ -150,10 +150,6 @@ def cl_filtering_filt_attr(ad_dict: Dict[str, AnnData], filt_attr: str, res_df: 
         top_attr = attr_proportions.loc[label].nlargest(n_top_attr).index.tolist()
         # group by the sample_id (level 0 of the MultiIndex)
         # for each sample, check if top_filt is a subset of all its 'filt_attr' values
-        
-        '''valid_samples_mask = aggr_copy.groupby('cl_filter')[filt_attr].apply(
-        lambda x: all(x.value_counts().get(attr, 0) >= 13[] for attr in top_attr)
-        )'''
         valid_samples_mask = aggr_copy.groupby('cl_filter')[filt_attr].apply(
         lambda x: all(
         (x == attr).mean() >= attr_proportions.loc['overall'].max()
@@ -182,4 +178,4 @@ def cl_filtering_filt_attr(ad_dict: Dict[str, AnnData], filt_attr: str, res_df: 
     # drop cl_filter because it won't be needed
     res_df = res_df.drop(columns=['cl_filter', filt_attr]
     )
-    return  res_df
+    return  res_df'''
