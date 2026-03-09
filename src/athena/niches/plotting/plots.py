@@ -82,7 +82,7 @@ def plot_ARIs(aris_df:pd.DataFrame, best_avg: bool = False, title: str = None, s
     return ax
 
 
-def plot_zscores_heatmap(ad_dict: Union[Dict[str, AnnData], None]=None, group_key: str=None, attr: str = None, zscores: pd.DataFrame = None, title: str = None, save: str = None, tight_layout: bool = False, show: bool = True, ax = None, val_min:int = None, val_max:int=None, colormap = None, return_data:bool = False):
+def plot_zscores_heatmap(ad_dict: Union[Dict[str, AnnData], None]=None, group_key: str=None, attr: str = None, zscores: pd.DataFrame = None, title: str = None, save: str = None, tight_layout: bool = False, show: bool = True, ax = None, val_min:int = None, val_max:int=None, colormap = None, return_data:bool = False, fig_size:tuple=None):
     '''
     Plot important heatmap of z-scores of attr enrichment in each cluster.
 
@@ -111,12 +111,15 @@ def plot_zscores_heatmap(ad_dict: Union[Dict[str, AnnData], None]=None, group_ke
         fig = ax.get_figure()
         show = False # do not automatically show plot if we provide axes
     else:
-        num_cols = len(zscores.columns)
-        num_rows = len(zscores.index)
-        # Logic: 1 unit of size for every X items, but never smaller than min_size
-        width = max(num_cols * 0.5, 5)
-        height = max(num_rows * 0.5, 5)
-        fig, ax = plt.subplots(figsize=(width, height))
+        if fig_size is None:
+            num_cols = len(zscores.columns)
+            num_rows = len(zscores.index)
+            # Logic: 1 unit of size for every X items, but never smaller than min_size
+            width = max(num_cols * 0.5, 5)
+            height = max(num_rows * 0.5, 5)
+            fig, ax = plt.subplots(figsize=(width, height))
+        else:
+            fig, ax = plt.subplots(figsize=fig_size)
         ax.set_aspect('equal')
     
     
@@ -151,7 +154,7 @@ def plot_zscores_heatmap(ad_dict: Union[Dict[str, AnnData], None]=None, group_ke
     
     return ax
 
-def plot_stacked_bars(ad_dict:Union[ Dict[str, AnnData], None]=None, proportions: Union[pd.DataFrame, None]=None, attr:str=None, group_key: str=None, color_map: Dict[str,str] = None, save: str = None, tight_layout: bool = False, show: bool = True, title: str = None, return_data:bool = False):
+def plot_stacked_bars(ad_dict:Union[ Dict[str, AnnData], None]=None, proportions: Union[pd.DataFrame, None]=None, attr:str=None, group_key: str=None, color_map: Dict[str,str] = None, save: str = None, tight_layout: bool = False, show: bool = True, title: str = None, return_data:bool = False, fig_size:tuple=None):
     '''
     Create stacked bar plots for cell type proportions in each niche cluster.
     Args:
@@ -173,12 +176,14 @@ def plot_stacked_bars(ad_dict:Union[ Dict[str, AnnData], None]=None, proportions
     if ad_dict is not None:
         assert attr is not None and group_key is not None, 'if providing ad_dict, attr and group_key must be provided'
         proportions = attr_proportions(ad_dict=ad_dict, attr=attr, group_key=group_key)
+    labels = list(proportions.columns)
     if color_map is None:
-        labels = list(proportions.columns)
         color_map= get_color_map(labels)
     
-    number_of_groups = len(proportions.index)   
-    fig, axes = plt.subplots(1, number_of_groups, figsize=(25, 10), sharey=True)
+    number_of_groups = len(proportions.index)  
+    if fig_size is None:
+         fig_size=(25, 10)
+    fig, axes = plt.subplots(1, number_of_groups, figsize=fig_size, sharey=True)
     
     for ax, (i, (row_name, row_series)) in zip(axes, enumerate(proportions.iterrows())):
     
