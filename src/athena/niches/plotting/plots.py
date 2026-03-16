@@ -13,7 +13,7 @@ from athena.plotting.utils import savefig, dpi, label_fontdict, title_fontdict
 from athena.niches.plotting.utils import get_color_map, data_for_circos_plot
 #%%
 
-def plot_ARIs(aris_df:pd.DataFrame, best_avg: bool = False, title: str = None, save: str = None, ax: int = None, tight_layout: bool = False, show: bool = True):
+def plot_ARIs(aris_df:pd.DataFrame, best_avg: bool = False, title: str = None, save: str = None, ax: int = None, tight_layout: bool = False, xlabel:str = None,  show: bool = True):
     '''
     Args:
         aris_df: Dataframe with ARIs for each column (Seed)
@@ -21,6 +21,7 @@ def plot_ARIs(aris_df:pd.DataFrame, best_avg: bool = False, title: str = None, s
         title: title of plot
         show: whether to show the picture or not
         save: Path to save the plot.png if desired
+        xlabel: x axis label
         tight_layout
     
     Return:
@@ -66,6 +67,8 @@ def plot_ARIs(aris_df:pd.DataFrame, best_avg: bool = False, title: str = None, s
     ax.set_ylim(0, 1)
     ax.set_ylabel('Adjusted Rand Index', label_fontdict)
     ax.set_xticklabels(labels=aris_df.columns, rotation=45, ha='right', fontsize= label_fontdict['size'])
+    if xlabel is not None: 
+        ax.set_xlabel(xlabel, label_fontdict)
     if title is not None:
         ax.set_title(title, title_fontdict)
 

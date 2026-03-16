@@ -70,7 +70,7 @@ def cl_filter_add(res_df: pd.DataFrame, cl_filtering_ent: str, ad_dict: Dict[str
 
 
 
-def cl_filtering( res_df: pd.DataFrame, cl_filtering_prop: float , cl_filtering_nent: int, cl_filtering_ent: str, ad_dict: Dict[str, AnnData]=None,min_obs: int = 0):
+def cl_filtering( res_df: pd.DataFrame, cl_filtering_prop: float = 0.0 , cl_filtering_nent: int = 0, cl_filtering_ent: str = 'sample_id', ad_dict: Dict[str, AnnData]=None,min_obs: int = 0):
     """Filtering of clusters that are present in less than cluster_filtering_perc of the cluster_filtering_ent
     Args:
         ad_dict: Dictionary of AnnData instances with keys as sample names.
@@ -87,6 +87,7 @@ def cl_filtering( res_df: pd.DataFrame, cl_filtering_prop: float , cl_filtering_
             - 'labels' = filtered labels, with Na instead of filtered labels
         
     """
+    #res_df= res_df.copy()
     if cl_filtering_ent != 'sample_id':
         assert ad_dict != None, "if cl_filtering_ent != 'sample_id, ad_dict has to be provided"
     
@@ -111,9 +112,13 @@ def cl_filtering( res_df: pd.DataFrame, cl_filtering_prop: float , cl_filtering_
     cl_filter_counts = res_df.groupby('labels')['cl_filter'].apply(lambda x: (x.value_counts() >= min_obs).sum())
     # identify labels (clusters) that fall below the thereshold = that are present in less than the threshold number of cluster filtering entities
     index_to_filter = cl_filter_counts[cl_filter_counts < threshold].index.tolist()
-    # change the labels (cluster) that have to be filtered out to nan values
-    res_df.loc[res_df['labels'].isin(index_to_filter),'labels'] = pd.NA
     
+    if pd.api.types.is_categorical_dtype(res_df['labels']):
+        print(index_to_filter)
+        res_df['labels'] = res_df['labels'].cat.add_categories(['NaN'])
+        res_df.loc[res_df['labels'].isin(index_to_filter),'labels'] = 'NaN'
+    else:
+        res_df.loc[res_df['labels'].isin(index_to_filter),'labels'] = pd.NA
     # drop cl_filter because it won't be needed
     res_df = res_df.drop(columns=['cl_filter'])
     return  res_df

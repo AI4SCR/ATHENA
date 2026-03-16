@@ -88,7 +88,7 @@ def combine_seed_labels(multiple_seeds_dict: Dict[int, Dict[str, Union[pd.Series
     return labels_df
 
 
-def cl_robustness(multiple_seeds_dict: Dict[int, Dict[str, Union[pd.Series, int, Dict[str, float]]]])-> dict:
+def cl_robustness(multiple_seeds_dict: Dict[int, Dict[str, Union[pd.Series, int, Dict[str, float]]]], save_aris_df:Union[str, None]=None)-> dict:
     '''Select the best seed based on average ARI with other seeds.
 
     Args:
@@ -102,7 +102,8 @@ def cl_robustness(multiple_seeds_dict: Dict[int, Dict[str, Union[pd.Series, int,
     
     # compute ARIs
     aris = compute_ARIs(labels_df)
-
+    if save_aris_df:
+        aris.to_parquet(f'{save_aris_df}')
     # compute avg ari for each seed
     avg_aris = aris.mean()
     best_seed = avg_aris.idxmax() 

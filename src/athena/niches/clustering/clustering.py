@@ -10,6 +10,7 @@ from athena.niches.neighborhood_representation.neigh_repr import aggregate_n_rep
 from athena.niches.clustering.cluster_filtering import cl_filtering
 from athena.niches.clustering.robustness_analysis import cl_robustness
 from athena.niches.clustering.clustering_metrics import get_metrics
+import os
 #%%
 
 def n_slection(res_dict: Dict[str,Dict[str, str]], sel_n_metric: str ):
@@ -113,7 +114,7 @@ def cluster(n_rep: pd.DataFrame, cl_n:int, seed: int, cl_algorithm: str, cl_filt
     
     return n_rep, centers, inertia
 
-def cluster_singleseed( n_rep: pd.DataFrame, cl_n:int, seed: int, cl_algorithm: str, cl_filter:bool, cl_filtering_prop: float , cl_filtering_nent: int, cl_filtering_ent:str, min_obs: int,ad_dict: Dict[str, AnnData] = None,  **cl_params ):
+def cluster_singleseed( n_rep: pd.DataFrame, cl_n:int, seed: int, cl_algorithm: str, cl_filter:bool, cl_filtering_prop: float , cl_filtering_nent: int, cl_filtering_ent:str, min_obs: int,ad_dict: Dict[str, AnnData] = None, sampling_size:int = 10000, save_sil_scores:Union[str, None]=None,  **cl_params ):
     '''clustering and metrics one n and one seed
     Args:
         ad_dict: Dictionary of AnnData instances with keys as sample names.
@@ -126,6 +127,9 @@ def cluster_singleseed( n_rep: pd.DataFrame, cl_n:int, seed: int, cl_algorithm: 
         cl_filtering_nent: minimum number of entities in cl_filtering_ent that a cluster label has to be in to be kept
         cl_filtering_ent: entity to use for clusters filtering. Options are 'sample_id' or any categorical column in ad.obs.
         min_obs: minimum number of obs of a sample assigned to a cluster to consider the cluster present in the sample when filtering. 
+        save_aris_df:folder where to save the ARIs dataframe, None if not to save
+        sampling_size: number of observations to use to compute the silhouette score
+        save_sil_score: folder where to save the dataframe silhouette scores per observation, None if not to save
         **cl_params = additional parameters for the clustering
     
     Return
@@ -146,7 +150,11 @@ def cluster_singleseed( n_rep: pd.DataFrame, cl_n:int, seed: int, cl_algorithm: 
 
     columns=['labels', 'labels_raw'] if 'labels_raw' in n_rep.columns else ['labels']
     values_df = n_rep.drop(columns=columns)
-    metrics = get_metrics(values_df=values_df, labels=n_rep['labels'], centers=centers, inertia=inertia)
+    
+    if save_sil_scores:
+        save_sil_scores_complete = os.path.join(save_sil_scores, f'sil_score_{cl_n}.parquet')
+        os.makedirs(save_sil_scores, exist_ok=True)
+    metrics = get_metrics(values_df=values_df, labels=n_rep['labels'], centers=centers, inertia=inertia, save_sil_scores=save_sil_scores_complete, sampling_size=sampling_size)
     
     if 'labels_raw' in n_rep.columns: 
         res_dict = {'labels': n_rep['labels'], 'labels_raw':n_rep['labels_raw'], 'seed': seed, 'n_clusters': cl_n, 'metrics': metrics}
@@ -193,7 +201,7 @@ def multiseed_dicts( n_rep: pd.DataFrame, cl_n:int, seeds: List[int], cl_algorit
     
     for seed in seeds:
         n_rep_copy = n_rep.copy()
-        n_rep_copy, seed_centers, seed_inertia = cluster(ad_dict=ad_dict, n_rep=n_rep_copy, cl_n=cl_n, seed=seed, cl_algorithm=cl_algorithm, cl_filter=cl_filter, cl_filtering_nent=cl_filtering_nent, cl_filtering_ent=cl_filtering_ent, cl_filtering_prop=cl_filtering_prop, min_obs=min_obs,  **cl_params)
+        n_rep_copy, seed_centers, seed_inertia = cluster(ad_dict=ad_dict, n_rep=n_rep_copy, cl_n=cl_n, seed=seed, cl_algorithm=cl_algorithm, cl_filter=cl_filter, cl_filtering_nent=cl_filtering_nent, cl_filtering_ent=cl_filtering_ent, cl_filtering_prop=cl_filtering_prop, min_obs=min_obs, **cl_params)
 
         centers[seed] = seed_centers
         inertias[seed] = seed_inertia
@@ -207,7 +215,7 @@ def multiseed_dicts( n_rep: pd.DataFrame, cl_n:int, seeds: List[int], cl_algorit
     return res_dict, centers, inertias   
     
 
-def cluster_multiseed(ad_dict: Dict[str, AnnData], n_rep: pd.DataFrame, cl_n:int, seeds: List[int], cl_algorithm: str, cl_filter:bool, cl_filtering_prop: float, cl_filtering_nent: int, cl_filtering_ent:str,  min_obs: int, filter_attr:str=None, **cl_params ):
+def cluster_multiseed(ad_dict: Dict[str, AnnData], n_rep: pd.DataFrame, cl_n:int, seeds: List[int], cl_algorithm: str, cl_filter:bool, cl_filtering_prop: float, cl_filtering_nent: int, cl_filtering_ent:str,  min_obs: int, save_aris_df:Union[str, None]=None, sampling_size:int = 10000, save_sil_scores:Union[str, None]=None, **cl_params ):
     '''clustering and metrics one n and one seed
     Args:
         ad_dict: Dictionary of AnnData instances with keys as sample names.
@@ -220,6 +228,9 @@ def cluster_multiseed(ad_dict: Dict[str, AnnData], n_rep: pd.DataFrame, cl_n:int
         cl_filtering_nent: minimum number of entities in cl_filtering_ent that a cluster label has to be in to be kept
         cl_filtering_ent: entity to use for clusters filtering. Options are 'sample_id' or any categorical column in ad.obs.
         min_obs: minimum number of obs of a sample assigned to a cluster to consider the cluster present in the sample when filtering. 
+        save_aris_df:folder where to save the ARIs dataframe, None if not to save
+        sampling_size: number of observations to use to compute the silhouette score
+        save_sil_score: folder where to save the dataframe silhouette scores per observation, None if not to save
         **cl_params = additional parameters for the clustering
     
     Return
@@ -239,10 +250,16 @@ def cluster_multiseed(ad_dict: Dict[str, AnnData], n_rep: pd.DataFrame, cl_n:int
     
     res_dict, centers, inertias = multiseed_dicts(ad_dict=ad_dict, n_rep=n_rep, cl_n=cl_n, seeds=seeds, cl_algorithm=cl_algorithm, cl_filter=cl_filter, cl_filtering_prop=cl_filtering_prop, cl_filtering_nent=cl_filtering_nent, cl_filtering_ent=cl_filtering_ent, min_obs=min_obs,  **cl_params )
 
-    best_seed_dict = cl_robustness(res_dict)
+    if save_aris_df:
+        save_aris_df_complete = os.path.join(save_aris_df, f'aris_df_{cl_n}.parquet')
+        os.makedirs(save_aris_df, exist_ok=True)
+    best_seed_dict = cl_robustness(res_dict, save_aris_df=save_aris_df_complete)
     best_seed =  best_seed_dict['seed']
-      
-    metrics = get_metrics(values_df=n_rep, labels=best_seed_dict['labels'], centers = centers[best_seed], inertia = inertias[best_seed])
+    
+    if save_sil_scores:
+        save_sil_scores_complete = os.path.join(save_sil_scores, f'sil_score_{cl_n}.parquet')
+        os.makedirs(save_sil_scores, exist_ok=True)
+    metrics = get_metrics(values_df=n_rep, labels=best_seed_dict['labels'], centers = centers[best_seed], inertia = inertias[best_seed],  sampling_size=sampling_size, save_sil_scores=save_sil_scores_complete)
     
     best_seed_dict['metrics']['inertia'] = metrics['inertia']
     best_seed_dict['metrics']['silhouette_score'] = metrics['silhouette_score']
@@ -250,7 +267,7 @@ def cluster_multiseed(ad_dict: Dict[str, AnnData], n_rep: pd.DataFrame, cl_n:int
     return best_seed_dict
 
 
-def cluster_singlen( n_rep: pd.DataFrame, cl_n:int, random_seeds: int, cl_algorithm: str, cl_filter:bool, cl_filtering_prop: float, cl_filtering_nent: int, cl_filtering_ent:str, min_obs: int, ad_dict: Dict[str, AnnData] = None,random_state: int = 42,  **cl_params ):
+def cluster_singlen( n_rep: pd.DataFrame, cl_n:int, random_seeds: int, cl_algorithm: str, cl_filter:bool, cl_filtering_prop: float, cl_filtering_nent: int, cl_filtering_ent:str, min_obs: int, ad_dict: Dict[str, AnnData] = None,random_state: int = 42, save_aris_df:Union[str, None]=None, sampling_size:int = 10000, save_sil_scores:Union[str, None]=None,  **cl_params ):
     '''clustering and metrics one n and one seed
     Args:
         ad_dict: Dictionary of AnnData instances with keys as sample names.
@@ -264,6 +281,9 @@ def cluster_singlen( n_rep: pd.DataFrame, cl_n:int, random_seeds: int, cl_algori
         cl_filtering_nent: minimum number of entities in cl_filtering_ent that a cluster label has to be in to be kept
         cl_filtering_ent: entity to use for clusters filtering. Options are 'sample_id' or any categorical column in ad.obs.
         min_obs: minimum number of obs of a sample assigned to a cluster to consider the cluster present in the sample when filtering. 
+        save_aris_df:folder where to save the ARIs dataframe, None if not to save
+        sampling_size: number of observations to use to compute the silhouette score
+        save_sil_score: folder where to save the dataframe silhouette scores per observation, None if not to save
         **cl_params = additional parameters for the clustering
     
     Return
@@ -288,11 +308,11 @@ def cluster_singlen( n_rep: pd.DataFrame, cl_n:int, random_seeds: int, cl_algori
 
     if random_seeds == 1:
         seed = np.random.randint(0, 2**32, dtype='uint64') 
-        res_dict = cluster_singleseed(ad_dict=ad_dict, n_rep=n_rep, cl_n=cl_n, seed=seed, cl_algorithm=cl_algorithm, cl_filter=cl_filter, cl_filtering_prop=cl_filtering_prop, cl_filtering_nent=cl_filtering_nent, cl_filtering_ent=cl_filtering_ent, min_obs=min_obs,  **cl_params )
+        res_dict = cluster_singleseed(ad_dict=ad_dict, n_rep=n_rep, cl_n=cl_n, seed=seed, cl_algorithm=cl_algorithm, cl_filter=cl_filter, cl_filtering_prop=cl_filtering_prop, cl_filtering_nent=cl_filtering_nent, cl_filtering_ent=cl_filtering_ent, min_obs=min_obs, sampling_size=sampling_size, save_sil_scores=save_sil_scores,  **cl_params )
     
     else:
         seeds = np.random.randint(0, 2**32, size=random_seeds, dtype='uint64').tolist()
-        res_dict = cluster_multiseed(ad_dict=ad_dict, n_rep=n_rep, cl_n=cl_n, seeds=seeds, cl_algorithm=cl_algorithm, cl_filter=cl_filter, cl_filtering_prop=cl_filtering_prop, cl_filtering_nent=cl_filtering_nent, cl_filtering_ent=cl_filtering_ent, min_obs=min_obs,  **cl_params )
+        res_dict = cluster_multiseed(ad_dict=ad_dict, n_rep=n_rep, cl_n=cl_n, seeds=seeds, cl_algorithm=cl_algorithm, cl_filter=cl_filter, cl_filtering_prop=cl_filtering_prop, cl_filtering_nent=cl_filtering_nent, cl_filtering_ent=cl_filtering_ent, min_obs=min_obs, sampling_size=sampling_size, save_sil_scores=save_sil_scores, save_aris_df=save_aris_df,  **cl_params )
 
     res_dict['labels'] = res_dict['labels'].dropna().astype(int).map("niche_{}".format).reindex(res_dict['labels'].index).astype('category')
     if 'labels_raw' in res_dict.keys():
@@ -300,7 +320,7 @@ def cluster_singlen( n_rep: pd.DataFrame, cl_n:int, random_seeds: int, cl_algori
     
     return res_dict
 
-def cluster_multin(n_rep: pd.DataFrame, cl_n:int, random_seeds: int, cl_algorithm: str, cl_filter:bool, cl_filtering_prop: float, cl_filtering_nent: int, cl_filtering_ent:str, min_obs: int, sel_n: bool, sel_n_metric: str,ad_dict: Dict[str, AnnData]=None, random_state: int = 42, **cl_params):
+def cluster_multin(n_rep: pd.DataFrame, cl_n:int, random_seeds: int, cl_algorithm: str, cl_filter:bool, cl_filtering_prop: float, cl_filtering_nent: int, cl_filtering_ent:str, min_obs: int, sel_n: bool, sel_n_metric: str,ad_dict: Dict[str, AnnData]=None, random_state: int = 42, save_aris_df:Union[str, None]=None, sampling_size:int = 10000, save_sil_scores:Union[str, None]=None, **cl_params):
     '''clustering and metrics one n and one seed
     Args:
         ad_dict: Dictionary of AnnData instances with keys as sample names.
@@ -317,6 +337,9 @@ def cluster_multin(n_rep: pd.DataFrame, cl_n:int, random_seeds: int, cl_algorith
         sel_n: whether to select the best k based on the select_k_metric. 
         sel_n_metric: metric to use for selecting the best k. Options are 'silhouette_score' or 'inertia' or 'average_ARI'.
                     it cannot be average_ARI if random_seeds == 1 is False. 
+        save_aris_df:folder where to save the ARIs dataframe, None if not to save
+        sampling_size: number of observations to use to compute the silhouette score
+        save_sil_score: folder where to save the dataframe silhouette scores per observation, None if not to save
         **cl_params = additional parameters for the clustering
     
     Return
@@ -345,10 +368,10 @@ def cluster_multin(n_rep: pd.DataFrame, cl_n:int, random_seeds: int, cl_algorith
         n_rep_copy = n_rep.copy()
         if random_seeds == 1:
             seed = np.random.randint(0, 2**32, dtype='uint64') 
-            n_dict = cluster_singleseed(ad_dict=ad_dict, n_rep=n_rep_copy, cl_n=i, seed=seed, cl_algorithm=cl_algorithm, cl_filter=cl_filter, cl_filtering_prop=cl_filtering_prop, cl_filtering_nent=cl_filtering_nent, cl_filtering_ent=cl_filtering_ent, min_obs=min_obs,  **cl_params )    
+            n_dict = cluster_singleseed(ad_dict=ad_dict, n_rep=n_rep_copy, cl_n=i, seed=seed, cl_algorithm=cl_algorithm, cl_filter=cl_filter, cl_filtering_prop=cl_filtering_prop, cl_filtering_nent=cl_filtering_nent, cl_filtering_ent=cl_filtering_ent, min_obs=min_obs, sampling_size=sampling_size, save_sil_scores=save_sil_scores, **cl_params )    
         else:
             seeds = np.random.randint(0, 2**32, size=random_seeds, dtype='uint64').tolist()
-            n_dict = cluster_multiseed(ad_dict=ad_dict, n_rep=n_rep_copy, cl_n=i, seeds=seeds, cl_algorithm=cl_algorithm, cl_filter=cl_filter, cl_filtering_prop=cl_filtering_prop, cl_filtering_nent=cl_filtering_nent, cl_filtering_ent=cl_filtering_ent, min_obs=min_obs,  **cl_params )
+            n_dict = cluster_multiseed(ad_dict=ad_dict, n_rep=n_rep_copy, cl_n=i, seeds=seeds, cl_algorithm=cl_algorithm, cl_filter=cl_filter, cl_filtering_prop=cl_filtering_prop, cl_filtering_nent=cl_filtering_nent, cl_filtering_ent=cl_filtering_ent, min_obs=min_obs, sampling_size=sampling_size, save_sil_scores=save_sil_scores, save_aris_df=save_aris_df, **cl_params )
         res_dict[i] = n_dict
     
     if sel_n:
@@ -363,7 +386,7 @@ def cluster_multin(n_rep: pd.DataFrame, cl_n:int, random_seeds: int, cl_algorith
     return res_dict
 
 def clustering(ad_dict: Dict[str,AnnData], n_rep_key: str = None, attr_rep: str = None, mode_rep: str = None, graph_key: str = None, n_filtering: bool = False, min_neigh: int = 0,
-                cl_algorithm: str = 'kmeans', cl_n: Union[int, List[int]] = 4, random_seeds: int= 1, random_state: int = 42, key_added: str = None, cl_filter: bool = False, cl_filtering_prop: float = 0.0, cl_filtering_nent: int = 0, cl_filtering_ent: str = 'sample_id', min_obs: int = 0, filter_attr: str = None, sel_n:bool = False, sel_n_metric: str = 'silhouette_score', inplace:bool=True, **cl_params):
+                cl_algorithm: str = 'kmeans', cl_n: Union[int, List[int]] = 4, random_seeds: int= 1, random_state: int = 42, key_added: str = None, cl_filter: bool = False, cl_filtering_prop: float = 0.0, cl_filtering_nent: int = 0, cl_filtering_ent: str = 'sample_id', min_obs: int = 0, sel_n:bool = False, sel_n_metric: str = 'silhouette_score', inplace:bool=True, save_aris_df:Union[str, None]=None, sampling_size:int = 10000, save_sil_scores:Union[str, None]=None, **cl_params):
     
     """K-means clustering of the merged (all samples together) local neighborhood representation of cells.
 
@@ -391,6 +414,9 @@ def clustering(ad_dict: Dict[str,AnnData], n_rep_key: str = None, attr_rep: str 
         sel_n_metric: metric to use for selecting the best k. Options are 'silhouette_score' or 'inertia' or 'average_ARI'.
                     it cannot be avg_ari if random_seeds == 1 is False.
         inplace: Whether to add the clustering results to the current AnnData instances or to return a new one.
+        save_aris_df:folder where to save the ARIs dataframe, None if not to save
+        sampling_size: number of observations to use to compute the silhouette score
+        save_sil_score: folder where to save the dataframe silhouette scores per observation, None if not to save
         **cl_params: Additional arguments for clustering function. -> if not provided default values will be used.
 
     Returns: 
@@ -413,12 +439,12 @@ def clustering(ad_dict: Dict[str,AnnData], n_rep_key: str = None, attr_rep: str 
 
     # one cluster number
     if type(cl_n) == int:
-        res_dict = cluster_singlen(ad_dict=ad_dict, n_rep=n_rep, cl_n=cl_n, random_seeds=random_seeds, cl_algorithm=cl_algorithm, cl_filter=cl_filter, cl_filtering_prop=cl_filtering_prop, cl_filtering_nent =cl_filtering_nent, cl_filtering_ent=cl_filtering_ent, min_obs=min_obs, random_state=random_state, **cl_params)
+        res_dict = cluster_singlen(ad_dict=ad_dict, n_rep=n_rep, cl_n=cl_n, random_seeds=random_seeds, cl_algorithm=cl_algorithm, cl_filter=cl_filter, cl_filtering_prop=cl_filtering_prop, cl_filtering_nent =cl_filtering_nent, cl_filtering_ent=cl_filtering_ent, min_obs=min_obs, random_state=random_state, sampling_size=sampling_size, save_sil_scores=save_sil_scores, save_aris_df=save_aris_df, **cl_params)
     
     # multiple cluster numbers 
     elif type(cl_n) == list:
         assert len(cl_n) > 1, 'If k is a list it must contain more than one value.' 
-        res_dict = cluster_multin(ad_dict=ad_dict, n_rep=n_rep, cl_n=cl_n, random_seeds=random_seeds, cl_algorithm=cl_algorithm, cl_filter=cl_filter, cl_filtering_prop=cl_filtering_prop, cl_filtering_nent = cl_filtering_nent, cl_filtering_ent=cl_filtering_ent, min_obs=min_obs, sel_n=sel_n, sel_n_metric=sel_n_metric, random_state=random_state,  **cl_params)
+        res_dict = cluster_multin(ad_dict=ad_dict, n_rep=n_rep, cl_n=cl_n, random_seeds=random_seeds, cl_algorithm=cl_algorithm, cl_filter=cl_filter, cl_filtering_prop=cl_filtering_prop, cl_filtering_nent = cl_filtering_nent, cl_filtering_ent=cl_filtering_ent, min_obs=min_obs, sel_n=sel_n, sel_n_metric=sel_n_metric, random_state=random_state, sampling_size=sampling_size, save_sil_scores=save_sil_scores, save_aris_df=save_aris_df,  **cl_params)
     
     # add clusterign results in ad_dict
     clustering_add(ad_dict=ad_dict, res_dict=res_dict, key_added=key_added, sel_n=sel_n)
