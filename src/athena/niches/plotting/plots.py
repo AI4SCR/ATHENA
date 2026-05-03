@@ -428,7 +428,7 @@ def plot_interactions_dot_plots(ad_dict: Dict[str,AnnData]=None, interaction_key
 
 
 
-def plot_interactions_circos_plots(ad_dict: Dict[str,AnnData]=None, interaction_key_group:str=None, interaction_key_overall:str=None, aggregator: str = 'mean',merged_group:pd.Series=None,above_median_fr:pd.Series=None,  color: str = 'interaction_values', color_map: Dict[str,str] = None, title: str = None, save: str = None, ax: int = None, tight_layout: bool = False, show: bool = True, val_min: int=None, val_max:int = None, return_data: bool = False):
+def plot_interactions_circos_plots(ad_dict: Dict[str,AnnData]=None, interaction_key_group:str=None, interaction_key_overall:str=None, aggregator: str = 'mean',merged_group:pd.Series=None,above_median_fr:pd.Series=None,  color: str = 'interaction_values', color_map: Dict[str,str] = None, title: str = None, save: str = None, ax: int = None, tight_layout: bool = False, show: bool = True, val_min: int=None, val_max:int = None, figsize: tuple = None, return_data: bool = False):
     '''
     Create circos plots for aggregated interactions across samples.
 
@@ -521,8 +521,10 @@ def plot_interactions_circos_plots(ad_dict: Dict[str,AnnData]=None, interaction_
         show = False # do not automatically show plot if we provide axes
         return_data = False
     else:
+        if figsize is None:
+            figsize = (20, 15)
         fig, ax = plt.subplots(
-        figsize=(20, 15), 
+        figsize=figsize, 
         dpi=dpi, 
         subplot_kw={'projection': 'polar'})
         #ax.set_aspect('equal')
