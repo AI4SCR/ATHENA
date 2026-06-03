@@ -110,6 +110,6 @@ def cl_robustness(multiple_seeds_dict: Dict[int, Dict[str, Union[pd.Series, int,
 
     # add avg ari of the best seed to its dict metrics
     selected_seed_dict = multiple_seeds_dict[best_seed]
-    selected_seed_dict['metrics'] = { 'avg_ari': avg_aris[best_seed] }
+    selected_seed_dict['metrics']['avg_ari'] = avg_aris[best_seed]
 
     return selected_seed_dict

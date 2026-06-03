@@ -5,11 +5,14 @@ import pandas as pd
 from anndata import AnnData
 from typing import Dict, Union, List
 from sklearn.cluster import KMeans
+from sklearn.mixture import GaussianMixture
+from sklearn.metrics import pairwise_distances_argmin_min
 import copy
 from athena.niches.neighborhood_representation.neigh_repr import aggregate_n_rep
 from athena.niches.clustering.cluster_filtering import cl_filtering
 from athena.niches.clustering.robustness_analysis import cl_robustness
 from athena.niches.clustering.clustering_metrics import get_metrics
+from scipy.spatial.distance import cdist
 import os
 #%%
 
@@ -61,6 +64,41 @@ def k_means(n_rep: pd.DataFrame, cl_n:int, seed: int, **cl_params):
 
     return n_rep, centers, inertia
 
+def gmm(n_rep: pd.DataFrame, cl_n:int, seed: int, **cl_params):
+    ''' Gaussian Mixture Model clustering
+    Args:
+        n_rep: DataFrame with neighborhood representation to cluster.
+        cl_n: number of clusters.
+        seed: seed.
+        **cl_params = additional parameters for the clustering.
+    Return
+        - n_rep with 'labels' column added
+        - cluster centers
+        - cluster intertia
+    '''
+    
+    gmm = GaussianMixture(n_components=cl_n, random_state=seed, **cl_params)
+    gmm.fit(n_rep.values) 
+    labels = gmm.predict(n_rep.values)
+    probs_array = gmm.predict_proba(n_rep.values)
+    bic_score = gmm.bic(n_rep.values)
+    
+    
+    # inertia calculation
+    centers = gmm.means_
+    _, min_distances = pairwise_distances_argmin_min(n_rep.values, centers)
+    inertia = np.sum(min_distances**2) 
+    inertia = float(inertia)
+    
+    assert len(n_rep) == len(labels), 'Length of cl_values DataFrame and labels do not match.'
+    n_rep['labels'] = labels
+
+    prob_cols = [f'prob_cluster_{i}' for i in range(cl_n)]
+    probs_df = pd.DataFrame(probs_array, columns=prob_cols, index=n_rep.index)
+
+
+    return n_rep, centers, inertia, bic_score, probs_df
+
 
 def cluster(n_rep: pd.DataFrame, cl_n:int, seed: int, cl_algorithm: str, cl_filter:bool, cl_filtering_prop: float , cl_filtering_nent: int, cl_filtering_ent:str,  min_obs: int,ad_dict: Dict[str, AnnData] = None,  **cl_params ):
     '''clustering and filtering
@@ -88,15 +126,19 @@ def cluster(n_rep: pd.DataFrame, cl_n:int, seed: int, cl_algorithm: str, cl_filt
         assert ad_dict != None, "if cl_filter and cl_filtering_en != 'sample_id, ad_dict has to be provided"
     
     cl_algorithm_map = {
-        'kmeans': k_means
+        'kmeans': k_means,
+        'gmm': gmm
     }
-    assert cl_algorithm in cl_algorithm_map.keys(), f'cl_algorithm has to be {cl_algorithm_map.keys().tolist()}'
+    assert cl_algorithm in cl_algorithm_map.keys(), f'cl_algorithm has to be {cl_algorithm_map.keys()}'
     
     # define clustering function
     func = cl_algorithm_map[cl_algorithm]
 
     # clustering
-    n_rep, centers, inertia = func(n_rep = n_rep, cl_n=cl_n, seed=seed, **cl_params)
+    if cl_algorithm == 'gmm':
+         n_rep, centers, inertia, bic_score, probs_df = func(n_rep = n_rep, cl_n=cl_n, seed=seed, **cl_params)
+    else:
+        n_rep, centers, inertia = func(n_rep = n_rep, cl_n=cl_n, seed=seed, **cl_params)
 
     # filter labels if necessary
     if cl_filter:
@@ -112,7 +154,10 @@ def cluster(n_rep: pd.DataFrame, cl_n:int, seed: int, cl_algorithm: str, cl_filt
     else:
         centers = None
     
-    return n_rep, centers, inertia
+    if cl_algorithm == 'gmm':
+        return n_rep, centers, inertia, bic_score, probs_df
+    else:
+        return n_rep, centers, inertia
 
 def cluster_singleseed( n_rep: pd.DataFrame, cl_n:int, seed: int, cl_algorithm: str, cl_filter:bool, cl_filtering_prop: float , cl_filtering_nent: int, cl_filtering_ent:str, min_obs: int,ad_dict: Dict[str, AnnData] = None, sampling_size:int = 10000, save_sil_scores:Union[str, None]=None,  **cl_params ):
     '''clustering and metrics one n and one seed
@@ -146,7 +191,11 @@ def cluster_singleseed( n_rep: pd.DataFrame, cl_n:int, seed: int, cl_algorithm: 
     if (cl_filter == True) and (cl_filtering_ent != 'sample_id'):
         assert ad_dict != None, "if cl_filter and cl_filtering_en != 'sample_id, ad_dict has to be provided"
     
-    n_rep, centers, inertia = cluster(ad_dict=ad_dict, n_rep=n_rep, cl_n=cl_n, seed=seed, cl_algorithm=cl_algorithm, cl_filter=cl_filter, cl_filtering_nent= cl_filtering_nent, cl_filtering_ent=cl_filtering_ent, cl_filtering_prop=cl_filtering_prop,  min_obs=min_obs, **cl_params)
+    if cl_algorithm == 'gmm':
+        n_rep, centers, inertia, bic_score, probs_df = cluster(ad_dict=ad_dict, n_rep=n_rep, cl_n=cl_n, seed=seed, cl_algorithm=cl_algorithm, cl_filter=cl_filter, cl_filtering_nent= cl_filtering_nent, cl_filtering_ent=cl_filtering_ent, cl_filtering_prop=cl_filtering_prop,  min_obs=min_obs, **cl_params)
+
+    else:
+        n_rep, centers, inertia = cluster(ad_dict=ad_dict, n_rep=n_rep, cl_n=cl_n, seed=seed, cl_algorithm=cl_algorithm, cl_filter=cl_filter, cl_filtering_nent= cl_filtering_nent, cl_filtering_ent=cl_filtering_ent, cl_filtering_prop=cl_filtering_prop,  min_obs=min_obs, **cl_params)
 
     columns=['labels', 'labels_raw'] if 'labels_raw' in n_rep.columns else ['labels']
     values_df = n_rep.drop(columns=columns)
@@ -160,6 +209,10 @@ def cluster_singleseed( n_rep: pd.DataFrame, cl_n:int, seed: int, cl_algorithm: 
         res_dict = {'labels': n_rep['labels'], 'labels_raw':n_rep['labels_raw'], 'seed': seed, 'n_clusters': cl_n, 'metrics': metrics}
     else:
         res_dict = {'labels': n_rep['labels'], 'seed': seed, 'n_clusters': cl_n, 'metrics': metrics}
+    
+    if cl_algorithm == 'gmm':
+        res_dict['metrics']['bic_score'] = bic_score
+        res_dict['probabilities'] = probs_df
 
     return res_dict
 
@@ -201,7 +254,11 @@ def multiseed_dicts( n_rep: pd.DataFrame, cl_n:int, seeds: List[int], cl_algorit
     
     for seed in seeds:
         n_rep_copy = n_rep.copy()
-        n_rep_copy, seed_centers, seed_inertia = cluster(ad_dict=ad_dict, n_rep=n_rep_copy, cl_n=cl_n, seed=seed, cl_algorithm=cl_algorithm, cl_filter=cl_filter, cl_filtering_nent=cl_filtering_nent, cl_filtering_ent=cl_filtering_ent, cl_filtering_prop=cl_filtering_prop, min_obs=min_obs, **cl_params)
+        if cl_algorithm == 'gmm':
+            n_rep, centers, inertia, bic_score, probs_df = cluster(ad_dict=ad_dict, n_rep=n_rep, cl_n=cl_n, seed=seed, cl_algorithm=cl_algorithm, cl_filter=cl_filter, cl_filtering_nent= cl_filtering_nent, cl_filtering_ent=cl_filtering_ent, cl_filtering_prop=cl_filtering_prop,  min_obs=min_obs, **cl_params)
+
+        else:
+            n_rep_copy, seed_centers, seed_inertia = cluster(ad_dict=ad_dict, n_rep=n_rep_copy, cl_n=cl_n, seed=seed, cl_algorithm=cl_algorithm, cl_filter=cl_filter, cl_filtering_nent=cl_filtering_nent, cl_filtering_ent=cl_filtering_ent, cl_filtering_prop=cl_filtering_prop, min_obs=min_obs, **cl_params)
 
         centers[seed] = seed_centers
         inertias[seed] = seed_inertia
@@ -210,6 +267,11 @@ def multiseed_dicts( n_rep: pd.DataFrame, cl_n:int, seeds: List[int], cl_algorit
             seed_dict = {'labels': n_rep_copy['labels'], 'labels_raw':n_rep_copy['labels_raw'], 'seed': seed, 'n_clusters': cl_n}
         else:
             seed_dict = {'labels': n_rep_copy['labels'], 'seed': seed, 'n_clusters': cl_n}
+        
+        if cl_algorithm == 'gmm':
+            seed_dict['metrics']['bic_score'] = bic_score
+            seed_dict['probabilities'] = probs_df
+
         res_dict[seed] = seed_dict 
 
     return res_dict, centers, inertias   

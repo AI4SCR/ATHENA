@@ -416,8 +416,9 @@ def plot_interactions_dot_plots(ad_dict: Dict[str,AnnData]=None, interaction_key
             savefig(fig, save)
     if show:
         fig.show()
+        return ax
     else:
-        plt.close(fig)
+        return fig
 
     
     
@@ -516,7 +517,7 @@ def plot_interactions_circos_plots(ad_dict: Dict[str,AnnData]=None, interaction_
         link_kws_handler=link_handler
         )
     
-    if ax:
+    if ax is not None:
         fig = ax.get_figure()
         show = False # do not automatically show plot if we provide axes
         return_data = False
@@ -543,7 +544,7 @@ def plot_interactions_circos_plots(ad_dict: Dict[str,AnnData]=None, interaction_
     ax.text(1.05, 1.0, 
         cw_legend, 
         transform=ax.transAxes, 
-        fontsize=14,
+        fontsize=16,
         verticalalignment='top', 
         horizontalalignment='left', # 'left' anchors it to the right of the plot
         bbox=dict(boxstyle='round,pad=0.5', facecolor='white', alpha=0.8, edgecolor='gray'))
@@ -551,9 +552,9 @@ def plot_interactions_circos_plots(ad_dict: Dict[str,AnnData]=None, interaction_
     if title:    
         fig.suptitle(
             title,
-            fontsize=16,
+            fontsize=20,
             fontweight="bold",
-            y=0.99  # vertical position: 1.0 is top of figure
+            y=1.05  # vertical position: 1.0 is top of figure
         )
 
     # Add colorbar legend
@@ -576,8 +577,9 @@ def plot_interactions_circos_plots(ad_dict: Dict[str,AnnData]=None, interaction_
             savefig(fig, save)
     if show:
         fig.show()
+        return ax
     else:
-        plt.close(fig)
+        return fig
     
     if return_data: 
         return dicts

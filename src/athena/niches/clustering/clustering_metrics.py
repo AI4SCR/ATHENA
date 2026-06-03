@@ -31,20 +31,29 @@ def compute_inertia(filtered_n_rep: pd.DataFrame, filtered_labels: pd.Series, ce
 def get_sampled_silhouette(values_df: pd.DataFrame, labels: pd.Series, sampling_size:int = 10000, save_sil_scores:Union[str, None]=None):
     # stratisfied sampling of the data    
     X = values_df.values
-    idx, _ = train_test_split(
-        np.arange(len(labels)),
-        train_size=min(sampling_size / len(X), 1.0),
-        stratify=labels,
-        random_state=42
-    )
+    assert (sampling_size<=len(X)), 'the silhouette cannot be computed on a higher number of observations than present in the n_rep'
     
-    X_sample = X[idx]
-    labels_sample = labels.iloc[idx].values
+    if sampling_size == len(X):
+        X_sample = X
+        labels_sample = labels.values
+    else: 
+        idx, _ = train_test_split(
+            np.arange(len(labels)),
+            train_size=sampling_size / len(X),
+            stratify=labels,
+            random_state=42
+        )
+    
+        X_sample = X[idx]
+        labels_sample = labels.iloc[idx].values
     
     # computing individual silhouette samples
     sample_scores = silhouette_samples(X_sample, labels_sample, metric='euclidean', n_jobs=12)
     if save_sil_scores:
-        sil_df = labels.iloc[idx].to_frame(name='label').copy()
+        if sampling_size == len(X):
+            sil_df = labels.to_frame(name='label').copy()
+        else:
+            sil_df = labels.iloc[idx].to_frame(name='label').copy()
         sil_df['silhouette_score'] = sample_scores
         sil_df.to_parquet(save_sil_scores)
     
