@@ -480,6 +480,8 @@ def plot_interactions_circos_plots(ad_dict: Dict[str,AnnData]=None, interaction_
     if color_map is None:
         labels = sorted(list(set(sectors_df.index.unique()).union(set(sectors_df.columns.unique())))) 
         cell_color_map= get_color_map(labels)
+    else:
+        cell_color_map = color_map
 
     def link_handler(from_label, to_label):
         # Get external value
