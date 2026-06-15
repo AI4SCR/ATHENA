@@ -22,7 +22,8 @@ dependencies = [
     "astropy",
     "scikit-learn",
     "scikit-image",
-    "colorcet"
+    "colorcet",
+    "pycirclize"
 ]
 
 [tool.setuptools]
