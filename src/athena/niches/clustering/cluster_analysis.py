@@ -13,7 +13,7 @@ def aggregate_attr(ad_dict: Dict[str, AnnData], attr: Union[str, List[str]]):
 
     Args:
         ad_dict: Dictionary of AnnData instances with keys as sample names.
-        attr_key: .obs column or list of columns to merge in one dataframe
+        attr: .obs column or list of columns to merge in one dataframe
 
     Returns: 
         dataframe containing the aggr .obs columns of the anndata objs in the ad_dict
@@ -41,9 +41,11 @@ def aggregate_attr(ad_dict: Dict[str, AnnData], attr: Union[str, List[str]]):
 def freq_for_z_scores(aggr: pd.DataFrame, attr: str, group_key: str, aggregator: str = 'mean', min_obs:int =0):
     '''compute mean and standard deviation of the frequency of each attribute in each niche and overall
     Args:
-        ad_dict: Dictionary of AnnData instances with keys as sample names.
+        aggr: DataFrame with sample_id and observation_id as MultiIndex containing attr column (e.g. cell_type) and group_key column (e.g. niche labels)
         attr: .obs column to compute the z scores
         group_key: .obs_column with cluster labels
+        aggregator: 'mean' or 'median' to compute the mean or median frequency of attributes
+        min_obs: minimum number of observations in a niche in a sample to include it in the analysis
     Returns:
         freq_mean = pd.DataFrame with mean frequency of attributes (columns) overall and in each niche (row names) 
         freq_std = pd.DataFrame with standard deviation of frequency of attributes (columns) overall and in each niche (row names) 
@@ -86,6 +88,10 @@ def z_scores(ad_dict: Dict[str, AnnData]=None, aggr: pd.DataFrame=None, attr: st
         ad_dict: Dictionary of AnnData instances with keys as sample names.
         attr: .obs column to compute the z scores
         group_key: .obs_column with cluster labels
+        aggr: pd.DataFrame with sample_id and observation_id as MultiIndex containing attr column (e.g. cell_type) and group_key column (e.g. niche labels) (if already computed, otherwise it will be computed from ad_dict)
+        aggregator: 'mean' or 'median' to compute the mean or median frequency of attributes
+        min_obs: minimum number of observations in a niche in a sample to include it in the analysis
+
     Returns:
         pd.DataFrame with z scores for each group
     '''
@@ -128,7 +134,7 @@ def z_scores(ad_dict: Dict[str, AnnData]=None, aggr: pd.DataFrame=None, attr: st
 def freq_attr(aggr: pd.DataFrame, group_key: str, attr:str, min_obs:int=0):
     '''compute mean and standard deviation of the frequency of each attribute in each niche and overall
     Args:
-        aggr: pd.Dataframe with attr and group_key as columns
+        aggr: pd.DataFrame with sample_id and observation_id as MultiIndex containing attr column (e.g. cell_type) and group_key column (e.g. niche labels)
         attr: .obs column to compute the z scores
         group_key: .obs_column with cluster labels
     Returns:

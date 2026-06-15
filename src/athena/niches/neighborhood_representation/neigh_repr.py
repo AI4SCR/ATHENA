@@ -62,6 +62,8 @@ def n_rep_ad(ad: AnnData, attr_rep: str, mode_rep: str = 'proportion', graph_key
         graph_key: Specifies the graph representation to use in ad.obsp.
         key_added: Key added to ad.uns with the neighborhood representation.
         inplace: Whether to add the metric to the current AnnData instance or to return a new one.
+        n_filtering: whether to filter out cells with less than min_neigh neighbors.
+        min_neigh: if n_filtering is True -> cells with less than min_neigh neighbors are filtered out of the neighborhood representation
 
     Returns: 
         if inplace -> ad.uns[key_added] with neighborhood representation of the anndata object
@@ -101,6 +103,8 @@ def n_rep_ad_dict(ad_dict: Dict[str,AnnData], attr_rep: str, mode_rep: str = 'pr
         graph_key: Specifies the graph representation to use in ad.obsp.
         key_added: Key added to ad.uns with the neighborhood representation.
         inplace: Whether to add the metric to the current AnnData instance or to return a new one.
+        n_filtering: whether to filter out cells with less than min_neigh neighbors.
+        min_neigh: if n_filtering is True -> cells with less than min_neigh neighbors are filtered out of the neighborhood representation
 
     Returns: 
         if inplace -> ad_dict with ad.uns[key_added] with neighborhood representation of the anndata object added to each anndata object

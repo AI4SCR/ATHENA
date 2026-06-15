@@ -19,6 +19,7 @@ def compute_int(ad: AnnData, graph_key: str, attr: str, mode: str = 'proportion'
         ad: AnnData object
         graph_key: Key in ad.obsp where the graph adjacency matrix is stored
         attr: The obs column in adata.obs that contains the attr types among which count interactions 
+        mode: whether to compute the count or proprortion of interactions. must be 'count' or 'proportion'
     
     Returns:
         interactions_df: pd.Series with 
@@ -192,7 +193,6 @@ def above_median(ad: AnnData, median_interaction_overall: pd.DataFrame, interact
     Args:
         ad_dict: Dictionary of AnnData instances with keys as sample names.
         interaction_key_group: Key in ad.uns where the group interactions pd.Series is stored
-        interaction_key_overall: Key in ad.uns where the overall interactions pd.Series is stored 
         median_interaction_overall: pd.Dataframe with median interaction overall between each pair of attributes
 
     Returns:
@@ -214,7 +214,7 @@ def above_median_count(ad_dict: Dict[str,AnnData] = None, interaction_key_group:
         interaction_key_group: Key in ad.uns where the group interactions pd.Series is stored
         interaction_key_overall: Key in ad.uns where the overall interactions pd.Series is stored 
         median_interaction_overall: pd.Dataframe with median interaction overall between each pair of attributes
-        above_median_count: pd.Series with the counts of how many 
+
     Returns:
         pd.Series with fraction of samples above median interaction proportion for each pair of cell types
     '''
@@ -247,6 +247,7 @@ def above_median_fraction(ad_dict: Dict[str,AnnData] = None, interaction_key_gro
         interaction_key_overall: Key in ad.uns where the overall interactions pd.Series is stored 
         median_interaction_overall: pd.Dataframe with median interaction overall between each pair of attributes
         above_median_count: pd.Series with the counts of how many 
+        samples_with_group: int with the number of samples that have the group of interest and can be included in the above_median_count calculation (i.e. that have the interaction_key_group in their ad.uns)
     Returns:
         pd.Series with fraction of samples above median interaction proportion for each pair of cell types
     '''
@@ -277,6 +278,7 @@ def above_median_fraction_old(ad_dict: Dict[str,AnnData] = None, interaction_key
         interaction_key_group: Key in ad.uns where the group interactions pd.Series is stored
         interaction_key_overall: Key in ad.uns where the overall interactions pd.Series is stored 
         median_interaction_overall: pd.Dataframe with median interaction overall between each pair of attributes
+        above_median_count: pd.Series with the counts of how many samples have the interaction proportion in the group above the median interaction proportion overall for each pair of cell types
 
     Returns:
         pd.Series with fraction of samples above median interaction proportion for each pair of cell types

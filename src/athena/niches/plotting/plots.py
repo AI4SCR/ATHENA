@@ -23,6 +23,8 @@ def plot_ARIs(aris_df:pd.DataFrame, best_avg: bool = False, title: str = None, s
         save: Path to save the plot.png if desired
         xlabel: x axis label
         tight_layout
+        best_avg: whether to highlight the seed with the best average ARI with a different color in the boxplot
+
     
     Return:
         ax
@@ -101,6 +103,8 @@ def plot_zscores_heatmap(ad_dict: Union[Dict[str, AnnData], None]=None, group_ke
         val_min, val_max: minimum and maximum values of the color scale
         return_data: whether to return the data used to make the plot
         save: Path to save the plot.png if desired
+        colormap: colormap to use for the heatmap. If None, 'vlag' will be used.
+        fig_size: tuple with figure size. If None, it will be automatically determined based on the number of clusters and attributes.
     
     Returns:
         ax or data if return_data
@@ -171,6 +175,9 @@ def plot_stacked_bars(ad_dict:Union[ Dict[str, AnnData], None]=None, proportions
         show: whether to show the picture or not
         return_data: whether to return the data used to make the plot
         save: Path to save the plot.png if desired
+        colormap: colormap to use for the heatmap. If None, 'vlag' will be used.
+        fig_size: tuple with figure size. If None, it will be automatically determined based on the number of clusters and cell types.
+
 
     Returns:
         ax or data if return_data
@@ -278,6 +285,11 @@ def plot_interactions_dot_plots(ad_dict: Dict[str,AnnData]=None, interaction_key
         val_min, val_max: minimum and maximum values of the color scale
         return_data: whether to return the data used to make the plot
         save: Path to save the plot.png if desired
+        color_map: colormap to use for the heatmap. If None, 'Reds' will be used.
+        above_median_fr: pd.Series with the above median fraction values for each pair of attributes. If None, it will be computed using ad_dict, interaction_key_group and interaction_key_overall
+        merged_group: pd.Series with the aggregated interaction values for each pair of attributes. If None, it will be computed using ad_dict and interaction_key_group
+        fig_size: tuple with figure size. If None, it will be automatically determined based on the number of clusters and attributes.
+        color: String indicating which color values to use 'interaction_values' or 'above_median_fraction' (the other will be used as size of the dots)
 
     Returns:
         ax or data if return_data
@@ -447,6 +459,11 @@ def plot_interactions_circos_plots(ad_dict: Dict[str,AnnData]=None, interaction_
         val_min, val_max: minimum and maximum values of the color scale
         return_data: whether to return the data used to make the plot
         save: Path to save the plot.png if desired
+        color_map: colormap to use for the heatmap. If None, 'Reds' will be used.
+        above_median_fr: pd.Series with the above median fraction values for each pair of attributes. If None, it will be computed using ad_dict, interaction_key_group and interaction_key_overall
+        merged_group: pd.Series with the aggregated interaction values for each pair of attributes. If None, it will be computed using ad_dict and interaction_key_group
+        figsize: tuple with figure size. If None, it will be set to (20, 15) by default
+        color: String indicating which color values to use 'interaction_values' or 'above_median_fraction' (the other will be used as thickness of the links)
 
     Returns:
         ax or data if return_data
@@ -605,7 +622,7 @@ def plot_interaction_heatmaps(ad_dict: Dict[str,AnnData]=None, interaction_key_g
         val_min, val_max: minimum and maximum values of the color scale
         return_data: whether to return the data used to make the plot
         save: Path to save the plot.png if desired
-
+        
     Returns:
         ax or data if return_data
     '''
@@ -654,10 +671,6 @@ def plot_interaction_heatmaps(ad_dict: Dict[str,AnnData]=None, interaction_key_g
 
     return ax
 
-
-def radar_plots():
-    '''needs also a functions to compute marker proportions for each niche'''
-    return
 
 
 

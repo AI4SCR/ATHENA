@@ -50,7 +50,7 @@ def cl_filter_add(res_df: pd.DataFrame, cl_filtering_ent: str, ad_dict: Dict[str
         cluster_filtering_ent: entity to use for cluster filtering. Options are 'sample_id' or any categorical column in ad.obs.
 
     Returns:
-        merged DataFrame with 'cl-filter' column added.
+        merged DataFrame with 'cl_filter' column added.
         '''
     cl_filter = cl_ent(ad_dict=ad_dict,res_df=res_df, cl_filtering_ent=cl_filtering_ent)
     
@@ -123,64 +123,3 @@ def cl_filtering( res_df: pd.DataFrame, cl_filtering_prop: float = 0.0 , cl_filt
     res_df = res_df.drop(columns=['cl_filter'])
     return  res_df
 
-
-'''def cl_filtering_filt_attr(ad_dict: Dict[str, AnnData], filt_attr: str, res_df: pd.DataFrame, cl_filtering_prop: float , cl_filtering_ent: str):
-    """Filtering of clusters that are present in less than cluster_filtering_perc of the cluster_filtering_ent
-    Args:
-        ad_dict: Dictionary of AnnData instances with keys as sample names.
-        res_df:  DataFrame of aggregated neighborhood representations of all the samples and 'labels' column with cluster assignments
-        cl_filtering: whether to filter clusters based on the cluster_filtering_entity.
-        cl_filtering_prop: propotion of clusters to keep based on the cluster_filtering_entity.
-        cl_filtering_ent: entity to use for clusters filtering. Options are 'sample_id' or any categorical column in ad.obs.
-
-    Returns: 
-        modified res_df:
-            - 'labels_raw' = copy of original 'labels' column
-            - 'labels' = filtered labels, with Na instead of filtered labels
-        
-    """
-    assert (1 <= cl_filtering_prop <= 100), "cluster_filtering_propotion must be between 1 and 100"
-
-    # add column with filtering entity to the aggregated neighborhood representation
-    res_df = cl_filter_add(ad_dict=ad_dict, res_df=res_df, cl_filtering_ent=cl_filtering_ent, filt_attr=filt_attr)
-    # make a copy of the original labels
-    aggr = res_df[['labels', filt_attr, 'cl_filter']]
-    attr_proportions = freq_attr(aggr=aggr, attr=filt_attr, group_key='labels')
-
-    n_top_attr = int(len(res_df[filt_attr].unique())*0.1) # 10% of the attributes
-    labels_to_filter = []
-    
-    for label in res_df['labels'].unique():
-        aggr_copy = aggr.copy()
-        top_attr = attr_proportions.loc[label].nlargest(n_top_attr).index.tolist()
-        # group by the sample_id (level 0 of the MultiIndex)
-        # for each sample, check if top_filt is a subset of all its 'filt_attr' values
-        valid_samples_mask = aggr_copy.groupby('cl_filter')[filt_attr].apply(
-        lambda x: all(
-        (x == attr).mean() >= attr_proportions.loc['overall'].max()
-        for attr in top_attr
-        ))
-
-        # list of sample_ids that returned True
-        valid_sample_ids = valid_samples_mask[valid_samples_mask].index
-
-        # filter the original dataframe to keep all observations for those samples
-        filtered_df = aggr_copy[aggr_copy['cl_filter'].isin(valid_sample_ids)]
-        
-        # check if the cluster is each cl_filter category of the filtered_df
-        cl_pres = filtered_df.groupby('cl_filter')['labels'].apply(lambda x: (x == label).any())
-
-        # propotion of True values (True = 1 and False = 0 => the mean is the propotion)
-        propotion = cl_pres.mean()*100
-        if propotion < cl_filtering_prop:
-            labels_to_filter.append(label)
-    # make a copy of the original labels
-    res_df['labels_raw'] = res_df['labels'].copy()
-
-    # change the labels (cluster) that have to be filtered out to nan values
-    res_df.loc[res_df['labels'].isin(labels_to_filter),'labels'] = pd.NA
-    
-    # drop cl_filter because it won't be needed
-    res_df = res_df.drop(columns=['cl_filter', filt_attr]
-    )
-    return  res_df'''

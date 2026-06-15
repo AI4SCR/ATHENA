@@ -564,6 +564,17 @@ def obs_add_singlen(res_dict: Dict[int, Dict[str, Union[pd.Series, int, Dict[str
     return obs_add
 
 def match_index_to_ad_obs(ad: AnnData, obs_add_sample: Union[pd.Series, pd.DataFrame], index_not_in_cluster:list ):
+    '''
+    Reindex obs_add_sample to match ad.obs.index and fill missing values with NaN. 
+    This is necessary to be able to add the clustering results to the original ad.obs even for the cells that were not in the neighborhood representation (and thus not in obs_add_sample) because of previous filtering steps.
+    Args:
+        ad: AnnData instance.
+        obs_add_sample: pd.Series or pd.DataFrame with clustering results for the cells in the neighborhood representation.
+        index_not_in_cluster: list of indices of ad.obs that are not in obs_add_sample (i.e., the cells that were filtered out of the neighborhood representation).
+    Returns:
+        obs_add_sample reindexed to match ad.obs.index and with NaN for the cells that were not in the neighborhood representation.
+
+    '''
     complete_index = ad.obs.index.to_list()
     obs_add_sample = obs_add_sample.reindex(complete_index)
     if type(obs_add_sample) == pd.Series:
@@ -575,7 +586,7 @@ def match_index_to_ad_obs(ad: AnnData, obs_add_sample: Union[pd.Series, pd.DataF
 
 
 def clustering_add(ad_dict: Dict[str, AnnData], res_dict: dict, key_added:str, sel_n:bool = None):
-    '''Addition of clustering results to original (inplace) or new(not inplace) AnnData objects in ad_dict.
+    '''Addition of clustering results to original (inplace) or new (not inplace) AnnData objects in ad_dict.
     Args:
         ad_dict: Dictionary of AnnData instances with keys as sample names.
         res_dict: Dictionary containing clustering results.
@@ -613,7 +624,7 @@ def clustering_add(ad_dict: Dict[str, AnnData], res_dict: dict, key_added:str, s
 
 
 def clustering_add_ad(ad: AnnData, sample_id:str, res_dict: dict, key_added:str, sel_n:bool = None):
-    '''Addition of clustering results to original (inplace) or new(not inplace) AnnData objects in ad_dict.
+    '''Addition of clustering results to original (inplace) or new (not inplace) AnnData objects in ad_dict.
     Args:
         ad: AnnData instance.
         res_dict: Dictionary containing clustering results.

@@ -29,6 +29,16 @@ def compute_inertia(filtered_n_rep: pd.DataFrame, filtered_labels: pd.Series, ce
 
 
 def get_sampled_silhouette(values_df: pd.DataFrame, labels: pd.Series, sampling_size:int = 10000, save_sil_scores:Union[str, None]=None):
+    '''Compute silhouette score on a stratified sample of the data (to speed up the computation)
+    Args:
+        values_df: DataFrame of neighborhood representations onto which the clustering has been done.
+        labels: Series with clustering labels.
+        sampling_size: number of observations to sample for silhouette score computation (default: 10000)
+        save_sil_scores: if not None, path to save the silhouette scores of each observation in a parquet file (default: None)
+
+    Return:
+        silhouette_score(float)
+    '''
     # stratisfied sampling of the data    
     X = values_df.values
     assert (sampling_size<=len(X)), 'the silhouette cannot be computed on a higher number of observations than present in the n_rep'
@@ -70,7 +80,9 @@ def get_metrics(values_df: pd.DataFrame, labels: pd.Series, centers: Union[np.nd
         labels: Series with clustering labels.
         centers: array with cluster centers (or None if inertia has been given).
         inertia: cluster inertia (or None if the clusters have been filtered).
-    
+        sampling_size: number of observations to sample for silhouette score computation (default: 10000).
+        save_sil_scores: if not None, path to save the silhouette scores of each observation in a parquet file (default: None).
+
     Return
         dictionary with 'inertia' and 'silhouette_score'
     '''
@@ -98,25 +110,3 @@ def get_metrics(values_df: pd.DataFrame, labels: pd.Series, centers: Union[np.nd
         return metrics
     
 
-
-def stratified_sampling(values_df: pd.DataFrame, labels: pd.Series):
-    '''Subsample 10% of total observations for silhouette score taking into account cluster labels frequency. 
-    Args:
-        values_df: DataFrame of neighborhood representations onto which the clustering has been done.
-        labels: Series with clustering labels.
-    
-    Return
-        sampled_values and sampled_labels
-    '''
-    assert labels.index.equals(values_df.index)
-    df = values_df.copy()
-    df['labels'] = labels
-
-    total_n = 15
-    fraction = total_n / len(df)
-    
-    #sampled_df = df.groupby('labels', group_keys=False).apply(lambda x: x.sample(frac=fraction, random_state=42))
-    sampled_df = df.groupby('labels', group_keys=False).sample(frac=fraction, random_state=42)
-    sampled_labels = sampled_df['labels']
-    sampled_values = sampled_df.drop(columns=['labels'])
-    return sampled_values, sampled_labels

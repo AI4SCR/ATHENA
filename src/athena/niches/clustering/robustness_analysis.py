@@ -78,6 +78,13 @@ def assert_index_series(labels_dict: Dict[int, pd.Series]) -> bool:
     return True
 
 def combine_seed_labels(multiple_seeds_dict: Dict[int, Dict[str, Union[pd.Series, int, Dict[str, float]]]]):
+    '''Combine the clustering labels of different seeds into a single DataFrame.
+    
+    Args:
+        multiple_seeds_dict: dict with seeds as keys and seed dictionaries as values
+    Return:
+        pd.DataFrame with cell_id and sample_id as row indexes and seeds as column names, where the values are the clustering labels for each seed
+    '''
     labels = {}
     for seed in multiple_seeds_dict.keys():
         labels[seed] = multiple_seeds_dict[seed]['labels']
